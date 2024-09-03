@@ -19,7 +19,7 @@ struct ContentView: View {
                 Color(.primaryBackground).edgesIgnoringSafeArea(.all)
                 switch mainVM.currentPage {
                 case .onboarding:
-                    OnboardingScreen()
+                    OnboardingView()
                 case .home:
                     HomeScreen()
                 }

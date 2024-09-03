@@ -1,18 +1,18 @@
 //
-//  OnboardingScreen.swift
-//  ShipFastStarter
+//  ContactsScreen.swift
+//  ONG
 //
-//  Created by Dante Kim on 6/20/24.
+//  Created by Dante Kim on 9/2/24.
 //
 
 import SwiftUI
 
-struct OnboardingScreen: View {
+struct ContactsScreen: View {
     var body: some View {
         Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
     }
 }
 
 #Preview {
-    OnboardingScreen()
+    ContactsScreen()
 }

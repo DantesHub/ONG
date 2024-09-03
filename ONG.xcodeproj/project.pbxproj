@@ -7,6 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		888FF3BA2C8679F10025EC1B /* ContactsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 888FF3B92C8679F10025EC1B /* ContactsScreen.swift */; };
+		888FF3BC2C867CD80025EC1B /* LocationScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 888FF3BB2C867CD80025EC1B /* LocationScreen.swift */; };
+		888FF3BE2C867CEF0025EC1B /* Onboarding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 888FF3BD2C867CEF0025EC1B /* Onboarding.swift */; };
+		888FF3C02C867DBC0025EC1B /* BirthdayScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 888FF3BF2C867DBC0025EC1B /* BirthdayScreen.swift */; };
+		888FF3C22C867DC50025EC1B /* GenderScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 888FF3C12C867DC50025EC1B /* GenderScreen.swift */; };
+		888FF3C42C867DF50025EC1B /* NameScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 888FF3C32C867DF50025EC1B /* NameScreen.swift */; };
+		888FF3C62C867E0F0025EC1B /* NumberScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 888FF3C52C867E0F0025EC1B /* NumberScreen.swift */; };
 		88B37D0D2C23FD60000A7D91 /* ShipFastStarterApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B37D0C2C23FD60000A7D91 /* ShipFastStarterApp.swift */; };
 		88B37D0F2C23FD60000A7D91 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B37D0E2C23FD60000A7D91 /* ContentView.swift */; };
 		88B37D112C23FD60000A7D91 /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B37D102C23FD60000A7D91 /* Item.swift */; };
@@ -21,7 +28,7 @@
 		88B37D372C2407DF000A7D91 /* AnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B37D362C2407DF000A7D91 /* AnalyticsService.swift */; };
 		88B37D3A2C240CAB000A7D91 /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = 88B37D392C240CAB000A7D91 /* RevenueCat */; };
 		88B37D3C2C240CF3000A7D91 /* HomeScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B37D3B2C240CF3000A7D91 /* HomeScreen.swift */; };
-		88B37D3E2C240CFF000A7D91 /* OnboardingScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B37D3D2C240CFF000A7D91 /* OnboardingScreen.swift */; };
+		88B37D3E2C240CFF000A7D91 /* FirstOnboardingScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B37D3D2C240CFF000A7D91 /* FirstOnboardingScreen.swift */; };
 		88B37D402C240D12000A7D91 /* SharedComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B37D3F2C240D12000A7D91 /* SharedComponents.swift */; };
 		88B37D422C240D5D000A7D91 /* FontManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B37D412C240D5D000A7D91 /* FontManager.swift */; };
 		88B37D442C240D77000A7D91 /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 88B37D432C240D77000A7D91 /* Colors.xcassets */; };
@@ -37,6 +44,14 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		888FF3B92C8679F10025EC1B /* ContactsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsScreen.swift; sourceTree = "<group>"; };
+		888FF3BB2C867CD80025EC1B /* LocationScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationScreen.swift; sourceTree = "<group>"; };
+		888FF3BD2C867CEF0025EC1B /* Onboarding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Onboarding.swift; sourceTree = "<group>"; };
+		888FF3BF2C867DBC0025EC1B /* BirthdayScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BirthdayScreen.swift; sourceTree = "<group>"; };
+		888FF3C12C867DC50025EC1B /* GenderScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenderScreen.swift; sourceTree = "<group>"; };
+		888FF3C32C867DF50025EC1B /* NameScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NameScreen.swift; sourceTree = "<group>"; };
+		888FF3C52C867E0F0025EC1B /* NumberScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberScreen.swift; sourceTree = "<group>"; };
+		888FF3CA2C8684640025EC1B /* ONG-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "ONG-Info.plist"; sourceTree = "<group>"; };
 		88B37D092C23FD60000A7D91 /* ONG.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ONG.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		88B37D0C2C23FD60000A7D91 /* ShipFastStarterApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShipFastStarterApp.swift; sourceTree = "<group>"; };
 		88B37D0E2C23FD60000A7D91 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -48,7 +63,7 @@
 		88B37D332C240761000A7D91 /* RCPurchaseController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RCPurchaseController.swift; sourceTree = "<group>"; };
 		88B37D362C2407DF000A7D91 /* AnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsService.swift; sourceTree = "<group>"; };
 		88B37D3B2C240CF3000A7D91 /* HomeScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeScreen.swift; sourceTree = "<group>"; };
-		88B37D3D2C240CFF000A7D91 /* OnboardingScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingScreen.swift; sourceTree = "<group>"; };
+		88B37D3D2C240CFF000A7D91 /* FirstOnboardingScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstOnboardingScreen.swift; sourceTree = "<group>"; };
 		88B37D3F2C240D12000A7D91 /* SharedComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedComponents.swift; sourceTree = "<group>"; };
 		88B37D412C240D5D000A7D91 /* FontManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontManager.swift; sourceTree = "<group>"; };
 		88B37D432C240D77000A7D91 /* Colors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Colors.xcassets; sourceTree = "<group>"; };
@@ -78,9 +93,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		888FF3C92C867E4A0025EC1B /* Polling */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Polling;
+			sourceTree = "<group>";
+		};
 		88B37D002C23FD60000A7D91 = {
 			isa = PBXGroup;
 			children = (
+				888FF3CA2C8684640025EC1B /* ONG-Info.plist */,
 				88B37D0B2C23FD60000A7D91 /* ShipFastStarter */,
 				88B37D0A2C23FD60000A7D91 /* Products */,
 				88B37D382C240CAB000A7D91 /* Frameworks */,
@@ -130,6 +153,7 @@
 		88B37D1D2C23FD78000A7D91 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				888FF3C92C867E4A0025EC1B /* Polling */,
 				88B37D0E2C23FD60000A7D91 /* ContentView.swift */,
 				88B37D262C23FFE9000A7D91 /* Home */,
 				88B37D252C23FFE5000A7D91 /* Onboarding */,
@@ -183,7 +207,14 @@
 		88B37D252C23FFE5000A7D91 /* Onboarding */ = {
 			isa = PBXGroup;
 			children = (
-				88B37D3D2C240CFF000A7D91 /* OnboardingScreen.swift */,
+				888FF3BD2C867CEF0025EC1B /* Onboarding.swift */,
+				88B37D3D2C240CFF000A7D91 /* FirstOnboardingScreen.swift */,
+				888FF3B92C8679F10025EC1B /* ContactsScreen.swift */,
+				888FF3BB2C867CD80025EC1B /* LocationScreen.swift */,
+				888FF3BF2C867DBC0025EC1B /* BirthdayScreen.swift */,
+				888FF3C12C867DC50025EC1B /* GenderScreen.swift */,
+				888FF3C32C867DF50025EC1B /* NameScreen.swift */,
+				888FF3C52C867E0F0025EC1B /* NumberScreen.swift */,
 			);
 			path = Onboarding;
 			sourceTree = "<group>";
@@ -319,7 +350,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				888FF3BA2C8679F10025EC1B /* ContactsScreen.swift in Sources */,
 				88B37D322C2406DA000A7D91 /* Constants.swift in Sources */,
+				888FF3C42C867DF50025EC1B /* NameScreen.swift in Sources */,
 				88B37D542C2411FC000A7D91 /* Extensions.swift in Sources */,
 				88B37D342C240761000A7D91 /* RCPurchaseController.swift in Sources */,
 				88B37D572C241321000A7D91 /* NetworkManger.swift in Sources */,
@@ -329,15 +362,20 @@
 				88B37D402C240D12000A7D91 /* SharedComponents.swift in Sources */,
 				88B37D3C2C240CF3000A7D91 /* HomeScreen.swift in Sources */,
 				88B37D422C240D5D000A7D91 /* FontManager.swift in Sources */,
+				888FF3C62C867E0F0025EC1B /* NumberScreen.swift in Sources */,
 				88B37D482C2410BE000A7D91 /* UIDevice.swift in Sources */,
 				88B37D4E2C241127000A7D91 /* Color.swift in Sources */,
+				888FF3C22C867DC50025EC1B /* GenderScreen.swift in Sources */,
 				88B37D4A2C2410EB000A7D91 /* Numbers.swift in Sources */,
+				888FF3BC2C867CD80025EC1B /* LocationScreen.swift in Sources */,
 				88B37D4C2C241110000A7D91 /* Array.swift in Sources */,
-				88B37D3E2C240CFF000A7D91 /* OnboardingScreen.swift in Sources */,
+				88B37D3E2C240CFF000A7D91 /* FirstOnboardingScreen.swift in Sources */,
 				88B37D0D2C23FD60000A7D91 /* ShipFastStarterApp.swift in Sources */,
 				88B37D372C2407DF000A7D91 /* AnalyticsService.swift in Sources */,
+				888FF3BE2C867CEF0025EC1B /* Onboarding.swift in Sources */,
 				88B37D502C24118F000A7D91 /* API.swift in Sources */,
 				88B37D592C241355000A7D91 /* ResponseModel.swift in Sources */,
+				888FF3C02C867DBC0025EC1B /* BirthdayScreen.swift in Sources */,
 				88B37D242C23FDF8000A7D91 /* MainViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -475,6 +513,10 @@
 				DEVELOPMENT_TEAM = M5757NXZKD;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "ONG-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "";
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Gas needs your location to find nearby schools and connect you with friends. We care about your privacy and only use your location for this purpose.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -504,6 +546,10 @@
 				DEVELOPMENT_TEAM = M5757NXZKD;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "ONG-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "";
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Gas needs your location to find nearby schools and connect you with friends. We care about your privacy and only use your location for this purpose.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
