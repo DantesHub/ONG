@@ -49,6 +49,7 @@ struct OnboardingView: View {
                     case .number: NumberScreen()
                     case .contacts: ContactsScreen()
                     case .location: LocationScreen()
+                    case .highschool: HighSchoolScreen()
                 }
             }
        }
@@ -73,6 +74,8 @@ struct OnboardingView: View {
                 mainVM.onboardingScreen = .first
             case .location:
                 mainVM.onboardingScreen = .location
+        case .highschool:
+            mainVM.onboardingScreen = .age
         }
         return
 
@@ -91,6 +94,7 @@ enum OnboardingScreenType {
     case number
     case contacts
     case location
+    case highschool
 }
 
 struct CustomProgressViewStyle: ProgressViewStyle {

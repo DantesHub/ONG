@@ -44,9 +44,12 @@
 		88C1E55C2C8692C900C9317E /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 88C1E55B2C8692C900C9317E /* FirebaseAuth */; };
 		88C1E55E2C8692C900C9317E /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = 88C1E55D2C8692C900C9317E /* FirebaseDatabase */; };
 		88C1E5602C8692C900C9317E /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 88C1E55F2C8692C900C9317E /* FirebaseFirestore */; };
-		88C1E5622C86A28200C9317E /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 88C1E5612C86A28200C9317E /* GoogleService-Info.plist */; };
 		88C1E5642C86A6B300C9317E /* FirebaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88C1E5632C86A6B300C9317E /* FirebaseService.swift */; };
 		88C1E5662C86A6C400C9317E /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88C1E5652C86A6C400C9317E /* AuthViewModel.swift */; };
+		88C1E5682C86D86800C9317E /* HighSchoolScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88C1E5672C86D86800C9317E /* HighSchoolScreen.swift */; };
+		88C1E56A2C86D95B00C9317E /* NetworkViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88C1E5692C86D95B00C9317E /* NetworkViewModel.swift */; };
+		88C1E5732C876CF100C9317E /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 88C1E5712C876CF100C9317E /* GoogleService-Info.plist */; };
+		88C1E5782C876E7500C9317E /* ONG-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 88C1E5772C876E7500C9317E /* ONG-Info.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -57,7 +60,6 @@
 		888FF3C12C867DC50025EC1B /* GenderScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenderScreen.swift; sourceTree = "<group>"; };
 		888FF3C32C867DF50025EC1B /* NameScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NameScreen.swift; sourceTree = "<group>"; };
 		888FF3C52C867E0F0025EC1B /* NumberScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberScreen.swift; sourceTree = "<group>"; };
-		888FF3CA2C8684640025EC1B /* ONG-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "ONG-Info.plist"; sourceTree = "<group>"; };
 		88B37D092C23FD60000A7D91 /* ONG.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ONG.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		88B37D0C2C23FD60000A7D91 /* ShipFastStarterApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShipFastStarterApp.swift; sourceTree = "<group>"; };
 		88B37D0E2C23FD60000A7D91 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -83,9 +85,12 @@
 		88B37D562C241321000A7D91 /* NetworkManger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManger.swift; sourceTree = "<group>"; };
 		88B37D582C241355000A7D91 /* ResponseModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResponseModel.swift; sourceTree = "<group>"; };
 		88C1E5592C86900100C9317E /* ONG.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ONG.entitlements; sourceTree = "<group>"; };
-		88C1E5612C86A28200C9317E /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		88C1E5632C86A6B300C9317E /* FirebaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseService.swift; sourceTree = "<group>"; };
 		88C1E5652C86A6C400C9317E /* AuthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
+		88C1E5672C86D86800C9317E /* HighSchoolScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighSchoolScreen.swift; sourceTree = "<group>"; };
+		88C1E5692C86D95B00C9317E /* NetworkViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkViewModel.swift; sourceTree = "<group>"; };
+		88C1E5712C876CF100C9317E /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "ShipFastStarter/GoogleService-Info.plist"; sourceTree = "<group>"; };
+		88C1E5772C876E7500C9317E /* ONG-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "ONG-Info.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -117,8 +122,8 @@
 			isa = PBXGroup;
 			children = (
 				88C1E5592C86900100C9317E /* ONG.entitlements */,
-				888FF3CA2C8684640025EC1B /* ONG-Info.plist */,
-				88C1E5612C86A28200C9317E /* GoogleService-Info.plist */,
+				88C1E5712C876CF100C9317E /* GoogleService-Info.plist */,
+				88C1E5772C876E7500C9317E /* ONG-Info.plist */,
 				88B37D0B2C23FD60000A7D91 /* ShipFastStarter */,
 				88B37D0A2C23FD60000A7D91 /* Products */,
 				88B37D382C240CAB000A7D91 /* Frameworks */,
@@ -162,6 +167,7 @@
 			children = (
 				88B37D232C23FDF8000A7D91 /* MainViewModel.swift */,
 				88C1E5652C86A6C400C9317E /* AuthViewModel.swift */,
+				88C1E5692C86D95B00C9317E /* NetworkViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -231,6 +237,7 @@
 				888FF3C12C867DC50025EC1B /* GenderScreen.swift */,
 				888FF3C32C867DF50025EC1B /* NameScreen.swift */,
 				888FF3C52C867E0F0025EC1B /* NumberScreen.swift */,
+				88C1E5672C86D86800C9317E /* HighSchoolScreen.swift */,
 			);
 			path = Onboarding;
 			sourceTree = "<group>";
@@ -359,8 +366,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				88B37D442C240D77000A7D91 /* Colors.xcassets in Resources */,
+				88C1E5732C876CF100C9317E /* GoogleService-Info.plist in Resources */,
 				88B37D162C23FD60000A7D91 /* Preview Assets.xcassets in Resources */,
-				88C1E5622C86A28200C9317E /* GoogleService-Info.plist in Resources */,
+				88C1E5782C876E7500C9317E /* ONG-Info.plist in Resources */,
 				88B37D132C23FD60000A7D91 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -379,6 +387,7 @@
 				88B37D342C240761000A7D91 /* RCPurchaseController.swift in Sources */,
 				88B37D572C241321000A7D91 /* NetworkManger.swift in Sources */,
 				88B37D0F2C23FD60000A7D91 /* ContentView.swift in Sources */,
+				88C1E5682C86D86800C9317E /* HighSchoolScreen.swift in Sources */,
 				88B37D522C2411A4000A7D91 /* Types.swift in Sources */,
 				88B37D112C23FD60000A7D91 /* Item.swift in Sources */,
 				88B37D402C240D12000A7D91 /* SharedComponents.swift in Sources */,
@@ -391,6 +400,7 @@
 				88B37D4A2C2410EB000A7D91 /* Numbers.swift in Sources */,
 				888FF3BC2C867CD80025EC1B /* LocationScreen.swift in Sources */,
 				88C1E5642C86A6B300C9317E /* FirebaseService.swift in Sources */,
+				88C1E56A2C86D95B00C9317E /* NetworkViewModel.swift in Sources */,
 				88B37D4C2C241110000A7D91 /* Array.swift in Sources */,
 				88B37D3E2C240CFF000A7D91 /* FirstOnboardingScreen.swift in Sources */,
 				88B37D0D2C23FD60000A7D91 /* ShipFastStarterApp.swift in Sources */,
