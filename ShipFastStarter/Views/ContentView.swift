@@ -10,6 +10,7 @@ import SwiftData
 
 struct ContentView: View {
     @EnvironmentObject var mainVM: MainViewModel
+    @StateObject var authVM = AuthViewModel()
     @Environment(\.modelContext) private var modelContext
     @Query private var items: [Item]
 
@@ -20,6 +21,8 @@ struct ContentView: View {
                 switch mainVM.currentPage {
                 case .onboarding:
                     OnboardingView()
+                        .environmentObject(authVM)
+                        .environmentObject(mainVM)
                 case .home:
                     HomeScreen()
                 }

@@ -41,6 +41,12 @@
 		88B37D542C2411FC000A7D91 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B37D532C2411FC000A7D91 /* Extensions.swift */; };
 		88B37D572C241321000A7D91 /* NetworkManger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B37D562C241321000A7D91 /* NetworkManger.swift */; };
 		88B37D592C241355000A7D91 /* ResponseModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B37D582C241355000A7D91 /* ResponseModel.swift */; };
+		88C1E55C2C8692C900C9317E /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 88C1E55B2C8692C900C9317E /* FirebaseAuth */; };
+		88C1E55E2C8692C900C9317E /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = 88C1E55D2C8692C900C9317E /* FirebaseDatabase */; };
+		88C1E5602C8692C900C9317E /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 88C1E55F2C8692C900C9317E /* FirebaseFirestore */; };
+		88C1E5622C86A28200C9317E /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 88C1E5612C86A28200C9317E /* GoogleService-Info.plist */; };
+		88C1E5642C86A6B300C9317E /* FirebaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88C1E5632C86A6B300C9317E /* FirebaseService.swift */; };
+		88C1E5662C86A6C400C9317E /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88C1E5652C86A6C400C9317E /* AuthViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -76,6 +82,10 @@
 		88B37D532C2411FC000A7D91 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		88B37D562C241321000A7D91 /* NetworkManger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManger.swift; sourceTree = "<group>"; };
 		88B37D582C241355000A7D91 /* ResponseModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResponseModel.swift; sourceTree = "<group>"; };
+		88C1E5592C86900100C9317E /* ONG.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ONG.entitlements; sourceTree = "<group>"; };
+		88C1E5612C86A28200C9317E /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
+		88C1E5632C86A6B300C9317E /* FirebaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseService.swift; sourceTree = "<group>"; };
+		88C1E5652C86A6C400C9317E /* AuthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -83,10 +93,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				88C1E55E2C8692C900C9317E /* FirebaseDatabase in Frameworks */,
 				88B37D3A2C240CAB000A7D91 /* RevenueCat in Frameworks */,
+				88C1E55C2C8692C900C9317E /* FirebaseAuth in Frameworks */,
 				88B37D302C24052B000A7D91 /* Mixpanel in Frameworks */,
 				88B37D2A2C24018B000A7D91 /* SuperwallKit in Frameworks */,
 				88B37D2D2C2404D5000A7D91 /* AppsFlyerLib in Frameworks */,
+				88C1E5602C8692C900C9317E /* FirebaseFirestore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -103,7 +116,9 @@
 		88B37D002C23FD60000A7D91 = {
 			isa = PBXGroup;
 			children = (
+				88C1E5592C86900100C9317E /* ONG.entitlements */,
 				888FF3CA2C8684640025EC1B /* ONG-Info.plist */,
+				88C1E5612C86A28200C9317E /* GoogleService-Info.plist */,
 				88B37D0B2C23FD60000A7D91 /* ShipFastStarter */,
 				88B37D0A2C23FD60000A7D91 /* Products */,
 				88B37D382C240CAB000A7D91 /* Frameworks */,
@@ -146,6 +161,7 @@
 			isa = PBXGroup;
 			children = (
 				88B37D232C23FDF8000A7D91 /* MainViewModel.swift */,
+				88C1E5652C86A6C400C9317E /* AuthViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -233,6 +249,7 @@
 				88B37D452C241089000A7D91 /* Networking */,
 				88B37D332C240761000A7D91 /* RCPurchaseController.swift */,
 				88B37D362C2407DF000A7D91 /* AnalyticsService.swift */,
+				88C1E5632C86A6B300C9317E /* FirebaseService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -288,6 +305,9 @@
 				88B37D2C2C2404D5000A7D91 /* AppsFlyerLib */,
 				88B37D2F2C24052B000A7D91 /* Mixpanel */,
 				88B37D392C240CAB000A7D91 /* RevenueCat */,
+				88C1E55B2C8692C900C9317E /* FirebaseAuth */,
+				88C1E55D2C8692C900C9317E /* FirebaseDatabase */,
+				88C1E55F2C8692C900C9317E /* FirebaseFirestore */,
 			);
 			productName = ShipFastStarter;
 			productReference = 88B37D092C23FD60000A7D91 /* ONG.app */;
@@ -322,6 +342,7 @@
 				88B37D282C24018B000A7D91 /* XCRemoteSwiftPackageReference "Superwall-iOS" */,
 				88B37D2B2C2404D5000A7D91 /* XCRemoteSwiftPackageReference "AppsFlyerFramework" */,
 				88B37D2E2C24052B000A7D91 /* XCRemoteSwiftPackageReference "mixpanel-swift" */,
+				88C1E55A2C86925D00C9317E /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			productRefGroup = 88B37D0A2C23FD60000A7D91 /* Products */;
 			projectDirPath = "";
@@ -339,6 +360,7 @@
 			files = (
 				88B37D442C240D77000A7D91 /* Colors.xcassets in Resources */,
 				88B37D162C23FD60000A7D91 /* Preview Assets.xcassets in Resources */,
+				88C1E5622C86A28200C9317E /* GoogleService-Info.plist in Resources */,
 				88B37D132C23FD60000A7D91 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -368,11 +390,13 @@
 				888FF3C22C867DC50025EC1B /* GenderScreen.swift in Sources */,
 				88B37D4A2C2410EB000A7D91 /* Numbers.swift in Sources */,
 				888FF3BC2C867CD80025EC1B /* LocationScreen.swift in Sources */,
+				88C1E5642C86A6B300C9317E /* FirebaseService.swift in Sources */,
 				88B37D4C2C241110000A7D91 /* Array.swift in Sources */,
 				88B37D3E2C240CFF000A7D91 /* FirstOnboardingScreen.swift in Sources */,
 				88B37D0D2C23FD60000A7D91 /* ShipFastStarterApp.swift in Sources */,
 				88B37D372C2407DF000A7D91 /* AnalyticsService.swift in Sources */,
 				888FF3BE2C867CEF0025EC1B /* Onboarding.swift in Sources */,
+				88C1E5662C86A6C400C9317E /* AuthViewModel.swift in Sources */,
 				88B37D502C24118F000A7D91 /* API.swift in Sources */,
 				88B37D592C241355000A7D91 /* ResponseModel.swift in Sources */,
 				888FF3C02C867DBC0025EC1B /* BirthdayScreen.swift in Sources */,
@@ -435,7 +459,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -492,7 +516,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -507,15 +531,17 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = ONG.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"ShipFastStarter/Preview Content\"";
-				DEVELOPMENT_TEAM = M5757NXZKD;
+				DEVELOPMENT_TEAM = VY92D2R4AT;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "ONG-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "";
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_NSContactsUsageDescription = "ONG needs access to your contacts to help you find mutuals. We'll only access the contacts you choose to interact with.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Gas needs your location to find nearby schools and connect you with friends. We care about your privacy and only use your location for this purpose.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -527,7 +553,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = io.nora.kaizen.ShipFastStarter;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ong.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -540,15 +566,17 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = ONG.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"ShipFastStarter/Preview Content\"";
-				DEVELOPMENT_TEAM = M5757NXZKD;
+				DEVELOPMENT_TEAM = VY92D2R4AT;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "ONG-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "";
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_NSContactsUsageDescription = "ONG needs access to your contacts to help you find mutuals. We'll only access the contacts you choose to interact with.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Gas needs your location to find nearby schools and connect you with friends. We care about your privacy and only use your location for this purpose.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -560,7 +588,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = io.nora.kaizen.ShipFastStarter;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ong.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -624,6 +652,14 @@
 				kind = branch;
 			};
 		};
+		88C1E55A2C86925D00C9317E /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.1.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -646,6 +682,21 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 88B37D272C2400F5000A7D91 /* XCRemoteSwiftPackageReference "purchases-ios-spm" */;
 			productName = RevenueCat;
+		};
+		88C1E55B2C8692C900C9317E /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 88C1E55A2C86925D00C9317E /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		88C1E55D2C8692C900C9317E /* FirebaseDatabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 88C1E55A2C86925D00C9317E /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseDatabase;
+		};
+		88C1E55F2C8692C900C9317E /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 88C1E55A2C86925D00C9317E /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
