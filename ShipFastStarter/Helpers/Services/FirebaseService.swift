@@ -11,7 +11,8 @@ class FirebaseService {
     // MARK: - Authentication
 
     func signUpWithPhoneNumber(phoneNumber: String, completion: @escaping (Result<String, Error>) -> Void) {
-        PhoneAuthProvider.provider().verifyPhoneNumber(phoneNumber, uiDelegate: nil) { verificationID, error in
+        let authUI = PhoneAuthUIDelegate()
+        PhoneAuthProvider.provider().verifyPhoneNumber(phoneNumber, uiDelegate: authUI) { verificationID, error in
             if let error = error {
                 print("Detailed error: \(error.localizedDescription)")
                 if let authError = error as? AuthErrorCode {
@@ -70,4 +71,20 @@ class FirebaseService {
     }
     
     // Add more methods as needed for your specific Firebase interactions
+}
+
+// MARK: - PhoneAuthUIDelegate
+
+class PhoneAuthUIDelegate: NSObject, AuthUIDelegate {
+    func present(_ viewControllerToPresent: UIViewController, animated flag: Bool, completion: (() -> Void)? = nil) {
+        if let topController = UIApplication.shared.windows.first?.rootViewController {
+            topController.present(viewControllerToPresent, animated: flag, completion: completion)
+        }
+    }
+    
+    func dismiss(animated flag: Bool, completion: (() -> Void)? = nil) {
+        if let topController = UIApplication.shared.windows.first?.rootViewController?.presentedViewController {
+            topController.dismiss(animated: flag, completion: completion)
+        }
+    }
 }
