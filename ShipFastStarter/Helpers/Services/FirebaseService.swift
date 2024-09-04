@@ -75,7 +75,16 @@ class FirebaseService {
     
     
     //MARK: - Firestore database
-
+     func batchSave(documents: [(collection: String, data: [String: Any])]) async throws {
+        let batch = Firestore.firestore().batch()
+        
+        for doc in documents {
+            let ref = Firestore.firestore().collection(doc.collection).document()
+            batch.setData(doc.data, forDocument: ref)
+        }
+        
+        try await batch.commit()
+    }
     
     func addDocument(_ object: FBObject, collection: String, completion: @escaping (String?) -> Void) {
         if let dict = object.encodeToDictionary() {

@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import FirebaseFirestore
 
 struct School: Codable, Identifiable {
     let id = UUID()
@@ -18,6 +19,7 @@ struct School: Codable, Identifiable {
 class HighSchoolViewModel: ObservableObject {
     @Published var schools: [School] = []
     @Published var searchQuery = ""
+    @Published var isHighSchoolLocked = false
     private var cancellables = Set<AnyCancellable>()
     
     init() {
@@ -27,7 +29,28 @@ class HighSchoolViewModel: ObservableObject {
             .sink { [weak self] query in
                 self?.searchSchools(query: query)
             }
-            .store(in: &cancellables)
+            .store(in: &cancellables)        
+    }
+    
+    func checkHighSchoolLock(for user: User) {
+        Task {
+            do {
+                let users: [User] = try await FirebaseService.shared.fetchDocuments(
+                    collection: "users",
+                    whereField: "schoolId",
+                    isEqualTo: user.schoolId
+                )
+                
+                let userCount = users.count
+                
+                DispatchQueue.main.async {
+                    // Adjust this threshold as needed
+                    self.isHighSchoolLocked = userCount >= 10
+                }
+            } catch {
+                print("Error checking high school lock: \(error.localizedDescription)")
+            }
+        }
     }
     
     func searchSchools(query: String) {

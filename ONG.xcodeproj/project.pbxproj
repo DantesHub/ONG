@@ -17,6 +17,7 @@
 		884B24822C87E13B00229F1E /* ProfileScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B24812C87E13B00229F1E /* ProfileScreen.swift */; };
 		884B24842C87E44500229F1E /* PollScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B24832C87E44500229F1E /* PollScreen.swift */; };
 		884B24862C87E7BB00229F1E /* PollComplete.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B24852C87E7BB00229F1E /* PollComplete.swift */; };
+		884B24882C8803D300229F1E /* Question.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B24872C8803D300229F1E /* Question.swift */; };
 		888FF3BA2C8679F10025EC1B /* ContactsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 888FF3B92C8679F10025EC1B /* ContactsScreen.swift */; };
 		888FF3BC2C867CD80025EC1B /* LocationScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 888FF3BB2C867CD80025EC1B /* LocationScreen.swift */; };
 		888FF3BE2C867CEF0025EC1B /* Onboarding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 888FF3BD2C867CEF0025EC1B /* Onboarding.swift */; };
@@ -73,6 +74,7 @@
 		884B24812C87E13B00229F1E /* ProfileScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileScreen.swift; sourceTree = "<group>"; };
 		884B24832C87E44500229F1E /* PollScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PollScreen.swift; sourceTree = "<group>"; };
 		884B24852C87E7BB00229F1E /* PollComplete.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PollComplete.swift; sourceTree = "<group>"; };
+		884B24872C8803D300229F1E /* Question.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Question.swift; sourceTree = "<group>"; };
 		888FF3B92C8679F10025EC1B /* ContactsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsScreen.swift; sourceTree = "<group>"; };
 		888FF3BB2C867CD80025EC1B /* LocationScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationScreen.swift; sourceTree = "<group>"; };
 		888FF3BD2C867CEF0025EC1B /* Onboarding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Onboarding.swift; sourceTree = "<group>"; };
@@ -260,6 +262,7 @@
 				884B24782C87B97D00229F1E /* PollOption.swift */,
 				884B247A2C87B98500229F1E /* HighSchool.swift */,
 				884B247C2C87B99D00229F1E /* VibeCheck.swift */,
+				884B24872C8803D300229F1E /* Question.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -451,6 +454,7 @@
 				88B37D0D2C23FD60000A7D91 /* ShipFastStarterApp.swift in Sources */,
 				884B247D2C87B99D00229F1E /* VibeCheck.swift in Sources */,
 				88B37D372C2407DF000A7D91 /* AnalyticsService.swift in Sources */,
+				884B24882C8803D300229F1E /* Question.swift in Sources */,
 				888FF3BE2C867CEF0025EC1B /* Onboarding.swift in Sources */,
 				88C1E5662C86A6C400C9317E /* AuthViewModel.swift in Sources */,
 				884B24842C87E44500229F1E /* PollScreen.swift in Sources */,

@@ -14,30 +14,28 @@ struct PollOption: Codable, Equatable, FBObject {
     let pollId: String
     let option: String
     let votes: [String: Int]?
-    let category: String?
+    let gradeLevel: String // New field
     var computedProgress: Double {
         guard let votes = votes else { return 0 }
         let totalVotes = votes.values.reduce(0, +)
         return totalVotes > 0 ? Double(votes.values.reduce(0, +)) / Double(totalVotes) : 0
     }
 
-    init(id: String, type: String, pollId: String, option: String, votes: [String: Int], category: String) {
+    init(id: String, type: String, pollId: String, option: String, votes: [String: Int], gradeLevel: String) {
         self.id = id
         self.type = type
         self.pollId = pollId
         self.option = option
         self.votes = votes
-        self.category = category
+        self.gradeLevel = gradeLevel
     }
-
-    
 
     static func == (lhs: PollOption, rhs: PollOption) -> Bool {
         return lhs.id == rhs.id
     }
 
     enum CodingKeys: String, CodingKey {
-        case id, type, pollId, option, votes, category
+        case id, type, pollId, option, votes, gradeLevel
     }
 
     func encodeToDictionary() -> [String: Any]? {
@@ -57,6 +55,6 @@ struct PollOption: Codable, Equatable, FBObject {
         pollId: "example_poll_id",
         option: "Example Option",
         votes: [:],
-        category: "General"
+        gradeLevel: "9" // Example grade level
     )
 }

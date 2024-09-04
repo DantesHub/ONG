@@ -18,6 +18,7 @@ struct Poll: Codable, Equatable, FBObject {
     var grade: String
     var type: String
     let category: String
+    var usersWhoVoted: [String] // New field
 
     static var exPoll = Poll(
         id: "example_poll_id",
@@ -28,7 +29,8 @@ struct Poll: Codable, Equatable, FBObject {
         schoolId: "example_school_id",
         grade: "All",
         type: "Interest Based Question",
-        category: "General"
+        category: "General",
+        usersWhoVoted: []
     )
 
     static func == (lhs: Poll, rhs: Poll) -> Bool {
@@ -36,10 +38,10 @@ struct Poll: Codable, Equatable, FBObject {
     }
 
     enum CodingKeys: String, CodingKey {
-        case id, title, createdAt, pollOptions, isActive, schoolId, grade, type, category
+        case id, title, createdAt, pollOptions, isActive, schoolId, grade, type, category, usersWhoVoted
     }
 
-    init(id: String, title: String, createdAt: Date, pollOptions: [String], isActive: Bool, schoolId: String, grade: String, type: String, category: String) {
+    init(id: String, title: String, createdAt: Date, pollOptions: [String], isActive: Bool, schoolId: String, grade: String, type: String, category: String, usersWhoVoted: [String] = []) {
         self.id = id
         self.title = title
         self.createdAt = createdAt
@@ -49,6 +51,7 @@ struct Poll: Codable, Equatable, FBObject {
         self.grade = grade
         self.type = type
         self.category = category
+        self.usersWhoVoted = usersWhoVoted
     }
 
     init(from decoder: Decoder) throws {
@@ -62,6 +65,7 @@ struct Poll: Codable, Equatable, FBObject {
         grade = try container.decode(String.self, forKey: .grade)
         type = try container.decode(String.self, forKey: .type)
         category = try container.decode(String.self, forKey: .category)
+        usersWhoVoted = try container.decode([String].self, forKey: .usersWhoVoted)
     }
 
     func encodeToDictionary() -> [String: Any]? {
@@ -76,11 +80,4 @@ struct Poll: Codable, Equatable, FBObject {
         }
     }
 
-    func createPoll() {
-        // Implementation for createPoll logic
-        // Add logic for making sure if we repeat the question not to use the same people
-        // Add logic for number of questions person has answered
-        // Sort and fetch from list of questions
-        // Want to see which questions users are churning from
-    }
 }

@@ -12,6 +12,7 @@ struct ContentView: View {
     @EnvironmentObject var mainVM: MainViewModel
     @StateObject var authVM = AuthViewModel()
     @StateObject var pollVM = PollViewModel()
+    @StateObject var highschoolVM = HighSchoolViewModel()
     @Environment(\.modelContext) private var modelContext
     @Query private var items: [Item]
 
@@ -35,6 +36,16 @@ struct ContentView: View {
                 case .poll:
                     PollScreen()
                         .environmentObject(pollVM)
+                }
+            }.onAppear {
+                if let user = mainVM.currUser {
+                    if !highschoolVM.isHighschoolLocked {
+                        // loadPolls
+                        pollVM.fetchPolls(for: user)
+                        if pollVM.pollSet.count < 8 {
+                            // create more polls
+                        }
+                    }
                 }
             }
         }
