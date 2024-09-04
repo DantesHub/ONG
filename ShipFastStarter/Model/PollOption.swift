@@ -13,13 +13,9 @@ struct PollOption: Codable, Equatable, FBObject {
     let type: String?
     let pollId: String
     let option: String
-    let votes: [String: Int]?
-    let gradeLevel: String // New field
-    var computedProgress: Double {
-        guard let votes = votes else { return 0 }
-        let totalVotes = votes.values.reduce(0, +)
-        return totalVotes > 0 ? Double(votes.values.reduce(0, +)) / Double(totalVotes) : 0
-    }
+    var votes: [String: Int]?
+    let gradeLevel: String
+    var computedProgress: Double = 0 // Make this mutable
 
     init(id: String, type: String, pollId: String, option: String, votes: [String: Int], gradeLevel: String) {
         self.id = id

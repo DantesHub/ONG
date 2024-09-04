@@ -41,7 +41,7 @@ struct ContentView: View {
                         highschoolVM.checkHighSchoolLock(for: user)
                         if !highschoolVM.isHighSchoolLocked {
                             // loadPolls
-                            pollVM.fetchPolls(for: user)
+                            await pollVM.fetchPolls(for: user)
                             if pollVM.pollSet.count < 8 {
                                 // create more polls
                                 await pollVM.createPoll(user: user)

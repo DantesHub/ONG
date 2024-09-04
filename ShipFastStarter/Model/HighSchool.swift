@@ -8,7 +8,7 @@
 import SwiftData
 import Foundation
 
-struct HighSchool: Codable, Equatable, FBObject {
+struct HighSchool: Codable, Equatable, Identifiable, FBObject {
     var id: String
     var name: String
     var location: String
@@ -34,7 +34,7 @@ struct HighSchool: Codable, Equatable, FBObject {
     }
 
     static var exHighSchool = HighSchool(
-        id: "123e4567-e89b-12d3-a456-426614174000",
+        id: UUID().uuidString,
         name: "buildspace",
         location: "Example City, State",
         totalAura: 1000,

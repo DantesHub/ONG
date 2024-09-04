@@ -12,6 +12,7 @@ struct PollScreen: View {
     @EnvironmentObject var pollVM: PollViewModel
     @State private var currentPollIndex = 0
     @State private var isComplete = false
+    @State private var animateProgress = false
     
     var body: some View {
         ZStack {
@@ -27,35 +28,27 @@ struct PollScreen: View {
                 .padding(.top, 8)
                 
                 // Main content
-                if let currentPoll = pollVM.pollSet[safe: currentPollIndex] {
+                if !pollVM.pollSet.isEmpty {
                     VStack {
                         Spacer()
                         
-                        // Emoji in the middle (you might want to add this to your Poll model)
+                        // Emoji in the middle
                         Text("🤔")
                             .font(.system(size: 100))
                         
                         // Poll question
-                        Text(currentPoll.title)
+                        Text(pollVM.selectedPoll.title)
                             .font(.title2)
                             .fontWeight(.bold)
                             .padding()
+                            .multilineTextAlignment(.center)
                         
                         Spacer()
                         
-                        // 4 Poll options in 2x2 grid
+                        // Poll options in vertical layout
                         VStack(spacing: 12) {
-                            ForEach(0..<pollVM.currentOptions.count, id: \.self) { index in
-                                if index % 2 == 0 {
-                                    HStack(spacing: 12) {
-                                        PollOptionView(option: pollVM.currentOptions[index])
-                                        if index + 1 < pollVM.currentOptions.count {
-                                            PollOptionView(option: pollVM.currentOptions[index + 1])
-                                        } else {
-                                            Spacer()
-                                        }
-                                    }
-                                }
+                            ForEach(pollVM.currentOptions.prefix(4), id: \.id) { option in
+                                PollOptionView(option: option, totalVotes: totalVotes, animateProgress: $animateProgress)
                             }
                         }
                         .padding()
@@ -87,23 +80,91 @@ struct PollScreen: View {
                         .padding(.horizontal)
                         .padding(.bottom, 20)
                     }
-                   
                 } else {
-                    Text("No polls available")
+                    Text("No more polls available")
+                        .font(.title)
+                        .foregroundColor(.white)
                 }
             }
         }
+        .onAppear {
+            Task {
+                await pollVM.getPollOptions()
+            }
+        }
+    }
+    
+    private var totalVotes: Int {
+        pollVM.currentOptions.reduce(0) { $0 + ($1.votes?.values.reduce(0, +) ?? 0) }
     }
     
     private func skipPoll() {
         if currentPollIndex < pollVM.pollSet.count - 1 {
             currentPollIndex += 1
             isComplete = false
-            if let nextPoll = pollVM.pollSet[safe: currentPollIndex] {
-                pollVM.selectedPoll = nextPoll
-                pollVM.getPollOptions()
+            pollVM.selectedPoll = pollVM.pollSet[currentPollIndex]
+            Task {
+                await pollVM.getPollOptions()
             }
         }
+    }
+}
+
+struct PollOptionView: View {
+    @EnvironmentObject var pollVM: PollViewModel
+    @EnvironmentObject var mainVM: MainViewModel
+    let option: PollOption
+    let totalVotes: Int
+    @Binding var animateProgress: Bool
+    @State private var progressWidth: CGFloat = 0
+    
+    var body: some View {
+        Button(action: {
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            Analytics.shared.logActual(event: "PollScreen: Tapped Option", parameters: ["":""])
+            if let user = mainVM.currUser {
+                Task {
+                    await pollVM.answerPoll(user: user, option: option)
+                    withAnimation(.easeInOut(duration: 0.5)) {
+                        animateProgress = true
+                    }                  
+                }
+            }
+        }) {
+            ZStack(alignment: .leading) {
+                Rectangle()
+                    .fill(Color.white)
+                    .cornerRadius(8)
+                    .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
+                
+                if pollVM.showProgress {
+                    Rectangle()
+                        .fill(Color.blue.opacity(0.3))
+                        .cornerRadius(8)
+                        .frame(width: progressWidth)
+                        .animation(.easeInOut(duration: 0.5), value: progressWidth)
+                }
+                
+                Text(option.option)
+                    .foregroundColor(.black)
+                    .padding()
+            }
+        }
+        .frame(height: 50)
+        .disabled(pollVM.showProgress)
+        .onChange(of: animateProgress) { newValue in
+            if newValue {
+                progressWidth = UIScreen.main.bounds.width * 0.8 * progress
+            } else {
+                progressWidth = 0
+            }
+        }
+    }
+    
+    private var progress: Double {
+        guard totalVotes > 0 else { return 0 }
+        let optionVotes = option.votes?.values.reduce(0, +) ?? 0
+        return Double(optionVotes) / Double(totalVotes)
     }
 }
 
@@ -114,33 +175,6 @@ struct StoryProgressBar: View {
         Rectangle()
             .foregroundColor(isComplete ? .white : .gray.opacity(0.3))
             .frame(height: 2)
-    }
-}
-
-struct PollOptionView: View {
-    let option: PollOption
-    
-    var body: some View {
-        Button(action: {
-            // Handle option selection
-        }) {
-            ZStack(alignment: .leading) {
-                Rectangle()
-                    .fill(Color.white)
-                    .cornerRadius(8)
-                    .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
-                
-                Rectangle()
-                    .fill(Color.blue.opacity(0.3))
-                    .cornerRadius(8)
-                    .frame(width: abs(UIScreen.main.bounds.width * 0.4 * option.computedProgress))
-                
-                Text(option.option)
-                    .foregroundColor(.black)
-                    .padding()
-            }
-        }
-        .frame(height: 50)
     }
 }
 

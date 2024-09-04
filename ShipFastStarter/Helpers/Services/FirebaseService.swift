@@ -106,19 +106,33 @@ class FirebaseService {
         }
     }
     
-    static func updateDocument(document: FBObject?, collection: String) async throws {
-        guard let documentDict = document?.encodeToDictionary(), let id = document?.id else {
-            return
-        }
+     func updateDocument(collection: String, object: FBObject) async throws {
+        let documentCollection = FirebaseService.db.collection(collection)
         
-        let documentCollection = db.collection(collection)
         return try await withCheckedThrowingContinuation { continuation in
-            documentCollection.document(id).updateData(documentDict) { err in
-                if let err = err {
-                    continuation.resume(throwing: err)
-                } else {
-                    print("successfully update")
-                    continuation.resume(returning: ())
+            guard let data = object.encodeToDictionary(), let id = data["id"] as? String else {
+                continuation.resume(throwing: NSError(domain: "FirebaseService", code: 400, userInfo: [NSLocalizedDescriptionKey: "Failed to encode object to dictionary or missing id"]))
+                return
+            }
+            
+            documentCollection.whereField("id", isEqualTo: id).getDocuments { (querySnapshot, error) in
+                if let error = error {
+                    continuation.resume(throwing: error)
+                    return
+                }
+                
+                guard let document = querySnapshot?.documents.first else {
+                    continuation.resume(throwing: NSError(domain: "FirebaseService", code: 404, userInfo: [NSLocalizedDescriptionKey: "No matching document found"]))
+                    return
+                }
+                
+                document.reference.setData(data, merge: true) { error in
+                    if let error = error {
+                        continuation.resume(throwing: error)
+                    } else {
+                        print("Document successfully updated")
+                        continuation.resume(returning: ())
+                    }
                 }
             }
         }
@@ -230,7 +244,7 @@ class FirebaseService {
                 let jsonData = try JSONSerialization.data(withJSONObject: document.data())
                 return try JSONDecoder().decode(T.self, from: jsonData)
             } catch {
-                print("Error decoding document \(document.documentID): \(error.localizedDescription)")
+                print("Error decoding document \(collection) \(document.documentID): \(error.localizedDescription)")
                 if let decodingError = error as? DecodingError {
                     switch decodingError {
                     case .keyNotFound(let key, let context):

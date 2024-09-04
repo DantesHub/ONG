@@ -8,38 +8,96 @@
 import Foundation
 import FirebaseFirestore
 
+@MainActor
 class PollViewModel: ObservableObject {
     @Published var pollSet: [Poll] = [Poll.exPoll]
     @Published var allPolls: [Poll] = [Poll.exPoll]
     @Published var selectedPoll = Poll.exPoll
     @Published var currentOptions: [PollOption] = []
-    
+    @Published var showProgress = false
+    @Published var animateProgress = false
+    @Published var animateAllOptions = false
     init() {
         // Initialize without loading polls
     }
 
-    func fetchPolls(for user: User) {
+    func fetchPolls(for user: User) async {
+        do {
+            let polls: [Poll] = try await FirebaseService.shared.fetchDocuments(
+                collection: "polls",
+                whereField: "schoolId",
+                isEqualTo: user.schoolId
+            )
+            self.allPolls = polls
+            self.pollSet = polls.filter { poll in
+                !poll.usersWhoVoted.contains(user.id)
+            }
+            self.pollSet.sort { $0.createdAt > $1.createdAt }
+            if let first = self.pollSet.first {
+                self.selectedPoll = first
+                await self.getPollOptions()
+            }
+        } catch {
+            print("Error fetching polls: \(error.localizedDescription)")
+        }
+    }
+
+    func answerPoll(user: User, option: PollOption) async {
+        // Immediately update local state
+        if var updatedOption = currentOptions.first(where: { $0.id == option.id }) {
+            var updatedVotes = updatedOption.votes ?? [:]
+            updatedVotes[user.id] = (updatedVotes[user.id] ?? 0) + 1
+            updatedOption.votes = updatedVotes
+            
+            if let index = currentOptions.firstIndex(where: { $0.id == option.id }) {
+                currentOptions[index] = updatedOption
+            }
+        }
+        showProgress = true
+        animateProgress = true
+        animateAllOptions = true
+        
+        // Perform Firebase updates in the background
         Task {
             do {
-                let polls: [Poll] = try await FirebaseService.shared.fetchDocuments(
-                    collection: "polls",
-                    whereField: "schoolId",
-                    isEqualTo: user.schoolId
+                // Update the poll option in Firestore
+                try await FirebaseService.shared.updateDocument(
+                    collection: "pollOptions",
+                    object: option
                 )
-                DispatchQueue.main.async {
-                    self.allPolls = polls
-                    self.pollSet = polls.filter { poll in
-                        !poll.usersWhoVoted.contains(user.id)
-                    }
-                    self.pollSet.sort { $0.createdAt > $1.createdAt }
-                    if let first = self.pollSet.first {
-                        self.selectedPoll = first
-                        self.getPollOptions()
-                    }
-                }
+
+                // Update the user's votedPolls
+                var updatedUser = user
+                updatedUser.votedPolls.append(selectedPoll.id)
+                try await FirebaseService.shared.updateDocument(
+                    collection: "users",
+                    object: updatedUser
+                )
+                
+                // Update the poll's usersWhoVoted
+                var updatedPoll = selectedPoll
+                updatedPoll.usersWhoVoted.append(user.id)
+                try await FirebaseService.shared.updateDocument(
+                    collection: "polls",
+                    object: updatedPoll
+                )
+                selectedPoll = updatedPoll
+                
+                // // Wait for a short delay to show the progress
+                // try await Task.sleep(nanoseconds: 1_500_000_000) // 1.5 seconds
+                
+                // // Move to the next poll
+                // if let nextPollIndex = pollSet.firstIndex(where: { $0.id == selectedPoll.id })?.advanced(by: 1),
+                //    nextPollIndex < pollSet.count {
+                //     selectedPoll = pollSet[nextPollIndex]
+                //     await getPollOptions()
+                // } else {
+                //     // No more polls available
+                //     currentOptions = []
+                // }
             } catch {
-                print("Error fetching polls: \(error.localizedDescription)")
-            }
+                print("Error answering poll: \(error.localizedDescription)")
+            }                     
         }
     }
 
@@ -101,14 +159,12 @@ class PollViewModel: ObservableObject {
             try await FirebaseService.shared.batchSave(documents: batchDocuments)
 
             // Update local state
-            DispatchQueue.main.async {
-                self.allPolls.append(contentsOf: newPolls)
-                self.pollSet = self.allPolls.filter { !$0.usersWhoVoted.contains(user.id) }
-                self.pollSet.sort { $0.createdAt > $1.createdAt }
-                if let first = self.pollSet.first {
-                    self.selectedPoll = first
-                    self.getPollOptions()
-                }
+            self.allPolls.append(contentsOf: newPolls)
+            self.pollSet = self.allPolls.filter { !$0.usersWhoVoted.contains(user.id) }
+            self.pollSet.sort { $0.createdAt > $1.createdAt }
+            if let first = self.pollSet.first {
+                self.selectedPoll = first
+                await self.getPollOptions()
             }
         } catch {
             print("Error creating polls: \(error.localizedDescription)")
@@ -116,7 +172,6 @@ class PollViewModel: ObservableObject {
     }
 
     func createOptions(users: [User]) -> [PollOption] {
-
         // if user has made in app purchase they have highest priority
         // number of votedPolls they have should be close second
         // number of friends they have
@@ -160,51 +215,49 @@ class PollViewModel: ObservableObject {
             remainingUsers.remove(at: index)
         }
 
-        // Convert selected users to PollOptions
-        return selectedUsers.map { user in
+        // Convert selected users to PollOptions, ensuring we have exactly 4 options
+        let options = selectedUsers.prefix(4).map { user in
             PollOption(
                 id: UUID().uuidString,
                 type: "Poll",
                 pollId: selectedPoll.id,
                 option: "\(user.firstName) \(user.lastName) (\(user.grade))",
                 votes: ["\(user.firstName) \(user.lastName) (\(user.grade))": 0],
-                gradeLevel: user.grade // Assuming User model has a gradeLevel property
+                gradeLevel: user.grade
             )
         }
+
+
+        return options
     }
 
     func getSelectedPollResults() {
         // Implement logic to get poll results
     }
     
-    func getPollOptions() {
-        Task {
-            do {
-                let options: [PollOption] = try await FirebaseService.shared.fetchDocuments(
-                    collection: "pollOptions",
-                    whereField: "pollId",
-                    isEqualTo: selectedPoll.id,
-                    limit: 12
-                )
-                DispatchQueue.main.async {
-                    self.currentOptions = options
-                    self.objectWillChange.send()
-                }
-            } catch {
-                print("Error getting poll options: \(error.localizedDescription)")
-                if let decodingError = error as? DecodingError {
-                    switch decodingError {
-                    case .keyNotFound(let key, let context):
-                        print("Key '\(key.stringValue)' not found: \(context.debugDescription)")
-                    case .valueNotFound(let type, let context):
-                        print("Value of type '\(type)' not found: \(context.debugDescription)")
-                    case .typeMismatch(let type, let context):
-                        print("Type mismatch for type '\(type)': \(context.debugDescription)")
-                    case .dataCorrupted(let context):
-                        print("Data corrupted: \(context.debugDescription)")
-                    @unknown default:
-                        print("Unknown decoding error")
-                    }
+    func getPollOptions() async {
+        do {
+            let options: [PollOption] = try await FirebaseService.shared.fetchDocuments(
+                collection: "pollOptions",
+                whereField: "pollId",
+                isEqualTo: selectedPoll.id,
+                limit: 12
+            )
+            self.currentOptions = options
+        } catch {
+            print("Error getting poll options: \(error.localizedDescription)")
+            if let decodingError = error as? DecodingError {
+                switch decodingError {
+                case .keyNotFound(let key, let context):
+                    print("Key '\(key.stringValue)' not found: \(context.debugDescription)")
+                case .valueNotFound(let type, let context):
+                    print("Value of type '\(type)' not found: \(context.debugDescription)")
+                case .typeMismatch(let type, let context):
+                    print("Type mismatch for type '\(type)': \(context.debugDescription)")
+                case .dataCorrupted(let context):
+                    print("Data corrupted: \(context.debugDescription)")
+                @unknown default:
+                    print("Unknown decoding error")
                 }
             }
         }
@@ -214,7 +267,9 @@ class PollViewModel: ObservableObject {
         pollSet.shuffle()
         if let first = pollSet.first {
             selectedPoll = first
-            getPollOptions()
+            Task {
+                await getPollOptions()
+            }
         }
     }
 

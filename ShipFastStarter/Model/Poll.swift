@@ -58,7 +58,6 @@ struct Poll: Codable, Equatable, FBObject {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(String.self, forKey: .id)
         title = try container.decode(String.self, forKey: .title)
-        createdAt = try container.decode(Date.self, forKey: .createdAt)
         pollOptions = try container.decode([String].self, forKey: .pollOptions)
         isActive = try container.decode(Bool.self, forKey: .isActive)
         schoolId = try container.decode(String.self, forKey: .schoolId)
@@ -66,6 +65,16 @@ struct Poll: Codable, Equatable, FBObject {
         type = try container.decode(String.self, forKey: .type)
         category = try container.decode(String.self, forKey: .category)
         usersWhoVoted = try container.decode([String].self, forKey: .usersWhoVoted)
+
+        // Custom decoding for createdAt
+        if let createdAtTimestamp = try? container.decode(Double.self, forKey: .createdAt) {
+            createdAt = Date(timeIntervalSince1970: createdAtTimestamp)
+        } else if let createdAtString = try? container.decode(String.self, forKey: .createdAt),
+                  let createdAtDate = ISO8601DateFormatter().date(from: createdAtString) {
+            createdAt = createdAtDate
+        } else {
+            throw DecodingError.dataCorruptedError(forKey: .createdAt, in: container, debugDescription: "Date string does not match format expected by ISO8601DateFormatter.")
+        }
     }
 
     func encodeToDictionary() -> [String: Any]? {

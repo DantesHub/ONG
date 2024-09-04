@@ -45,7 +45,7 @@ class HighSchoolViewModel: ObservableObject {
                 
                 DispatchQueue.main.async {
                     // Adjust this threshold as needed
-                    self.isHighSchoolLocked = userCount >= 10
+                    self.isHighSchoolLocked = userCount >= 50
                 }
             } catch {
                 print("Error checking high school lock: \(error.localizedDescription)")
