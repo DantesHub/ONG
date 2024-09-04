@@ -8,7 +8,7 @@
 import Foundation
 
 class MainViewModel: ObservableObject {
-    @Published var currentPage: Page = .poll
+    @Published var currentPage: Page = .onboarding
     @Published var isPro = false
     @Published var showHalfOff = false 
     @Published var onboardingProgress: Double = 0.0
@@ -17,12 +17,13 @@ class MainViewModel: ObservableObject {
     
     init() {
         
-    }
+    }    
+
     
     func fetchUser() async {
         if let number = UserDefaults.standard.string(forKey: "userNumber") {
             do {
-                let users: [User] = try await FirebaseService.getFilteredDocuments(collection: "users", filterField: "phoneNumber", filterValue: number)
+                let users: [User] = try await FirebaseService.getFilteredDocuments(collection: "users", filterField: "number", filterValue: number)
                 if let user = users.first {
                     DispatchQueue.main.async {
                         self.currUser = user

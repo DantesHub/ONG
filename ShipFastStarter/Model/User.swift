@@ -51,9 +51,9 @@ struct User: Codable, Equatable, FBObject {
 
     static var exUser = User(
         id: UUID().uuidString,
-        firstName: "John",
-        lastName: "Doe",
-        schoolId: "example_school_id",
+        firstName: "Naveed",
+        lastName: "Johnmo",
+        schoolId: "123e4567-e89b-12d3-a456-426614174000",
         color: "#FF0000",
         aura: 100,
         godMode: false,
@@ -88,10 +88,19 @@ struct User: Codable, Equatable, FBObject {
         grade = try container.decode(String.self, forKey: .grade)
         number = try container.decode(String.self, forKey: .number)
         votedPolls = try container.decode([String].self, forKey: .votedPolls)
-        lastPollFinished = try container.decode(Date.self, forKey: .lastPollFinished)
         friends = try container.decode([String].self, forKey: .friends)
         invitedFriends = try container.decode([String].self, forKey: .invitedFriends)
         ogBadge = try container.decode(Bool.self, forKey: .ogBadge)
+
+        // Custom decoding for lastPollFinished
+        if let lastPollFinishedTimestamp = try? container.decode(Double.self, forKey: .lastPollFinished) {
+            lastPollFinished = Date(timeIntervalSince1970: lastPollFinishedTimestamp)
+        } else if let lastPollFinishedString = try? container.decode(String.self, forKey: .lastPollFinished),
+                  let lastPollFinishedDate = ISO8601DateFormatter().date(from: lastPollFinishedString) {
+            lastPollFinished = lastPollFinishedDate
+        } else {
+            lastPollFinished = Date() // Default to current date if unable to parse
+        }
     }
 
     func encodeToDictionary() -> [String: Any]? {

@@ -51,11 +51,11 @@ struct NumberScreen: View {
                     Analytics.shared.logActual(event: "NumberScreen: Tapped Next", parameters: ["":""])
                     let formattedNumber = "+1\(phoneNumber)"
                     withAnimation {
-                        if let user = mainVM.currUser {
-                            
-                            authVM.verifyCode(code: "3333333", user: user)
+                        if var user = mainVM.currUser {
+                            mainVM.currUser?.number = formattedNumber
+                            user.number = formattedNumber
                         }
-//                        authVM.signInWithPhoneNumber(phoneNumber: formattedNumber)
+                        authVM.signInWithPhoneNumber(phoneNumber: formattedNumber)
                     }
                 }) {
                     Text("Next")
@@ -79,7 +79,7 @@ struct NumberScreen: View {
                     }
                 
                 Button(action: {
-                    if let user = mainVM.currUser {
+                    if var user = mainVM.currUser {
                         authVM.verifyCode(code: verificationCode, user: user)
                     }
                 }) {

@@ -26,10 +26,7 @@ struct ContentView: View {
                         .environmentObject(authVM)
                         .environmentObject(mainVM)
                         .onAppear {
-                            Task {
-                                await mainVM.fetchUser()
-                                
-                            }
+                       
                         }
                 case .home:
                     HomeScreen()
@@ -38,15 +35,21 @@ struct ContentView: View {
                         .environmentObject(pollVM)
                 }
             }.onAppear {
-                if let user = mainVM.currUser {
-                    if !highschoolVM.isHighschoolLocked {
-                        // loadPolls
-                        pollVM.fetchPolls(for: user)
-                        if pollVM.pollSet.count < 8 {
-                            // create more polls
+                Task {
+                    await mainVM.fetchUser()
+                    if let user = mainVM.currUser {
+                        highschoolVM.checkHighSchoolLock(for: user)
+                        if !highschoolVM.isHighSchoolLocked {
+                            // loadPolls
+                            pollVM.fetchPolls(for: user)
+                            if pollVM.pollSet.count < 8 {
+                                // create more polls
+                                await pollVM.createPoll(user: user)
+                            }
                         }
                     }
                 }
+            
             }
         }
     }

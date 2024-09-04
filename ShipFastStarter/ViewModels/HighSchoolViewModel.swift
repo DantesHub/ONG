@@ -53,11 +53,11 @@ class HighSchoolViewModel: ObservableObject {
         }
     }
     
-    func searchSchools(query: String) {
+    func searchSchools(query: String) {                
         guard !query.isEmpty else {
             schools = []
             return
-        }
+        }    
         
         let encodedQuery = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
         let urlString = "https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/us-public-schools/records?limit=20&where=name%20like%20%27%25\(encodedQuery)%25%27&select=name,city,state"

@@ -34,9 +34,7 @@ class AuthViewModel: ObservableObject {
     @MainActor
     func verifyCode(code: String, user: User) {
         
-        FirebaseService.shared.addDocument(user, collection: "users") { str in
-            
-        }
+
         guard let verificationID = verificationID else { return }
         FirebaseService.shared.verifyCode(verificationID: verificationID, verificationCode: code) { result in
             DispatchQueue.main.async {

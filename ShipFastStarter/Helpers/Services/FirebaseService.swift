@@ -128,6 +128,7 @@ class FirebaseService {
     //MARK: - get methods
     static func getUser(completion: @escaping (Result<User, Error>) -> Void) {
         if let number = UserDefaults.standard.string(forKey: "userNumber") {
+            print(number, "shibal")
             let userCollection = FirebaseService.db.collection("users")
             userCollection.whereField("number", isEqualTo: number).getDocuments { (querySnapshot, error) in
                 if let error = error {
@@ -146,9 +147,8 @@ class FirebaseService {
 //                            case .failure(let error):
 //                                print(error.localizedDescription)
 //                            }
-//                            completion(.success(retUser))
 //                        }
-                        
+                            completion(.success(retUser))
                     } catch let decodeError {
                         completion(.failure(decodeError))
                     }

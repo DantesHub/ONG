@@ -10,9 +10,8 @@ import Foundation
 
 struct HighSchool: Codable, Equatable, FBObject {
     var id: String
-    var schoolId: String
+    var name: String
     var location: String
-    var color: String
     var totalAura: Int
     var auraThisWeek: Int
     var pollIds: [String]
@@ -21,11 +20,10 @@ struct HighSchool: Codable, Equatable, FBObject {
     var long: String
     var county: String
 
-    init(id: String, schoolId: String, location: String, color: String, totalAura: Int, auraThisWeek: Int, pollIds: [String], students: [String], lat: String, long: String, county: String) {
+    init(id: String, name: String, location: String, totalAura: Int, auraThisWeek: Int, pollIds: [String], students: [String], lat: String, long: String, county: String) {
         self.id = id
-        self.schoolId = schoolId
+        self.name = name
         self.location = location
-        self.color = color
         self.totalAura = totalAura
         self.auraThisWeek = auraThisWeek
         self.pollIds = pollIds
@@ -36,10 +34,9 @@ struct HighSchool: Codable, Equatable, FBObject {
     }
 
     static var exHighSchool = HighSchool(
-        id: "example_id",
-        schoolId: "example_school_id",
+        id: "123e4567-e89b-12d3-a456-426614174000",
+        name: "buildspace",
         location: "Example City, State",
-        color: "#0000FF",
         totalAura: 1000,
         auraThisWeek: 100,
         pollIds: [],
@@ -54,7 +51,7 @@ struct HighSchool: Codable, Equatable, FBObject {
     }
 
     enum CodingKeys: String, CodingKey {
-        case id, schoolId, location, color, totalAura, auraThisWeek, pollIds, students, lat, long, county
+        case id, name, location, totalAura, auraThisWeek, pollIds, students, lat, long, county
     }
 
     func encodeToDictionary() -> [String: Any]? {

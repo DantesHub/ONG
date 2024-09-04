@@ -59,10 +59,11 @@ class PollViewModel: ObservableObject {
                     whereField: "schoolId",
                     isEqualTo: user.schoolId
                 ) as [User]
-
+                let id = UUID().uuidString
+                selectedPoll.id = id
                 let options = createOptions(users: users ?? [])
                 let poll = Poll(
-                    id: UUID().uuidString,
+                    id: id,
                     title: question.question,
                     createdAt: Date(),
                     pollOptions: options.map { $0.id },
@@ -73,13 +74,14 @@ class PollViewModel: ObservableObject {
                     category: question.category,
                     usersWhoVoted: [] // Initialize with empty array
                 )
+                selectedPoll = poll
 
                 newPolls.append(poll)
                 newOptions.append(contentsOf: options)
             }
         }
 
-        // Prepare data for batch save
+        // Prepare data for batch savex
         var batchDocuments: [(collection: String, data: [String: Any])] = []
 
         for poll in newPolls {

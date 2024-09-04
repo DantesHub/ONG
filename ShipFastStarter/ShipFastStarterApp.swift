@@ -58,9 +58,7 @@ private extension ShipFastStarterApp {
             let userId = UUID().uuidString
             UserDefaults.standard.setValue(userId, forKey: Constants.userId)
         } else {
-            Task {
-                await mainVM.fetchUser()
-            }
+        
         }
         
         let userId = UserDefaults.standard.string(forKey: Constants.userId) ?? ""
@@ -82,7 +80,7 @@ private extension ShipFastStarterApp {
         Mixpanel.mainInstance().track(event: "App Start")
         Mixpanel.mainInstance().identify(distinctId: userId)
         
-        
+        UserDefaults.standard.setValue("1234562891", forKey: "userNumber")
     }
 }
 
