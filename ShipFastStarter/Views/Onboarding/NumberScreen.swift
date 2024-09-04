@@ -9,6 +9,7 @@ import SwiftUI
 
 struct NumberScreen: View {
     @EnvironmentObject var authVM: AuthViewModel
+    @EnvironmentObject var mainVM: MainViewModel
     @State private var phoneNumber = ""
     @State private var verificationCode = ""
     @State private var isNextEnabled = false
@@ -50,7 +51,11 @@ struct NumberScreen: View {
                     Analytics.shared.logActual(event: "NumberScreen: Tapped Next", parameters: ["":""])
                     let formattedNumber = "+1\(phoneNumber)"
                     withAnimation {
-                        authVM.signInWithPhoneNumber(phoneNumber: formattedNumber)
+                        if let user = mainVM.currUser {
+                            
+                            authVM.verifyCode(code: "3333333", user: user)
+                        }
+//                        authVM.signInWithPhoneNumber(phoneNumber: formattedNumber)
                     }
                 }) {
                     Text("Next")
@@ -74,7 +79,9 @@ struct NumberScreen: View {
                     }
                 
                 Button(action: {
-                    authVM.verifyCode(code: verificationCode)
+                    if let user = mainVM.currUser {
+                        authVM.verifyCode(code: verificationCode, user: user)
+                    }
                 }) {
                     Text("Verify")
                         .frame(maxWidth: .infinity)

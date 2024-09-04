@@ -14,7 +14,7 @@ class AuthViewModel: ObservableObject {
     @Published var verificationID: String?
     @Published var isVerificationCodeSent = false
     @Published var isVerified = false
-
+    
     func signInWithPhoneNumber(phoneNumber: String) {
         FirebaseService.shared.signUpWithPhoneNumber(phoneNumber: phoneNumber) { result in
             DispatchQueue.main.async {
@@ -30,19 +30,28 @@ class AuthViewModel: ObservableObject {
             }
         }
     }
-
-    func verifyCode(code: String) {
+    
+    @MainActor
+    func verifyCode(code: String, user: User) {
+        
+        FirebaseService.shared.addDocument(user, collection: "users") { str in
+            
+        }
         guard let verificationID = verificationID else { return }
         FirebaseService.shared.verifyCode(verificationID: verificationID, verificationCode: code) { result in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let authResult):
-                    self.isVerified = true
-                    self.signInSuccessful = true
+                    FirebaseService.shared.addDocument(user, collection: "users") { str in
+                        self.signInSuccessful = true
+                        self.isVerified = true
+                    }
                     print("Successfully verified and signed in: \(authResult.user.uid)")
+                  
                 case .failure(let error):
                     self.signInError = error
                     print("Error verifying code: \(error.localizedDescription)")
+               
                 }
             }
         }

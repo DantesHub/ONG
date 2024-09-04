@@ -11,6 +11,7 @@ import SwiftData
 struct ContentView: View {
     @EnvironmentObject var mainVM: MainViewModel
     @StateObject var authVM = AuthViewModel()
+    @StateObject var pollVM = PollViewModel()
     @Environment(\.modelContext) private var modelContext
     @Query private var items: [Item]
 
@@ -23,8 +24,17 @@ struct ContentView: View {
                     OnboardingView()
                         .environmentObject(authVM)
                         .environmentObject(mainVM)
+                        .onAppear {
+                            Task {
+                                await mainVM.fetchUser()
+                                
+                            }
+                        }
                 case .home:
                     HomeScreen()
+                case .poll:
+                    PollScreen()
+                        .environmentObject(pollVM)
                 }
             }
         }

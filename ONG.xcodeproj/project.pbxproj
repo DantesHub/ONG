@@ -8,6 +8,15 @@
 
 /* Begin PBXBuildFile section */
 		884B24732C879A1900229F1E /* HighSchoolViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B24722C879A1900229F1E /* HighSchoolViewModel.swift */; };
+		884B24752C87B96E00229F1E /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B24742C87B96E00229F1E /* User.swift */; };
+		884B24772C87B97500229F1E /* Poll.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B24762C87B97500229F1E /* Poll.swift */; };
+		884B24792C87B97D00229F1E /* PollOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B24782C87B97D00229F1E /* PollOption.swift */; };
+		884B247B2C87B98500229F1E /* HighSchool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B247A2C87B98500229F1E /* HighSchool.swift */; };
+		884B247D2C87B99D00229F1E /* VibeCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B247C2C87B99D00229F1E /* VibeCheck.swift */; };
+		884B247F2C87BECE00229F1E /* PollViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B247E2C87BECE00229F1E /* PollViewModel.swift */; };
+		884B24822C87E13B00229F1E /* ProfileScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B24812C87E13B00229F1E /* ProfileScreen.swift */; };
+		884B24842C87E44500229F1E /* PollScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B24832C87E44500229F1E /* PollScreen.swift */; };
+		884B24862C87E7BB00229F1E /* PollComplete.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B24852C87E7BB00229F1E /* PollComplete.swift */; };
 		888FF3BA2C8679F10025EC1B /* ContactsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 888FF3B92C8679F10025EC1B /* ContactsScreen.swift */; };
 		888FF3BC2C867CD80025EC1B /* LocationScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 888FF3BB2C867CD80025EC1B /* LocationScreen.swift */; };
 		888FF3BE2C867CEF0025EC1B /* Onboarding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 888FF3BD2C867CEF0025EC1B /* Onboarding.swift */; };
@@ -55,6 +64,15 @@
 
 /* Begin PBXFileReference section */
 		884B24722C879A1900229F1E /* HighSchoolViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighSchoolViewModel.swift; sourceTree = "<group>"; };
+		884B24742C87B96E00229F1E /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		884B24762C87B97500229F1E /* Poll.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Poll.swift; sourceTree = "<group>"; };
+		884B24782C87B97D00229F1E /* PollOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PollOption.swift; sourceTree = "<group>"; };
+		884B247A2C87B98500229F1E /* HighSchool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighSchool.swift; sourceTree = "<group>"; };
+		884B247C2C87B99D00229F1E /* VibeCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VibeCheck.swift; sourceTree = "<group>"; };
+		884B247E2C87BECE00229F1E /* PollViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PollViewModel.swift; sourceTree = "<group>"; };
+		884B24812C87E13B00229F1E /* ProfileScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileScreen.swift; sourceTree = "<group>"; };
+		884B24832C87E44500229F1E /* PollScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PollScreen.swift; sourceTree = "<group>"; };
+		884B24852C87E7BB00229F1E /* PollComplete.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PollComplete.swift; sourceTree = "<group>"; };
 		888FF3B92C8679F10025EC1B /* ContactsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsScreen.swift; sourceTree = "<group>"; };
 		888FF3BB2C867CD80025EC1B /* LocationScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationScreen.swift; sourceTree = "<group>"; };
 		888FF3BD2C867CEF0025EC1B /* Onboarding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Onboarding.swift; sourceTree = "<group>"; };
@@ -113,9 +131,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		884B24802C87E12B00229F1E /* Profile */ = {
+			isa = PBXGroup;
+			children = (
+				884B24812C87E13B00229F1E /* ProfileScreen.swift */,
+			);
+			path = Profile;
+			sourceTree = "<group>";
+		};
 		888FF3C92C867E4A0025EC1B /* Polling */ = {
 			isa = PBXGroup;
 			children = (
+				884B24832C87E44500229F1E /* PollScreen.swift */,
+				884B24852C87E7BB00229F1E /* PollComplete.swift */,
 			);
 			path = Polling;
 			sourceTree = "<group>";
@@ -171,6 +199,7 @@
 				88C1E5652C86A6C400C9317E /* AuthViewModel.swift */,
 				88C1E5692C86D95B00C9317E /* NetworkViewModel.swift */,
 				884B24722C879A1900229F1E /* HighSchoolViewModel.swift */,
+				884B247E2C87BECE00229F1E /* PollViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -178,6 +207,7 @@
 		88B37D1D2C23FD78000A7D91 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				884B24802C87E12B00229F1E /* Profile */,
 				888FF3C92C867E4A0025EC1B /* Polling */,
 				88B37D0E2C23FD60000A7D91 /* ContentView.swift */,
 				88B37D262C23FFE9000A7D91 /* Home */,
@@ -225,6 +255,11 @@
 		88B37D222C23FDEE000A7D91 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				884B24742C87B96E00229F1E /* User.swift */,
+				884B24762C87B97500229F1E /* Poll.swift */,
+				884B24782C87B97D00229F1E /* PollOption.swift */,
+				884B247A2C87B98500229F1E /* HighSchool.swift */,
+				884B247C2C87B99D00229F1E /* VibeCheck.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -384,10 +419,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				888FF3BA2C8679F10025EC1B /* ContactsScreen.swift in Sources */,
+				884B247F2C87BECE00229F1E /* PollViewModel.swift in Sources */,
 				88B37D322C2406DA000A7D91 /* Constants.swift in Sources */,
 				888FF3C42C867DF50025EC1B /* NameScreen.swift in Sources */,
+				884B24822C87E13B00229F1E /* ProfileScreen.swift in Sources */,
+				884B247B2C87B98500229F1E /* HighSchool.swift in Sources */,
 				88B37D542C2411FC000A7D91 /* Extensions.swift in Sources */,
 				88B37D342C240761000A7D91 /* RCPurchaseController.swift in Sources */,
+				884B24862C87E7BB00229F1E /* PollComplete.swift in Sources */,
 				88B37D572C241321000A7D91 /* NetworkManger.swift in Sources */,
 				88B37D0F2C23FD60000A7D91 /* ContentView.swift in Sources */,
 				88C1E5682C86D86800C9317E /* HighSchoolScreen.swift in Sources */,
@@ -401,20 +440,25 @@
 				88B37D482C2410BE000A7D91 /* UIDevice.swift in Sources */,
 				88B37D4E2C241127000A7D91 /* Color.swift in Sources */,
 				888FF3C22C867DC50025EC1B /* GenderScreen.swift in Sources */,
+				884B24772C87B97500229F1E /* Poll.swift in Sources */,
 				88B37D4A2C2410EB000A7D91 /* Numbers.swift in Sources */,
 				888FF3BC2C867CD80025EC1B /* LocationScreen.swift in Sources */,
 				88C1E5642C86A6B300C9317E /* FirebaseService.swift in Sources */,
+				884B24792C87B97D00229F1E /* PollOption.swift in Sources */,
 				88C1E56A2C86D95B00C9317E /* NetworkViewModel.swift in Sources */,
 				88B37D4C2C241110000A7D91 /* Array.swift in Sources */,
 				88B37D3E2C240CFF000A7D91 /* FirstOnboardingScreen.swift in Sources */,
 				88B37D0D2C23FD60000A7D91 /* ShipFastStarterApp.swift in Sources */,
+				884B247D2C87B99D00229F1E /* VibeCheck.swift in Sources */,
 				88B37D372C2407DF000A7D91 /* AnalyticsService.swift in Sources */,
 				888FF3BE2C867CEF0025EC1B /* Onboarding.swift in Sources */,
 				88C1E5662C86A6C400C9317E /* AuthViewModel.swift in Sources */,
+				884B24842C87E44500229F1E /* PollScreen.swift in Sources */,
 				88B37D502C24118F000A7D91 /* API.swift in Sources */,
 				88B37D592C241355000A7D91 /* ResponseModel.swift in Sources */,
 				888FF3C02C867DBC0025EC1B /* BirthdayScreen.swift in Sources */,
 				88B37D242C23FDF8000A7D91 /* MainViewModel.swift in Sources */,
+				884B24752C87B96E00229F1E /* User.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

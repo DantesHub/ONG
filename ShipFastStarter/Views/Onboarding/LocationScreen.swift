@@ -4,6 +4,7 @@ import CoreLocation
 class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     private let locationManager = CLLocationManager()
     @Published var authorizationStatus: CLAuthorizationStatus?
+    @Published var accuracyAuthorization: CLAccuracyAuthorization?
     
     override init() {
         super.init()
@@ -16,6 +17,11 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         authorizationStatus = manager.authorizationStatus
+        accuracyAuthorization = manager.accuracyAuthorization
+    }
+    
+    func requestTemporaryFullAccuracyAuthorization(purposeKey: String) {
+        locationManager.requestTemporaryFullAccuracyAuthorization(withPurposeKey: purposeKey)
     }
 }
 
@@ -56,7 +62,7 @@ struct LocationScreen: View {
             
             HStack {
                 Image(systemName: "lock.fill")
-                Text("Gas cares intensely about your privacy.\nLocation is only used to find nearby schools.")
+                Text("ONG cares intensely about your privacy.\nLocation is only used to find nearby schools.")
                     .font(.caption)
                     .multilineTextAlignment(.center)
             }
@@ -65,6 +71,28 @@ struct LocationScreen: View {
         }
         .background(Color.orange)
         .edgesIgnoringSafeArea(.all)
+        .onChange(of: locationManager.authorizationStatus) { status in
+            if status == .authorizedWhenInUse {
+                handleLocationAuthorization()
+            }
+        }
+    }
+    
+    private func handleLocationAuthorization() {
+        switch locationManager.accuracyAuthorization {
+        case .fullAccuracy:
+            // Use precise location
+            print("Full accuracy granted")
+        case .reducedAccuracy:
+            // Use approximate location or request temporary full accuracy
+            locationManager.requestTemporaryFullAccuracyAuthorization(purposeKey: "FindNearbySchools")
+        case .none:
+            // Handle unexpected case
+            print("Accuracy authorization not determined")
+        @unknown default:
+            // Handle future cases
+            print("Unknown accuracy authorization")
+        }
     }
 }
 

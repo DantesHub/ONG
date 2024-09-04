@@ -11,7 +11,7 @@ import SwiftUI
 
 struct OnboardingView: View {
     @EnvironmentObject var mainVM: MainViewModel
-
+    @EnvironmentObject var authVM: MainViewModel
 
     var body: some View {
        ZStack {
@@ -46,7 +46,10 @@ struct OnboardingView: View {
                     case .gender: GenderScreen()
                     case .birthday: BirthdayScreen()
                     case .name: NameScreen()
-                    case .number: NumberScreen()
+                    case .number: 
+                        NumberScreen()
+                        .environmentObject(authVM)
+                        .environmentObject(mainVM)
                     case .contacts: ContactsScreen()
                     case .location: LocationScreen()
                     case .highschool: HighSchoolScreen()
