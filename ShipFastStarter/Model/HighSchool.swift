@@ -9,7 +9,7 @@ import SwiftData
 import Foundation
 
 struct HighSchool: Codable, Equatable, Identifiable, FBObject {
-    var id: String
+    let id: String
     var name: String
     var location: String
     var totalAura: Int
@@ -34,7 +34,7 @@ struct HighSchool: Codable, Equatable, Identifiable, FBObject {
     }
 
     static var exHighSchool = HighSchool(
-        id: UUID().uuidString,
+        id: "highschoolId",
         name: "buildspace",
         location: "Example City, State",
         totalAura: 1000,

@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8838DC362C8921D400500C6E /* ShadowModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8838DC352C8921D400500C6E /* ShadowModifier.swift */; };
+		8838DC3A2C89228100500C6E /* SharedComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8838DC392C89228100500C6E /* SharedComponents.swift */; };
 		884B24732C879A1900229F1E /* HighSchoolViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B24722C879A1900229F1E /* HighSchoolViewModel.swift */; };
 		884B24752C87B96E00229F1E /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B24742C87B96E00229F1E /* User.swift */; };
 		884B24772C87B97500229F1E /* Poll.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B24762C87B97500229F1E /* Poll.swift */; };
@@ -40,7 +42,6 @@
 		88B37D3A2C240CAB000A7D91 /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = 88B37D392C240CAB000A7D91 /* RevenueCat */; };
 		88B37D3C2C240CF3000A7D91 /* HomeScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B37D3B2C240CF3000A7D91 /* HomeScreen.swift */; };
 		88B37D3E2C240CFF000A7D91 /* FirstOnboardingScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B37D3D2C240CFF000A7D91 /* FirstOnboardingScreen.swift */; };
-		88B37D402C240D12000A7D91 /* SharedComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B37D3F2C240D12000A7D91 /* SharedComponents.swift */; };
 		88B37D422C240D5D000A7D91 /* FontManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B37D412C240D5D000A7D91 /* FontManager.swift */; };
 		88B37D442C240D77000A7D91 /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 88B37D432C240D77000A7D91 /* Colors.xcassets */; };
 		88B37D482C2410BE000A7D91 /* UIDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B37D472C2410BE000A7D91 /* UIDevice.swift */; };
@@ -64,6 +65,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		8838DC352C8921D400500C6E /* ShadowModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShadowModifier.swift; sourceTree = "<group>"; };
+		8838DC392C89228100500C6E /* SharedComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedComponents.swift; sourceTree = "<group>"; };
 		884B24722C879A1900229F1E /* HighSchoolViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighSchoolViewModel.swift; sourceTree = "<group>"; };
 		884B24742C87B96E00229F1E /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		884B24762C87B97500229F1E /* Poll.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Poll.swift; sourceTree = "<group>"; };
@@ -94,7 +97,6 @@
 		88B37D362C2407DF000A7D91 /* AnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsService.swift; sourceTree = "<group>"; };
 		88B37D3B2C240CF3000A7D91 /* HomeScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeScreen.swift; sourceTree = "<group>"; };
 		88B37D3D2C240CFF000A7D91 /* FirstOnboardingScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstOnboardingScreen.swift; sourceTree = "<group>"; };
-		88B37D3F2C240D12000A7D91 /* SharedComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedComponents.swift; sourceTree = "<group>"; };
 		88B37D412C240D5D000A7D91 /* FontManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontManager.swift; sourceTree = "<group>"; };
 		88B37D432C240D77000A7D91 /* Colors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Colors.xcassets; sourceTree = "<group>"; };
 		88B37D472C2410BE000A7D91 /* UIDevice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIDevice.swift; sourceTree = "<group>"; };
@@ -133,6 +135,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		8838DC342C8921C900500C6E /* ViewModifiers */ = {
+			isa = PBXGroup;
+			children = (
+				8838DC352C8921D400500C6E /* ShadowModifier.swift */,
+				8838DC392C89228100500C6E /* SharedComponents.swift */,
+			);
+			path = ViewModifiers;
+			sourceTree = "<group>";
+		};
 		884B24802C87E12B00229F1E /* Profile */ = {
 			isa = PBXGroup;
 			children = (
@@ -214,7 +225,6 @@
 				88B37D0E2C23FD60000A7D91 /* ContentView.swift */,
 				88B37D262C23FFE9000A7D91 /* Home */,
 				88B37D252C23FFE5000A7D91 /* Onboarding */,
-				88B37D3F2C240D12000A7D91 /* SharedComponents.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -222,6 +232,7 @@
 		88B37D1E2C23FD7C000A7D91 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				8838DC342C8921C900500C6E /* ViewModifiers */,
 				88B37D462C2410AF000A7D91 /* Extensions */,
 				88B37D352C2407D0000A7D91 /* Services */,
 				88B37D312C2406DA000A7D91 /* Constants.swift */,
@@ -427,6 +438,7 @@
 				888FF3C42C867DF50025EC1B /* NameScreen.swift in Sources */,
 				884B24822C87E13B00229F1E /* ProfileScreen.swift in Sources */,
 				884B247B2C87B98500229F1E /* HighSchool.swift in Sources */,
+				8838DC3A2C89228100500C6E /* SharedComponents.swift in Sources */,
 				88B37D542C2411FC000A7D91 /* Extensions.swift in Sources */,
 				88B37D342C240761000A7D91 /* RCPurchaseController.swift in Sources */,
 				884B24862C87E7BB00229F1E /* PollComplete.swift in Sources */,
@@ -436,9 +448,9 @@
 				884B24732C879A1900229F1E /* HighSchoolViewModel.swift in Sources */,
 				88B37D522C2411A4000A7D91 /* Types.swift in Sources */,
 				88B37D112C23FD60000A7D91 /* Item.swift in Sources */,
-				88B37D402C240D12000A7D91 /* SharedComponents.swift in Sources */,
 				88B37D3C2C240CF3000A7D91 /* HomeScreen.swift in Sources */,
 				88B37D422C240D5D000A7D91 /* FontManager.swift in Sources */,
+				8838DC362C8921D400500C6E /* ShadowModifier.swift in Sources */,
 				888FF3C62C867E0F0025EC1B /* NumberScreen.swift in Sources */,
 				88B37D482C2410BE000A7D91 /* UIDevice.swift in Sources */,
 				88B37D4E2C241127000A7D91 /* Color.swift in Sources */,
