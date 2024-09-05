@@ -108,7 +108,7 @@ struct PollScreen: View {
             }
         }
         .onAppear {
-            print("test")
+            print("test2")
             Task {
                 await pollVM.getPollOptions()
             }
