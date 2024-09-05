@@ -47,14 +47,14 @@ class PollViewModel: ObservableObject {
         }
     }
 
-    func answerPoll(user: User, option: PollOption) async {
+    func answerPoll(user: User, option: PollOption, totalVotes: Int) async {
         // Immediately update local state
         var finalOption = PollOption.exPollOption
         if var updatedOption = currentFourOptions.first(where: { $0.id == option.id }) {
             var updatedVotes = updatedOption.votes ?? [:]
             updatedVotes[user.id] = (updatedVotes[user.id] ?? 0) + 1
             updatedOption.votes = updatedVotes
-            finalOption = updatedOption
+            finalOption = updatedOption 
             if let index = currentFourOptions.firstIndex(where: { $0.id == option.id }) {
                 currentFourOptions[index] = updatedOption
             }
@@ -243,6 +243,7 @@ class PollViewModel: ObservableObject {
             self.currentFourOptions = Array(self.currentOptions.prefix(4))
             self.currentOptionIndex = 4
             updateQuestionEmoji()
+            resetPollState() // Reset the state for the new poll
         } catch {
             print("Error getting poll options: \(error.localizedDescription)")
         }
@@ -277,6 +278,12 @@ class PollViewModel: ObservableObject {
         } else {
             self.questionEmoji = "❓" // Default emoji if no match found
         }
+    }
+
+    func resetPollState() {
+        showProgress = false
+        animateProgress = false
+        animateAllOptions = false
     }
 
     // Other methods remain unchanged

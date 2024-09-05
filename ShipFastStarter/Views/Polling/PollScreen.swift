@@ -14,7 +14,7 @@ struct PollScreen: View {
     @State private var isComplete = false
     @State private var showTapToContinue = false
     @State private var animateProgress = false
-    @State private var contentOpacity: Double = 1  // Add this line
+    @State private var contentOpacity: Double = 1
     
     var body: some View {
         ZStack {
@@ -34,7 +34,7 @@ struct PollScreen: View {
                 if !pollVM.pollSet.isEmpty {
                     VStack {
                         Spacer()
-                        // Poll question and options
+                        // Poll question
                         VStack(spacing: 0) {
                             Text(pollVM.questionEmoji)
                                .font(.system(size: 64))
@@ -44,52 +44,62 @@ struct PollScreen: View {
                                 .frame(height: 124, alignment: .top)
                                 .padding(.horizontal, 24)
                                 .multilineTextAlignment(.center)
-                            
-                            Spacer()
-                            
-                            // Poll options in vertical layout
-                            VStack(spacing: 24) {
-                                ForEach(pollVM.currentFourOptions, id: \.id) { option in
-                                    PollOptionView(option: option, totalVotes: totalVotes, animateProgress: $animateProgress)
-                                }
-                            }
-                            .padding()
-                            .opacity(contentOpacity)  // Add this line
                         }
+                     
+                        Spacer()
+                        // Poll options in vertical layout
+                        VStack(spacing: 24) {
+                            ForEach(pollVM.currentFourOptions, id: \.id) { option in
+                                PollOptionView(option: option, totalVotes: totalVotes, animateProgress: $animateProgress)
+                            }
+                        }
+                        .padding()
                         
                         // Skip and Shuffle buttons
-                        HStack {
-                            Button(action: {
-                                skipPoll()
-                            }) {
-                                Text("Skip")
-                                    .foregroundColor(.white)
-                                    .padding()
-                                    .background(Color.black.opacity(0.5))
-                                    .cornerRadius(20)
-                            }
-                            
-                            Spacer()
-                            
-                            Button(action: {
-                                pollVM.shuffleOptions()
-                            }) {
-                                Image(systemName: "shuffle")
-                                    .foregroundColor(.white)
-                                    .padding()
-                                    .background(Color.black.opacity(0.5))
-                                    .cornerRadius(20)
-                            }
-                        }
-                        .padding(.horizontal)
-                        .padding(.bottom, 20)
-                        
-                        if showTapToContinue {
-                            Text("Tap to continue")
-                                .foregroundColor(.white)
+                        if pollVM.showProgress {
+                                HStack {
+                                    
+                                    Text("Tap to continue")
+                                        .foregroundColor(.white)
+                                        .sfPro(type: .bold, size: .h2)
+                                        .padding(.bottom, 20)
+                                }.frame(height: 64)
+                                .padding(.horizontal)
                                 .padding(.bottom, 20)
+                            
+                        } else {
+                            HStack {
+                                Button(action: {
+                                    skipPoll()
+                                }) {
+                                    Text("Skip")
+                                        .foregroundColor(.white)
+                                        .padding()
+                                        .background(Color.black.opacity(0.5))
+                                        .cornerRadius(20)
+                                }
+                                
+                                Spacer()
+                                
+                                Button(action: {
+                                    pollVM.shuffleOptions()
+                                }) {
+                                    Image(systemName: "shuffle")
+                                        .foregroundColor(.white)
+                                        .padding()
+                                        .background(Color.black.opacity(0.5))
+                                        .cornerRadius(20)
+                                }
+                            }
+                            .frame(height: 64)
+                            .padding(.horizontal)
+                            .padding(.bottom, 20)
                         }
+                  
+                        
+                      
                     }
+                    .opacity(contentOpacity)
                 } else {
                     Text("No more polls available")
                         .font(.title)
@@ -102,26 +112,16 @@ struct PollScreen: View {
                 await pollVM.getPollOptions()
             }
         }
-        .onChange(of: pollVM.showProgress) { newValue in
-            if newValue {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                    showTapToContinue = true
-                    animateProgress = true  // Add this line
-                }
+        .onChange(of: pollVM.showProgress) {
+            if pollVM.showProgress {
+                showTapToContinue = true
+                animateProgress = true
             }
         }
         .contentShape(Rectangle())
         .onTapGesture {
             if showTapToContinue {
-                withAnimation(.easeInOut(duration: 0.3)) {
-                    contentOpacity = 0
-                }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                    moveToNextPoll()
-                    withAnimation(.easeInOut(duration: 0.3)) {
-                        contentOpacity = 1
-                    }
-                }
+                animateTransition()
             }
         }
     }
@@ -131,7 +131,21 @@ struct PollScreen: View {
     }
     
     private func skipPoll() {
-        moveToNextPoll()
+        animateTransition()
+    }
+    
+    private func animateTransition() {
+        withAnimation(.easeInOut(duration: 0.3)) {
+            contentOpacity = 0
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            moveToNextPoll()
+            
+            withAnimation(.easeInOut(duration: 0.3)) {
+                contentOpacity = 1
+            }
+        }
     }
     
     private func moveToNextPoll() {
@@ -143,8 +157,7 @@ struct PollScreen: View {
                 await pollVM.getPollOptions()
             }
             showTapToContinue = false
-            pollVM.showProgress = false
-            animateProgress = false
+            animateProgress = false // Reset this local state
         }
     }
 }
@@ -167,9 +180,10 @@ struct PollOptionView: View {
                     self.opacity = 1
                     if let user = mainVM.currUser {
                         Task {
-                            await pollVM.answerPoll(user: user, option: option)
+                            await pollVM.answerPoll(user: user, option: option, totalVotes: 1)
                             withAnimation(.easeInOut(duration: 0.5)) {
-                                animateProgress = true
+                                pollVM.animateProgress = true
+                                animateProgress = true // Update the local binding
                             }
                         }
                     }
@@ -199,19 +213,30 @@ struct PollOptionView: View {
                             .foregroundColor(.black)
                             .sfPro(type: .semibold, size: .h3p1)
                         
-                        if pollVM.showProgress {
-                            Spacer()
-                            Text("\(Int(progress * 100))%")
-                                .foregroundColor(.black)
-                                .sfPro(type: .semibold, size: .h3p1)
-                        }
+//                        if pollVM.showProgress {
+//                            Spacer()
+//                            Text("\(Int(progress * 100))%")
+//                                .foregroundColor(.black)
+//                                .sfPro(type: .semibold, size: .h3p1)
+//                        }
                     }
                     .padding(.horizontal, 32)
                     .frame(maxWidth: .infinity, alignment: pollVM.showProgress ? .leading : .center)
                 }
+                .onChange(of: pollVM.animateProgress) {
+                    if pollVM.animateProgress {
+                        withAnimation(.easeInOut(duration: 0.5)) {
+                            progressWidth = geometry.size.width * progress
+                        }
+                    } else {
+                        progressWidth = 0
+                    }
+                }
                 .onChange(of: animateProgress) { newValue in
                     if newValue {
-                        progressWidth = geometry.size.width * progress
+                        withAnimation(.easeInOut(duration: 0.5)) {
+                            progressWidth = geometry.size.width * progress
+                        }
                     } else {
                         progressWidth = 0
                     }
