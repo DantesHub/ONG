@@ -5,3 +5,5 @@ The must haves for creating a profitable app.
 - Superwall
 - Revenuecat
 - Appsflyer
+
+remember to have fun
