@@ -14,7 +14,8 @@ struct NumberScreen: View {
     @State private var verificationCode = ""
     @State private var isNextEnabled = false
     @State private var isVerifyEnabled = false
-    
+    @State private var showNumberScreen = false
+
     var body: some View {
         VStack(spacing: 20) {
             Text(authVM.isVerificationCodeSent ? "Enter verification code" : "Enter your phone number")
@@ -51,6 +52,7 @@ struct NumberScreen: View {
                     Analytics.shared.logActual(event: "NumberScreen: Tapped Next", parameters: ["":""])
                     let formattedNumber = "+1\(phoneNumber)"
                     withAnimation {
+                        
                         if var user = mainVM.currUser {
                             mainVM.currUser?.number = formattedNumber
                             user.number = formattedNumber
