@@ -49,6 +49,11 @@ struct InboxScreen: View {
             }
         }.onAppear {
             // fetch notifications
+            if let user = mainVM.currUser {
+                Task {
+                    await inboxVM.fetchNotifications(for: user)
+                }
+            }
         }
     }
 }

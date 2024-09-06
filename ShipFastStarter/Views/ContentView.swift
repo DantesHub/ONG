@@ -12,6 +12,7 @@ struct ContentView: View {
     @EnvironmentObject var mainVM: MainViewModel
     @StateObject var authVM = AuthViewModel()
     @StateObject var pollVM = PollViewModel()
+    @StateObject var inboxVM = InboxViewModel()
     @StateObject var highschoolVM = HighSchoolViewModel()
     @Environment(\.modelContext) private var modelContext
     @Query private var items: [Item]
@@ -39,6 +40,17 @@ struct ContentView: View {
                         PollCooldownScreen()
                             .environmentObject(pollVM)
                             .environmentObject(mainVM)
+                    case .inbox:
+                        InboxScreen()
+                            .environmentObject(mainVM)
+                            .environmentObject(inboxVM)
+                    }
+                }
+                .onChange(of: mainVM.currUser) {
+                    if let currUser = mainVM.currUser, mainVM.currentPage == .inbox {
+                        Task {
+                            await inboxVM.fetchNotifications(for: currUser)
+                        }
                     }
                 }
                 .onAppear {
@@ -76,7 +88,8 @@ struct ContentView: View {
                         .environmentObject(mainVM)
                         .environmentObject(pollVM)
                 }
-            }     .navigationBarTitleDisplayMode(.inline)
+            }    
+            .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
                     if mainVM.currentPage != .onboarding {
                         ToolbarItem(placement: .principal) {
