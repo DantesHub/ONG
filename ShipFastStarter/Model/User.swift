@@ -26,12 +26,12 @@ struct User: Codable, Equatable, FBObject {
     var grade: String
     var number: String
     var votedPolls: [String]
-    var lastPollFinished: Date
+    var lastPollFinished: Date?
     var friends: [String]
     var invitedFriends: [String]
     var ogBadge: Bool
 
-    init(id: String, firstName: String, lastName: String, schoolId: String, color: String, aura: Int, godMode: Bool, birthday: String, grade: String, number: String, votedPolls: [String], lastPollFinished: Date, friends: [String], invitedFriends: [String], ogBadge: Bool) {
+    init(id: String, firstName: String, lastName: String, schoolId: String, color: String, aura: Int, godMode: Bool, birthday: String, grade: String, number: String, votedPolls: [String], lastPollFinished: Date?, friends: [String], invitedFriends: [String], ogBadge: Bool) {
         self.id = id
         self.firstName = firstName
         self.lastName = lastName
@@ -61,7 +61,7 @@ struct User: Codable, Equatable, FBObject {
         grade: "11",
         number: "1234567890",
         votedPolls: [],
-        lastPollFinished: Date(),
+        lastPollFinished: nil,
         friends: [],
         invitedFriends: [],
         ogBadge: true

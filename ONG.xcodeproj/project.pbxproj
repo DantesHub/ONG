@@ -9,6 +9,10 @@
 /* Begin PBXBuildFile section */
 		8838DC362C8921D400500C6E /* ShadowModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8838DC352C8921D400500C6E /* ShadowModifier.swift */; };
 		8838DC3A2C89228100500C6E /* SharedComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8838DC392C89228100500C6E /* SharedComponents.swift */; };
+		8838DC3E2C8A5B7B00500C6E /* PollCooldownScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8838DC3D2C8A5B7B00500C6E /* PollCooldownScreen.swift */; };
+		8838DC402C8A8F7D00500C6E /* SplashScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8838DC3F2C8A8F7D00500C6E /* SplashScreen.swift */; };
+		8838DC432C8A908400500C6E /* InboxScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8838DC422C8A908400500C6E /* InboxScreen.swift */; };
+		8838DC452C8A944900500C6E /* Date.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8838DC442C8A944900500C6E /* Date.swift */; };
 		884B24732C879A1900229F1E /* HighSchoolViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B24722C879A1900229F1E /* HighSchoolViewModel.swift */; };
 		884B24752C87B96E00229F1E /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B24742C87B96E00229F1E /* User.swift */; };
 		884B24772C87B97500229F1E /* Poll.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B24762C87B97500229F1E /* Poll.swift */; };
@@ -67,6 +71,10 @@
 /* Begin PBXFileReference section */
 		8838DC352C8921D400500C6E /* ShadowModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShadowModifier.swift; sourceTree = "<group>"; };
 		8838DC392C89228100500C6E /* SharedComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedComponents.swift; sourceTree = "<group>"; };
+		8838DC3D2C8A5B7B00500C6E /* PollCooldownScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PollCooldownScreen.swift; sourceTree = "<group>"; };
+		8838DC3F2C8A8F7D00500C6E /* SplashScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashScreen.swift; sourceTree = "<group>"; };
+		8838DC422C8A908400500C6E /* InboxScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InboxScreen.swift; sourceTree = "<group>"; };
+		8838DC442C8A944900500C6E /* Date.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Date.swift; sourceTree = "<group>"; };
 		884B24722C879A1900229F1E /* HighSchoolViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighSchoolViewModel.swift; sourceTree = "<group>"; };
 		884B24742C87B96E00229F1E /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		884B24762C87B97500229F1E /* Poll.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Poll.swift; sourceTree = "<group>"; };
@@ -144,6 +152,14 @@
 			path = ViewModifiers;
 			sourceTree = "<group>";
 		};
+		8838DC412C8A907700500C6E /* Inbox */ = {
+			isa = PBXGroup;
+			children = (
+				8838DC422C8A908400500C6E /* InboxScreen.swift */,
+			);
+			path = Inbox;
+			sourceTree = "<group>";
+		};
 		884B24802C87E12B00229F1E /* Profile */ = {
 			isa = PBXGroup;
 			children = (
@@ -157,6 +173,7 @@
 			children = (
 				884B24832C87E44500229F1E /* PollScreen.swift */,
 				884B24852C87E7BB00229F1E /* PollComplete.swift */,
+				8838DC3D2C8A5B7B00500C6E /* PollCooldownScreen.swift */,
 			);
 			path = Polling;
 			sourceTree = "<group>";
@@ -220,11 +237,13 @@
 		88B37D1D2C23FD78000A7D91 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				8838DC412C8A907700500C6E /* Inbox */,
 				884B24802C87E12B00229F1E /* Profile */,
 				888FF3C92C867E4A0025EC1B /* Polling */,
 				88B37D0E2C23FD60000A7D91 /* ContentView.swift */,
 				88B37D262C23FFE9000A7D91 /* Home */,
 				88B37D252C23FFE5000A7D91 /* Onboarding */,
+				8838DC3F2C8A8F7D00500C6E /* SplashScreen.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -339,6 +358,7 @@
 				88B37D492C2410EB000A7D91 /* Numbers.swift */,
 				88B37D4B2C241110000A7D91 /* Array.swift */,
 				88B37D4D2C241127000A7D91 /* Color.swift */,
+				8838DC442C8A944900500C6E /* Date.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -432,6 +452,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8838DC402C8A8F7D00500C6E /* SplashScreen.swift in Sources */,
 				888FF3BA2C8679F10025EC1B /* ContactsScreen.swift in Sources */,
 				884B247F2C87BECE00229F1E /* PollViewModel.swift in Sources */,
 				88B37D322C2406DA000A7D91 /* Constants.swift in Sources */,
@@ -439,6 +460,7 @@
 				884B24822C87E13B00229F1E /* ProfileScreen.swift in Sources */,
 				884B247B2C87B98500229F1E /* HighSchool.swift in Sources */,
 				8838DC3A2C89228100500C6E /* SharedComponents.swift in Sources */,
+				8838DC432C8A908400500C6E /* InboxScreen.swift in Sources */,
 				88B37D542C2411FC000A7D91 /* Extensions.swift in Sources */,
 				88B37D342C240761000A7D91 /* RCPurchaseController.swift in Sources */,
 				884B24862C87E7BB00229F1E /* PollComplete.swift in Sources */,
@@ -446,6 +468,7 @@
 				88B37D0F2C23FD60000A7D91 /* ContentView.swift in Sources */,
 				88C1E5682C86D86800C9317E /* HighSchoolScreen.swift in Sources */,
 				884B24732C879A1900229F1E /* HighSchoolViewModel.swift in Sources */,
+				8838DC452C8A944900500C6E /* Date.swift in Sources */,
 				88B37D522C2411A4000A7D91 /* Types.swift in Sources */,
 				88B37D112C23FD60000A7D91 /* Item.swift in Sources */,
 				88B37D3C2C240CF3000A7D91 /* HomeScreen.swift in Sources */,
@@ -463,6 +486,7 @@
 				88C1E56A2C86D95B00C9317E /* NetworkViewModel.swift in Sources */,
 				88B37D4C2C241110000A7D91 /* Array.swift in Sources */,
 				88B37D3E2C240CFF000A7D91 /* FirstOnboardingScreen.swift in Sources */,
+				8838DC3E2C8A5B7B00500C6E /* PollCooldownScreen.swift in Sources */,
 				88B37D0D2C23FD60000A7D91 /* ShipFastStarterApp.swift in Sources */,
 				884B247D2C87B99D00229F1E /* VibeCheck.swift in Sources */,
 				88B37D372C2407DF000A7D91 /* AnalyticsService.swift in Sources */,
