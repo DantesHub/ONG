@@ -13,7 +13,6 @@ protocol FBObject {
     func encodeToDictionary() -> [String: Any]?
 }
 
-
 struct User: Codable, Equatable, FBObject {
     var id: String
     var firstName: String
@@ -30,8 +29,9 @@ struct User: Codable, Equatable, FBObject {
     var friends: [String]
     var invitedFriends: [String]
     var ogBadge: Bool
+    var gender: String // New property
 
-    init(id: String, firstName: String, lastName: String, schoolId: String, color: String, aura: Int, godMode: Bool, birthday: String, grade: String, number: String, votedPolls: [String], lastPollFinished: Date?, friends: [String], invitedFriends: [String], ogBadge: Bool) {
+    init(id: String, firstName: String, lastName: String, schoolId: String, color: String, aura: Int, godMode: Bool, birthday: String, grade: String, number: String, votedPolls: [String], lastPollFinished: Date?, friends: [String], invitedFriends: [String], ogBadge: Bool, gender: String) {
         self.id = id
         self.firstName = firstName
         self.lastName = lastName
@@ -47,6 +47,7 @@ struct User: Codable, Equatable, FBObject {
         self.friends = friends
         self.invitedFriends = invitedFriends
         self.ogBadge = ogBadge
+        self.gender = gender
     }
 
     static var exUser = User(
@@ -64,7 +65,8 @@ struct User: Codable, Equatable, FBObject {
         lastPollFinished: nil,
         friends: [],
         invitedFriends: [],
-        ogBadge: true
+        ogBadge: true,
+        gender: "Male" // Example gender
     )
 
     static func == (lhs: User, rhs: User) -> Bool {
@@ -72,25 +74,27 @@ struct User: Codable, Equatable, FBObject {
     }
 
     enum CodingKeys: String, CodingKey {
-        case id, firstName, lastName, schoolId, color, aura, godMode, birthday, grade, number, votedPolls, lastPollFinished, friends, invitedFriends, ogBadge
+        case id, firstName, lastName, schoolId, color, aura, godMode, birthday, grade, number, votedPolls, lastPollFinished, friends, invitedFriends, ogBadge, gender
     }
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        
         id = try container.decode(String.self, forKey: .id)
         firstName = try container.decode(String.self, forKey: .firstName)
         lastName = try container.decode(String.self, forKey: .lastName)
         schoolId = try container.decode(String.self, forKey: .schoolId)
-        color = try container.decode(String.self, forKey: .color)
-        aura = try container.decode(Int.self, forKey: .aura)
-        godMode = try container.decode(Bool.self, forKey: .godMode)
-        birthday = try container.decode(String.self, forKey: .birthday)
-        grade = try container.decode(String.self, forKey: .grade)
-        number = try container.decode(String.self, forKey: .number)
-        votedPolls = try container.decode([String].self, forKey: .votedPolls)
-        friends = try container.decode([String].self, forKey: .friends)
-        invitedFriends = try container.decode([String].self, forKey: .invitedFriends)
-        ogBadge = try container.decode(Bool.self, forKey: .ogBadge)
+        color = try container.decodeIfPresent(String.self, forKey: .color) ?? "#000000" // Default black color
+        aura = try container.decodeIfPresent(Int.self, forKey: .aura) ?? 0
+        godMode = try container.decodeIfPresent(Bool.self, forKey: .godMode) ?? false
+        birthday = try container.decodeIfPresent(String.self, forKey: .birthday) ?? "2000-01-01" // Default birthday
+        grade = try container.decodeIfPresent(String.self, forKey: .grade) ?? "9" // Default to 9th grade
+        number = try container.decodeIfPresent(String.self, forKey: .number) ?? ""
+        votedPolls = try container.decodeIfPresent([String].self, forKey: .votedPolls) ?? []
+        friends = try container.decodeIfPresent([String].self, forKey: .friends) ?? []
+        invitedFriends = try container.decodeIfPresent([String].self, forKey: .invitedFriends) ?? []
+        ogBadge = try container.decodeIfPresent(Bool.self, forKey: .ogBadge) ?? false
+        gender = try container.decodeIfPresent(String.self, forKey: .gender) ?? "Unspecified" // Default gender
 
         // Custom decoding for lastPollFinished
         if let lastPollFinishedTimestamp = try? container.decode(Double.self, forKey: .lastPollFinished) {
@@ -99,7 +103,7 @@ struct User: Codable, Equatable, FBObject {
                   let lastPollFinishedDate = ISO8601DateFormatter().date(from: lastPollFinishedString) {
             lastPollFinished = lastPollFinishedDate
         } else {
-            lastPollFinished = Date() // Default to current date if unable to parse
+            lastPollFinished = nil
         }
     }
 

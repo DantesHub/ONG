@@ -14,7 +14,7 @@ struct PollOption: Codable, Equatable, FBObject {
     let option: String
     let userId: String
     var votes: [String: [String: String]]?
-    // id: [date: "100", viewedNotification: "true"]
+    // id: [date: timeStamp, numVotes: "100", viewedNotification: "true"]
     let gradeLevel: String
     var computedProgress: Double = 0 // Make this mutable
 

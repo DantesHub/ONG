@@ -8,8 +8,8 @@
 import Foundation
 
 class MainViewModel: ObservableObject {
-    @Published var currentPage: Page = .inbox
-    @Published var onboardingScreen: OnboardingScreenType = .location
+    @Published var currentPage: Page = .onboarding
+    @Published var onboardingScreen: OnboardingScreenType = .number
     @Published var isPro = false
     @Published var showHalfOff = false 
     @Published var onboardingProgress: Double = 0.0
@@ -40,7 +40,7 @@ class MainViewModel: ObservableObject {
     
     func fetchUserById(_ userId: String) async {
         do {
-            let user: User = try await FirebaseService.getDocument(collection: "users", documentId: userId)
+            let user: User = try await FirebaseService.shared.getDocument(collection: "users", documentId: userId)
             DispatchQueue.main.async {
                 self.currUser = user
             }

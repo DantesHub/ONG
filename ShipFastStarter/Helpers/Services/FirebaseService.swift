@@ -175,8 +175,8 @@ class FirebaseService {
     }
     
     //MARK: - Getter Methods
-    static func getDocument<T: Codable>(collection: String, documentId: String) async throws -> T {
-        let docRef = db.collection(collection).document(documentId)
+    func getDocument<T: Codable>(collection: String, documentId: String) async throws -> T {
+        let docRef = FirebaseService.db.collection(collection).document(documentId)
         let snapshot = try await docRef.getDocument()
         
         guard let data = snapshot.data() else {
@@ -206,7 +206,7 @@ class FirebaseService {
         
         return try querySnapshot.documents.compactMap { document in
             let jsonData = try JSONSerialization.data(withJSONObject: document.data())
-            return try JSONDecoder().decode(T.self, from: jsonData)
+            return try JSONDecoder().decode(T.self, from: jsonData)            
         }
     }
 

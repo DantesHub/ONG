@@ -35,6 +35,17 @@ class PollViewModel: ObservableObject {
                 whereField: "schoolId",
                 isEqualTo: user.schoolId
             )
+            
+            // Fetch poll options for each poll
+            for var poll in polls {
+                let options: [PollOption] = try await FirebaseService.shared.fetchDocuments(
+                    collection: "pollOptions",
+                    whereField: "pollId",
+                    isEqualTo: poll.id
+                )
+                poll.pollOptions = options
+            }
+            
             self.allPolls = polls
             self.pollSet = polls.filter { poll in
                 !poll.usersWhoVoted.contains(user.id)
@@ -62,7 +73,11 @@ class PollViewModel: ObservableObject {
             if updatedPoll.pollOptions[optionIndex].votes == nil {
                 updatedPoll.pollOptions[optionIndex].votes = [:]
             }
-            updatedPoll.pollOptions[optionIndex].votes?[user.id] = [dateString: "100", "viewedNotification": "false"]
+            updatedPoll.pollOptions[optionIndex].votes?[user.id] = [
+                "date": dateString,
+                "numVotes": "1",
+                "viewedNotification": "false"
+            ]
             
             updatedPoll.usersWhoVoted.append(user.id)
             
@@ -222,7 +237,7 @@ class PollViewModel: ObservableObject {
                 type: "Poll",
                 option: "\(user.firstName) \(user.lastName)",
                 userId: user.id,
-                votes: [:],
+                votes: [:], // Initialize with empty dictionary
                 gradeLevel: user.grade
             )
         }
@@ -238,14 +253,30 @@ class PollViewModel: ObservableObject {
         currentFourOptions = Array(selectedPoll.pollOptions.prefix(4))
         currentOptionIndex = 4
         updateQuestionEmoji()
-        updateTotalVotes()  // Update total votes when getting new options
+        await updateTotalVotes()  // Update total votes when getting new options
         resetPollState()
     }
     
     func shuffleOptions() {
-        var allOptions = selectedPoll.pollOptions
-        allOptions.shuffle()
-        currentFourOptions = Array(allOptions.prefix(4))
+        let totalOptions = selectedPoll.pollOptions.count
+        
+        if currentOptionIndex >= totalOptions {
+            // If we've shown all options, reshuffle and start over
+            selectedPoll.pollOptions.shuffle()
+            currentOptionIndex = 0
+        }
+        
+        let endIndex = min(currentOptionIndex + 4, totalOptions)
+        currentFourOptions = Array(selectedPoll.pollOptions[currentOptionIndex..<endIndex])
+        
+        // If we don't have 4 options, wrap around to the beginning
+        if currentFourOptions.count < 4 {
+            let remainingCount = 4 - currentFourOptions.count
+            currentFourOptions += Array(selectedPoll.pollOptions[0..<remainingCount])
+        }
+        
+        currentOptionIndex = (currentOptionIndex + 4) % totalOptions
+        
         updateQuestionEmoji()
     }
 
@@ -273,18 +304,26 @@ class PollViewModel: ObservableObject {
         animateProgress = false
         animateAllOptions = false
     }
-
+    
+    @MainActor
     func updateTotalVotes() {
-        totalVotes = selectedPoll.pollOptions.reduce(0) { $0 + ($1.votes?.count ?? 0) }
+        totalVotes = selectedPoll.pollOptions.reduce(0) { total, option in
+            total + (option.votes?.values.reduce(0) { $0 + (Int($1["numVotes"] ?? "0") ?? 0) } ?? 0)
+        }
         print("Updated total votes: \(totalVotes)")
-        print("Poll options votes: \(selectedPoll.pollOptions.map { ($0.option, $0.votes?.count ?? 0) })")
+//        print("Poll options votes: \(selectedPoll.pollOptions.map { option in
+//            let votes = option.votes?.values.reduce(0) { sum, voteInfo in
+//                sum + (Int(voteInfo["numVotes"] ?? "0") ?? 0)
+//            } ?? 0
+//            return (option.option, votes)
+//        })")
         objectWillChange.send()  // Force update
     }
 
     // Update this method if you need to calculate progress for each option
     private func calculateProgress(for option: PollOption) -> Double {
         guard totalVotes > 0 else { return 0 }
-        let optionVotes = option.votes?.count ?? 0
+        let optionVotes = option.votes?.values.reduce(0) { $0 + (Int($1["numVotes"] ?? "0") ?? 0) } ?? 0
         return Double(optionVotes) / Double(totalVotes)
     }
 
@@ -375,6 +414,31 @@ class PollViewModel: ObservableObject {
                 print("Error updating user in Firebase after cooldown reset: \(error.localizedDescription)")
             }
         }
+    }
+
+    // New function to check for new notifications
+    func hasNewNotifications(for user: User) -> Bool {
+        return selectedPoll.pollOptions.contains { option in
+            option.votes?[user.id]?["viewedNotification"] == "false"
+        }
+    }
+
+    // New function to mark notifications as viewed
+    func markNotificationsAsViewed(for user: User) async {
+        for i in 0..<selectedPoll.pollOptions.count {
+            if var votes = selectedPoll.pollOptions[i].votes?[user.id],
+               votes["viewedNotification"] == "false" {
+                votes["viewedNotification"] = "true"
+                selectedPoll.pollOptions[i].votes?[user.id] = votes
+                
+                // Update in Firebase
+                try? await FirebaseService.shared.updateDocument(
+                    collection: "pollOptions",
+                    object: selectedPoll.pollOptions[i]
+                )
+            }
+        }
+        objectWillChange.send()
     }
 
     deinit {
