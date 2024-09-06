@@ -53,6 +53,9 @@ struct OnboardingView: View {
                     case .contacts: ContactsScreen()
                     case .location: LocationScreen()
                     case .highschool: HighSchoolScreen()
+                    case .grade: GradeScreen() 
+                    case .lastName: LastNameScreen()
+                    case .username: UsernameScreen() 
                 }
             }
        }
@@ -77,8 +80,14 @@ struct OnboardingView: View {
                 mainVM.onboardingScreen = .first
             case .location:
                 mainVM.onboardingScreen = .location
-        case .highschool:
-            mainVM.onboardingScreen = .age
+            case .grade:
+                mainVM.onboardingScreen = .location
+            case .lastName:
+                mainVM.onboardingScreen = .first
+            case .highschool:
+                mainVM.onboardingScreen = .age
+            case .username:
+                mainVM.onboardingScreen = .lastName
         }
         return
 
@@ -98,6 +107,9 @@ enum OnboardingScreenType {
     case contacts
     case location
     case highschool
+    case grade
+    case lastName
+    case username
 }
 
 struct CustomProgressViewStyle: ProgressViewStyle {

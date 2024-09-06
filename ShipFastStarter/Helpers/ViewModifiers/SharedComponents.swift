@@ -83,15 +83,16 @@ struct SharedComponents {
         var img: Image?
         var title: String
         var isDisabled: Bool
-        var isOption: Bool = false
+        var isOption: Bool
         @State private var opacity: Double = 1
         var action: () -> Void
         
-        init(img: Image? = nil, title: String = "Continue", action: @escaping () -> Void, isDisabled: Bool = false) {
+        init(img: Image? = nil, title: String = "Continue", isOption: Bool = false, action: @escaping () -> Void, isDisabled: Bool = false) {
              self.img = img
              self.title = title
              self.action = action
              self.isDisabled = isDisabled
+             self.isOption = isOption
          }
         
         var body: some View {
@@ -119,7 +120,7 @@ struct SharedComponents {
                         Spacer()
                         Text(title)
                             .foregroundColor(.black)
-                            .sfPro(type: .semibold, size: .h3p1)
+                            .sfPro(type: .bold, size: .h3p1)
                         Spacer()
                         if let img = img {
                             img
@@ -129,7 +130,7 @@ struct SharedComponents {
                         }
                     }.padding(.horizontal, 32)
                 }
-                .frame(height: isOption ? 96 : 72)
+                .frame(height: isOption ? 104 : 72)
                 .scaleEffect(opacity == 1 ? 1 : 0.95)
                 .opacity(opacity)
             }

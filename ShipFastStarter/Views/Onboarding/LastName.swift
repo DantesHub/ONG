@@ -7,9 +7,9 @@
 
 import SwiftUI
 
-struct NameScreen: View {
+struct LastNameScreen: View {
     @EnvironmentObject var mainVM: MainViewModel
-    @State private var firstName: String = ""
+    @State private var lastName: String = ""
     @FocusState private var isNameFocused: Bool
     
     var body: some View {
@@ -19,14 +19,14 @@ struct NameScreen: View {
             VStack(spacing: 24) {
                 Spacer()
                 
-                Text("What's your first name?")
+                Text("what's your last name?")
                     .sfPro(type: .bold, size: .h1)
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
                 
-                Text(firstName.isEmpty ? "Dylan" : firstName)
+                Text(lastName.isEmpty ? "Molina" : lastName)
                     .sfPro(type: .bold, size: .h1Big)
-                    .foregroundColor(firstName.isEmpty ? .gray : .white)
+                    .foregroundColor(lastName.isEmpty ? .gray : .white)
                     .padding(.vertical, 16)
                     .frame(maxWidth: .infinity)
                     .background(Color.white.opacity(0.0))
@@ -41,14 +41,14 @@ struct NameScreen: View {
                 SharedComponents.PrimaryButton(
                     title: "Continue",
                     action: {
-                        mainVM.currUser?.firstName = firstName
+                        mainVM.currUser?.lastName = lastName
                         Analytics.shared.log(event: "NameScreen: Tapped Continue")
-                        mainVM.onboardingScreen = .lastName // Assuming .birthday is the next screen
+                        mainVM.onboardingScreen = .username // Assuming .birthday is the next screen
                     }
                 )
                 .padding(.horizontal, 24)
                 .padding(.bottom, 32)
-                .disabled(firstName.isEmpty)
+                .disabled(lastName.isEmpty)
             }
         }
         .onAppear {
@@ -57,7 +57,7 @@ struct NameScreen: View {
             }
         }
         .overlay(
-            TextField("", text: $firstName)
+            TextField("", text: $lastName)
                 .focused($isNameFocused)
                 .opacity(0)
                 .autocorrectionDisabled(true)
@@ -65,9 +65,9 @@ struct NameScreen: View {
     }
 }
 
-struct NameScreen_Previews: PreviewProvider {
+struct LastNameScreen_Previews: PreviewProvider {
     static var previews: some View {
-        NameScreen()
+        LastNameScreen()
             .environmentObject(MainViewModel())
     }
 }

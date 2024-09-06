@@ -12,7 +12,7 @@ class MainViewModel: ObservableObject {
     @Published var isPro = false
     @Published var showHalfOff = false 
     @Published var onboardingProgress: Double = 0.0
-    @Published var onboardingScreen: OnboardingScreenType = .birthday
+    @Published var onboardingScreen: OnboardingScreenType = .location
     @Published var currUser: User?
     
     init() {
