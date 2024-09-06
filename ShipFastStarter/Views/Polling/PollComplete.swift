@@ -33,7 +33,6 @@ struct PollComplete: View {
                             .shadow(color: .blue, radius: 1, y: 3)
                     }
                     Spacer()
-                   
                 }
                 Text("you just finished\nyour first poll!")
                     .sfPro(type: .bold, size: .h1)
@@ -42,17 +41,24 @@ struct PollComplete: View {
                     .padding()
                     .padding(.top)
                 Spacer()
-                SharedComponents.PrimaryButton(title: "continue") {
-                    Analytics.shared.log(event: "PollCompleted: Tapped Continue")
-                    pollVM.completedPoll = false
+                VStack(spacing: 16) {
+                    SharedComponents.PrimaryButton(title: "continue") {
+                        Analytics.shared.log(event: "PollCompleted: Tapped Continue")
+                        pollVM.completedPoll = false
+                    }
+                    SharedComponents.PrimaryButton(title: "Skip the wait!") {
+                        Analytics.shared.log(event: "PollCompleted: Skipped Wait")
+//                        if let user = mainVM.currUser {
+//                            pollVM.resetCooldown(user: user)
+//                        }
+                        presentationMode.wrappedValue.dismiss()
+                    }
                 }
                 .padding(.vertical, 48)
                 .padding(.horizontal, 24)
             }
         }.frame(maxWidth: .infinity, alignment: .center)
     }
-
-
 }
 
 struct PollComplete_Previews: PreviewProvider {

@@ -10,7 +10,7 @@ import SwiftUI
 struct GradeScreen: View {
     @EnvironmentObject var mainVM: MainViewModel
     @State private var selectedGrade: String = "9"
-    let grades = ["freshman 🙈", "sophomore 🤔 ", "junior 😇", "senior 👑 "]
+    let grades = ["9", "10", "11", "12"]
     
     var body: some View {
         ZStack {
@@ -19,28 +19,43 @@ struct GradeScreen: View {
             VStack(spacing: 24) {
                 Spacer()
                 
-                Text("What grade\nare you in?")
+                Text("What grade are you in?")
                     .sfPro(type: .bold, size: .h1)
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
                 
-                VStack(spacing: 24) {
+                Spacer()
+                
+                VStack(spacing: 16) {
                     ForEach(grades, id: \.self) { grade in
                         SharedComponents.PrimaryButton(
-                            title: "\(grade)",
-                            isOption: true,
+                            title: "Grade \(grade)",
                             action: {
-                                Analytics.shared.logActual(event: "GradeScreen: Tapped Continue", parameters: ["grade": grade])
-                                mainVM.onboardingScreen = .name
+                                selectedGrade = grade
                             }
                         )
+                        .opacity(selectedGrade == grade ? 1.0 : 0.6)
                     }
                 }
                 .padding(.horizontal, 24)
-                .padding(.top)
+                
                 Spacer()
                 
-             
+                Text("You selected grade \(selectedGrade)")
+                    .sfPro(type: .semibold, size: .h2)
+                    .foregroundColor(.white)
+                    .padding()
+                
+                SharedComponents.PrimaryButton(
+                    title: "Continue",
+                    action: {
+                        mainVM.currUser?.grade = selectedGrade
+                        Analytics.shared.log(event: "GradeScreen: Tapped Continue")
+//                        mainVM.onboardingScreen = .next // Replace with the appropriate next screen
+                    }
+                )
+                .padding(.horizontal, 24)
+                .padding(.bottom, 32)
             }
         }
     }

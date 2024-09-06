@@ -14,117 +14,118 @@ struct PollScreen: View {
     @State private var isComplete = false
     @State private var showTapToContinue = false
     @State private var contentOpacity: Double = 1  // Add this line
-    
+    @State private var showSplash = true  // Add this line
+
     var body: some View {
         ZStack {
-            VStack(spacing: 0) {
-                // Story bar
-                HStack(spacing: 4) {
-                    ForEach(0..<min(pollVM.pollSet.count, 8), id: \.self) { index in
-                        StoryProgressBar(isComplete: index <= currentPollIndex || (index == currentPollIndex && isComplete))
+                VStack(spacing: 0) {
+                    // Story bar
+                    HStack(spacing: 4) {
+                        ForEach(0..<min(pollVM.pollSet.count, 8), id: \.self) { index in
+                            StoryProgressBar(isComplete: index <= currentPollIndex || (index == currentPollIndex && isComplete))
+                        }
                     }
-                }
-                .padding(.horizontal, 16)
-                .padding(.top, 8)
-                .padding(.bottom, 16)
-                
-                // Main content
-                if !pollVM.pollSet.isEmpty {
-                    VStack {
-                        Spacer()
-                        // Poll question
-                        VStack(spacing: 0) {
-                            Text(pollVM.questionEmoji)
-                               .font(.system(size: 64))
-                               .padding(.top)
-                            Text(pollVM.selectedPoll.title)
-                                .sfPro(type: .bold, size: .h1)
-                                .frame(height: 124, alignment: .top)
-                                .padding(.horizontal, 24)
-                                .multilineTextAlignment(.center)
-                        }
-                         
-                        Spacer()
-                        // Poll options in vertical layout
-                        VStack(spacing: 24) {
-                            ForEach(pollVM.currentFourOptions, id: \.id) { option in
-                                PollOptionView(option: option)
+                    .padding(.horizontal, 16)
+                    .padding(.top, 8)
+                    .padding(.bottom, 16)
+                    
+                    // Main content
+                    if !pollVM.pollSet.isEmpty {
+                        VStack {
+                            Spacer()
+                            // Poll question
+                            VStack(spacing: 0) {
+                                Text(pollVM.questionEmoji)
+                                    .font(.system(size: 64))
+                                    .padding(.top)
+                                Text(pollVM.selectedPoll.title)
+                                    .sfPro(type: .bold, size: .h1)
+                                    .frame(height: 124, alignment: .top)
+                                    .padding(.horizontal, 24)
+                                    .multilineTextAlignment(.center)
                             }
-                        }
-                        .padding()
-                        
-                        // Skip and Shuffle buttons
-                        if pollVM.showProgress {
+                            
+                            Spacer()
+                            // Poll options in vertical layout
+                            VStack(spacing: 24) {
+                                ForEach(pollVM.currentFourOptions, id: \.id) { option in
+                                    PollOptionView(option: option)
+                                }
+                            }
+                            .padding()
+                            
+                            // Skip and Shuffle buttons
+                            if pollVM.showProgress {
                                 HStack {
                                     Text("Tap to continue")
                                         .foregroundColor(.white)
                                         .sfPro(type: .bold, size: .h2)
                                         .padding(.bottom, 20)
                                 }.frame(height: 64)
+                                    .padding(.horizontal)
+                                    .padding(.bottom, 20)
+                                
+                            } else {
+                                HStack {
+                                    Button(action: {
+                                        skipPoll()
+                                    }) {
+                                        Text("Skip")
+                                            .foregroundColor(.white)
+                                            .padding()
+                                            .background(Color.black.opacity(0.5))
+                                            .cornerRadius(20)
+                                    }
+                                    
+                                    Spacer()
+                                    
+                                    Button(action: {
+                                        pollVM.shuffleOptions()
+                                    }) {
+                                        Image(systemName: "shuffle")
+                                            .foregroundColor(.white)
+                                            .padding()
+                                            .background(Color.black.opacity(0.5))
+                                            .cornerRadius(20)
+                                    }
+                                }
+                                .frame(height: 64)
                                 .padding(.horizontal)
                                 .padding(.bottom, 20)
-                            
-                        } else {
-                            HStack {
-                                Button(action: {
-                                    skipPoll()
-                                }) {
-                                    Text("Skip")
-                                        .foregroundColor(.white)
-                                        .padding()
-                                        .background(Color.black.opacity(0.5))
-                                        .cornerRadius(20)
-                                }
-                                
-                                Spacer()
-                                
-                                Button(action: {
-                                    pollVM.shuffleOptions()
-                                }) {
-                                    Image(systemName: "shuffle")
-                                        .foregroundColor(.white)
-                                        .padding()
-                                        .background(Color.black.opacity(0.5))
-                                        .cornerRadius(20)
-                                }
                             }
-                            .frame(height: 64)
-                            .padding(.horizontal)
-                            .padding(.bottom, 20)
-                        }
-                      
                             
-                          
+                            
+                            
+                        }
+                        .opacity(contentOpacity)  // Add this line
+                    } else {
+                        Text("No more polls available")
+                            .font(.title)
+                            .foregroundColor(.white)
                     }
-                    .opacity(contentOpacity)  // Add this line
-                } else {
-                    Text("No more polls available")
-                        .font(.title)
-                        .foregroundColor(.white)
+                }.onTapGesture {
+                    if pollVM.showProgress {
+                        animateTransition()
+                    }
                 }
-            }.onTapGesture {
-                if pollVM.showProgress {
-                    animateTransition()
-                }
-            }
+            
         }
+        
     }
-    
-
 
     
-    private func skipPoll() {
+     func skipPoll() {
         updateProgressBar()
         animateTransition()
     }
     
-    private func updateProgressBar() {
+     func updateProgressBar() {
         if currentPollIndex < pollVM.pollSet.count - 1 {
             isComplete = true
         }
     }
     
-    private func animateTransition() {
+     func animateTransition() {
         withAnimation(.easeInOut(duration: 0.3)) {
             contentOpacity = 0
         }
@@ -138,7 +139,7 @@ struct PollScreen: View {
         }
     }
     
-    private func moveToNextPoll() {
+     func moveToNextPoll() {
         if currentPollIndex < pollVM.pollSet.count - 1 {
             currentPollIndex += 1
             pollVM.selectedPoll = pollVM.pollSet[currentPollIndex]
@@ -163,7 +164,7 @@ struct PollScreen: View {
 struct PollOptionView: View {
     @EnvironmentObject var pollVM: PollViewModel
     @EnvironmentObject var mainVM: MainViewModel
-    let option: Poll.PollOption
+    let option: PollOption
     @State private var progressWidth: CGFloat = 0
     @State private var opacity: Double = 1
     
@@ -251,12 +252,11 @@ struct PollOptionView: View {
     
     private var progress: Double {
         guard pollVM.totalVotes > 0 else { return 0 }
-        let optionVotes = pollVM.selectedPoll.pollOptions.first(where: { $0.id == option.id })?.votes.values.reduce(0, +) ?? 0
+        let optionVotes = pollVM.selectedPoll.pollOptions.first(where: { $0.id == option.id })?.votes?.count ?? 0
         let progress = Double(optionVotes) / Double(pollVM.totalVotes)
         print("Calculated progress for \(option.option): \(progress)")
         return progress
-    }
-}
+    }}
 
 struct StoryProgressBar: View {
     var isComplete: Bool

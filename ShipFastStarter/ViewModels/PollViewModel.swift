@@ -12,7 +12,7 @@ class PollViewModel: ObservableObject {
     @Published var pollSet: [Poll] = [Poll.exPoll]
     @Published var allPolls: [Poll] = [Poll.exPoll]
     @Published var selectedPoll: Poll = Poll.exPoll
-    @Published var currentFourOptions: [Poll.PollOption] = []
+    @Published var currentFourOptions: [PollOption] = []
     @Published var showProgress: Bool = false
     @Published var animateProgress: Bool = false
     @Published var animateAllOptions: Bool = false
@@ -50,11 +50,20 @@ class PollViewModel: ObservableObject {
     }
     
     @MainActor
-    func answerPoll(user: User, option: Poll.PollOption) async {
+    func answerPoll(user: User, option: PollOption) async {
         print("Answering poll for option: \(option.option)")
         if var updatedPoll = pollSet.first(where: { $0.id == selectedPoll.id }),
            let optionIndex = updatedPoll.pollOptions.firstIndex(where: { $0.id == option.id }) {
-            updatedPoll.pollOptions[optionIndex].votes[user.id, default: 0] += 1
+            
+            let currentDate = Date()
+            let dateString = ISO8601DateFormatter().string(from: currentDate)
+            
+            // Update votes with the new structure
+            if updatedPoll.pollOptions[optionIndex].votes == nil {
+                updatedPoll.pollOptions[optionIndex].votes = [:]
+            }
+            updatedPoll.pollOptions[optionIndex].votes?[user.id] = [dateString: "100", "viewedNotification": "false"]
+            
             updatedPoll.usersWhoVoted.append(user.id)
             
             selectedPoll = updatedPoll
@@ -161,7 +170,7 @@ class PollViewModel: ObservableObject {
         }
     }
 
-    func createOptions(users: [User]) -> [Poll.PollOption] {
+    func createOptions(users: [User]) -> [PollOption] {
         // if user has made in app purchase they have highest priority
         // number of votedPolls they have should be close second
         // number of friends they have
@@ -206,16 +215,17 @@ class PollViewModel: ObservableObject {
 
         }
 
-        // Convert selected users to PollOptions, ensuring we have exactly 4 options
+        // Convert selected users to PollOptions, ensuring we have exactly 12 options
         let options = selectedUsers.prefix(12).map { user in
-            Poll.PollOption(
+            PollOption(
                 id: UUID().uuidString,
+                type: "Poll",
                 option: "\(user.firstName) \(user.lastName)",
+                userId: user.id,
                 votes: [:],
                 gradeLevel: user.grade
             )
         }
-
 
         return options
     }
@@ -239,7 +249,8 @@ class PollViewModel: ObservableObject {
         updateQuestionEmoji()
     }
 
-    private func startCooldownTimer() {
+    @MainActor
+    func startCooldownTimer() {
         stopCooldownTimer() // Ensure any existing timer is stopped
         updateTimeRemaining()
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
@@ -264,12 +275,20 @@ class PollViewModel: ObservableObject {
     }
 
     func updateTotalVotes() {
-        totalVotes = selectedPoll.pollOptions.reduce(0) { $0 + ($1.votes.values.reduce(0, +)) }
+        totalVotes = selectedPoll.pollOptions.reduce(0) { $0 + ($1.votes?.count ?? 0) }
         print("Updated total votes: \(totalVotes)")
-        print("Poll options votes: \(selectedPoll.pollOptions.map { ($0.option, $0.votes.values.reduce(0, +)) })")
+        print("Poll options votes: \(selectedPoll.pollOptions.map { ($0.option, $0.votes?.count ?? 0) })")
         objectWillChange.send()  // Force update
     }
 
+    // Update this method if you need to calculate progress for each option
+    private func calculateProgress(for option: PollOption) -> Double {
+        guard totalVotes > 0 else { return 0 }
+        let optionVotes = option.votes?.count ?? 0
+        return Double(optionVotes) / Double(totalVotes)
+    }
+
+    @MainActor
     func finishPoll(user: User) {
         let cooldownDuration: TimeInterval = 12 * 60 * 60 // 12 hours in seconds
         cooldownEndTime = Date().addingTimeInterval(cooldownDuration)
@@ -289,7 +308,7 @@ class PollViewModel: ObservableObject {
             }
         }
     }
-
+    @MainActor
     func checkCooldown(user: User) {
         if let lastPollFinished = user.lastPollFinished {
             let cooldownDuration: TimeInterval = 12 * 60 * 60 // 12 hours in seconds
@@ -312,6 +331,7 @@ class PollViewModel: ObservableObject {
         timer = nil
     }
 
+    @MainActor
     private func updateTimeRemaining() {
         guard let cooldownEndTime = cooldownEndTime else {
             timeRemaining = 0
@@ -342,20 +362,19 @@ class PollViewModel: ObservableObject {
         objectWillChange.send()
 
         // Update user in Firebase
-            Task {
-                do {
-                    var updatedUser = user
-                    updatedUser.lastPollFinished = twelveHoursAgo // Set to 12 hours ago instead of nil
-                    try await FirebaseService.shared.updateDocument(
-                        collection: "users",
-                        object: updatedUser
-                    )
-                    print("User updated in Firebase after cooldown reset")
-                } catch {
-                    print("Error updating user in Firebase after cooldown reset: \(error.localizedDescription)")
-                }
+        Task {
+            do {
+                var updatedUser = user
+                updatedUser.lastPollFinished = twelveHoursAgo // Set to 12 hours ago instead of nil
+                try await FirebaseService.shared.updateDocument(
+                    collection: "users",
+                    object: updatedUser
+                )
+                print("User updated in Firebase after cooldown reset")
+            } catch {
+                print("Error updating user in Firebase after cooldown reset: \(error.localizedDescription)")
             }
-        
+        }
     }
 
     deinit {

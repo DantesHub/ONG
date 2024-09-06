@@ -16,6 +16,7 @@
 		8838DC472C8ABCE400500C6E /* GradeScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8838DC462C8ABCE400500C6E /* GradeScreen.swift */; };
 		8838DC492C8AC9C100500C6E /* LastName.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8838DC482C8AC9C100500C6E /* LastName.swift */; };
 		8838DC4B2C8ACD5800500C6E /* UsernameScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8838DC4A2C8ACD5800500C6E /* UsernameScreen.swift */; };
+		8838DC4D2C8B864E00500C6E /* InboxViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8838DC4C2C8B864E00500C6E /* InboxViewModel.swift */; };
 		884B24732C879A1900229F1E /* HighSchoolViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B24722C879A1900229F1E /* HighSchoolViewModel.swift */; };
 		884B24752C87B96E00229F1E /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B24742C87B96E00229F1E /* User.swift */; };
 		884B24772C87B97500229F1E /* Poll.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B24762C87B97500229F1E /* Poll.swift */; };
@@ -81,6 +82,7 @@
 		8838DC462C8ABCE400500C6E /* GradeScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradeScreen.swift; sourceTree = "<group>"; };
 		8838DC482C8AC9C100500C6E /* LastName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LastName.swift; sourceTree = "<group>"; };
 		8838DC4A2C8ACD5800500C6E /* UsernameScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsernameScreen.swift; sourceTree = "<group>"; };
+		8838DC4C2C8B864E00500C6E /* InboxViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InboxViewModel.swift; sourceTree = "<group>"; };
 		884B24722C879A1900229F1E /* HighSchoolViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighSchoolViewModel.swift; sourceTree = "<group>"; };
 		884B24742C87B96E00229F1E /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		884B24762C87B97500229F1E /* Poll.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Poll.swift; sourceTree = "<group>"; };
@@ -236,6 +238,7 @@
 				88C1E5692C86D95B00C9317E /* NetworkViewModel.swift */,
 				884B24722C879A1900229F1E /* HighSchoolViewModel.swift */,
 				884B247E2C87BECE00229F1E /* PollViewModel.swift */,
+				8838DC4C2C8B864E00500C6E /* InboxViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -497,6 +500,7 @@
 				884B24792C87B97D00229F1E /* PollOption.swift in Sources */,
 				88C1E56A2C86D95B00C9317E /* NetworkViewModel.swift in Sources */,
 				88B37D4C2C241110000A7D91 /* Array.swift in Sources */,
+				8838DC4D2C8B864E00500C6E /* InboxViewModel.swift in Sources */,
 				88B37D3E2C240CFF000A7D91 /* FirstOnboardingScreen.swift in Sources */,
 				8838DC3E2C8A5B7B00500C6E /* PollCooldownScreen.swift in Sources */,
 				88B37D0D2C23FD60000A7D91 /* ShipFastStarterApp.swift in Sources */,

@@ -21,60 +21,80 @@ struct ContentView: View {
     @State private var lastTapTime = Date()
 
     var body: some View {
-        GeometryReader { _ in
-            ZStack {
-                Color(.primaryBackground).edgesIgnoringSafeArea(.all)
-                switch mainVM.currentPage {
-                case .onboarding:
-                    OnboardingView()
-                        .environmentObject(authVM)
-                        .environmentObject(mainVM)
-                case .home:
-                    HomeScreen()
-                case .poll:
-                    PollScreen()
-                        .environmentObject(pollVM)
-                case .cooldown:
-                    PollCooldownScreen()
-                        .environmentObject(pollVM)
-                        .environmentObject(mainVM)
+        NavigationView {
+            GeometryReader { _ in
+                ZStack {
+                    Color(.primaryBackground).edgesIgnoringSafeArea(.all)
+                    switch mainVM.currentPage {
+                    case .onboarding:
+                        OnboardingView()
+                            .environmentObject(authVM)
+                            .environmentObject(mainVM)
+                    case .home:
+                        HomeScreen()
+                    case .poll:
+                        PollScreen()
+                            .environmentObject(pollVM)
+                    case .cooldown:
+                        PollCooldownScreen()
+                            .environmentObject(pollVM)
+                            .environmentObject(mainVM)
+                    }
                 }
-            }
-            .onAppear {
-                if UserDefaults.standard.bool(forKey: "finishedOnboarding") {
-                    Task {
-                        await mainVM.fetchUser()
-                        if let user = mainVM.currUser {
-                            pollVM.checkCooldown(user: user)
-                            highschoolVM.checkHighSchoolLock(for: user)
-                            
-                            if let endTime = pollVM.cooldownEndTime {
-                                pollVM.completedPoll = false
-                                mainVM.currentPage = .cooldown
-                            } else {
-                                if !highschoolVM.isHighSchoolLocked {
-                                    await pollVM.fetchPolls(for: user)
-                                    if pollVM.pollSet.count < 8 {
-                                        await pollVM.createPoll(user: user)
+                .onAppear {
+                    if !UserDefaults.standard.bool(forKey: "finishedOnboarding") {
+                        Task {
+                            await mainVM.fetchUser()
+                            if let user = mainVM.currUser {
+                                pollVM.checkCooldown(user: user)
+                                highschoolVM.checkHighSchoolLock(for: user)
+                                
+                                if let endTime = pollVM.cooldownEndTime {
+                                    pollVM.completedPoll = false
+                                    mainVM.currentPage = .cooldown
+                                } else {
+                                    if !highschoolVM.isHighSchoolLocked {
+                                        await pollVM.fetchPolls(for: user)
+                                        if pollVM.pollSet.count < 8 {
+                                            await pollVM.createPoll(user: user)
+                                        }
                                     }
                                 }
                             }
                         }
+                        
                     }
-
                 }
-            }
-            .gesture(
-                TapGesture(count: 3)
-                    .onEnded { _ in
-                        showDevTestingSheet = true
+                .gesture(
+                    TapGesture(count: 3)
+                        .onEnded { _ in
+                            showDevTestingSheet = true
+                        }
+                )
+                .sheet(isPresented: $showDevTestingSheet) {
+                    DevTestingView()
+                        .environmentObject(mainVM)
+                        .environmentObject(pollVM)
+                }
+            }     .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    if mainVM.currentPage != .onboarding {
+                        ToolbarItem(placement: .principal) {
+                            HStack {
+                                Text("inbox •")
+                                    .sfPro(type: .bold, size: .h3p1)
+                                Spacer()
+                                Text("play")
+                                    .sfPro(type: .bold, size: .h3p1)
+                                Spacer()
+                                Text("profile")
+                                    .sfPro(type: .bold, size: .h3p1)
+                            }
+                            .foregroundColor(.black)
+                        }
                     }
-            )
-            .sheet(isPresented: $showDevTestingSheet) {
-                DevTestingView()
-                    .environmentObject(mainVM)
-                    .environmentObject(pollVM)
-            }
+                    
+                }
         }
     }
 
@@ -131,4 +151,5 @@ struct DevTestingView: View {
 #Preview {
     ContentView()
         .modelContainer(for: Item.self, inMemory: true)
+        .environmentObject(MainViewModel())
 }
