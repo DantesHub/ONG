@@ -8,17 +8,16 @@
 import Foundation
 
 class MainViewModel: ObservableObject {
-    @Published var currentPage: Page = .poll
+    @Published var currentPage: Page = .onboarding
     @Published var isPro = false
     @Published var showHalfOff = false 
     @Published var onboardingProgress: Double = 0.0
-    @Published var onboardingScreen: OnboardingScreenType = .number
+    @Published var onboardingScreen: OnboardingScreenType = .birthday
     @Published var currUser: User?
     
     init() {
         
     }    
-
     
     func fetchUser() async {
         if let number = UserDefaults.standard.string(forKey: "userNumber") {
@@ -65,4 +64,5 @@ enum Page: String {
     case home = "Home"
     case onboarding = "Onboarding"
     case poll = "Polls"
+    case cooldown = "Cooldown"
 }

@@ -21,9 +21,11 @@ struct ShipFastStarterApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     @Environment(\.scenePhase) private var scenePhase
     @StateObject var mainVM: MainViewModel = MainViewModel()
-    
+    @StateObject var pollVM: PollViewModel = PollViewModel()
+    @State private var showSplash = true
+
     init() {
-      setup()
+        setup()
     }
     
     var sharedModelContainer: ModelContainer = {
@@ -41,8 +43,24 @@ struct ShipFastStarterApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .environmentObject(mainVM)
+            ZStack {
+                ContentView()
+                    .environmentObject(mainVM)
+                    .environmentObject(pollVM)
+                
+                if showSplash {
+                    SplashScreen()
+                        .transition(.opacity)
+                        .zIndex(1)
+                }
+            }
+            .onAppear {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                    withAnimation {
+                        showSplash = false
+                    }
+                }
+            }
         }
         .modelContainer(sharedModelContainer)
     }

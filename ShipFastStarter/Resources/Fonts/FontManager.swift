@@ -57,9 +57,10 @@ enum FontSize: CGFloat {
     case p2 = 16
     case p3 = 14
     case p4 = 12
-    case title = 48
+    case title = 50
     case huge = 56
     case titleHuge = 72
+    case sticker = 104
     case logo = 128
 }
 

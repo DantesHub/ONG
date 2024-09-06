@@ -12,19 +12,31 @@ struct Poll: Codable, Equatable, FBObject {
     var id: String
     let title: String
     let createdAt: Date
-    var pollOptions: [String]
+    var pollOptions: [PollOption]
     var isActive: Bool
     var schoolId: String
     var grade: String
     var type: String
     let category: String
-    var usersWhoVoted: [String] // New field
+    var usersWhoVoted: [String]
+
+    struct PollOption: Codable, Equatable, Identifiable {
+        let id: String
+        let option: String
+        var votes: [String: Int]
+        let gradeLevel: String
+    }
 
     static var exPoll = Poll(
         id: "example_poll_id",
         title: "Example Poll",
         createdAt: Date(),
-        pollOptions: ["example_option_id", "example_option_id", "example_option_id", "example_option_id"],
+        pollOptions: [
+            PollOption(id: UUID().uuidString, option: "Option 1", votes: [:], gradeLevel: "All"),
+            PollOption(id: UUID().uuidString, option: "Option 2", votes: [:], gradeLevel: "All"),
+            PollOption(id: UUID().uuidString, option: "Option 3", votes: [:], gradeLevel: "All"),
+            PollOption(id: UUID().uuidString, option: "Option 4", votes: [:], gradeLevel: "All")
+        ],
         isActive: true,
         schoolId: "example_school_id",
         grade: "All",
@@ -41,7 +53,7 @@ struct Poll: Codable, Equatable, FBObject {
         case id, title, createdAt, pollOptions, isActive, schoolId, grade, type, category, usersWhoVoted
     }
 
-    init(id: String, title: String, createdAt: Date, pollOptions: [String], isActive: Bool, schoolId: String, grade: String, type: String, category: String, usersWhoVoted: [String] = []) {
+    init(id: String, title: String, createdAt: Date, pollOptions: [PollOption], isActive: Bool, schoolId: String, grade: String, type: String, category: String, usersWhoVoted: [String] = []) {
         self.id = id
         self.title = title
         self.createdAt = createdAt
@@ -58,7 +70,7 @@ struct Poll: Codable, Equatable, FBObject {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(String.self, forKey: .id)
         title = try container.decode(String.self, forKey: .title)
-        pollOptions = try container.decode([String].self, forKey: .pollOptions)
+        pollOptions = try container.decode([PollOption].self, forKey: .pollOptions)
         isActive = try container.decode(Bool.self, forKey: .isActive)
         schoolId = try container.decode(String.self, forKey: .schoolId)
         grade = try container.decode(String.self, forKey: .grade)
