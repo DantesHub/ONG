@@ -30,8 +30,9 @@ struct User: Codable, Equatable, FBObject {
     var invitedFriends: [String]
     var ogBadge: Bool
     var gender: String // New property
+    var fcmToken: String
 
-    init(id: String, firstName: String, lastName: String, schoolId: String, color: String, aura: Int, godMode: Bool, birthday: String, grade: String, number: String, votedPolls: [String], lastPollFinished: Date?, friends: [String], invitedFriends: [String], ogBadge: Bool, gender: String) {
+    init(id: String, firstName: String, lastName: String, schoolId: String, color: String, aura: Int, godMode: Bool, birthday: String, grade: String, number: String, votedPolls: [String], lastPollFinished: Date?, friends: [String], invitedFriends: [String], ogBadge: Bool, gender: String, fcmToken: String) {
         self.id = id
         self.firstName = firstName
         self.lastName = lastName
@@ -48,6 +49,7 @@ struct User: Codable, Equatable, FBObject {
         self.invitedFriends = invitedFriends
         self.ogBadge = ogBadge
         self.gender = gender
+        self.fcmToken = fcmToken
     }
 
     static var exUser = User(
@@ -66,7 +68,8 @@ struct User: Codable, Equatable, FBObject {
         friends: [],
         invitedFriends: [],
         ogBadge: true,
-        gender: "Male" // Example gender
+        gender: "Male", // Example gender
+        fcmToken: ""
     )
 
     static func == (lhs: User, rhs: User) -> Bool {
@@ -74,7 +77,7 @@ struct User: Codable, Equatable, FBObject {
     }
 
     enum CodingKeys: String, CodingKey {
-        case id, firstName, lastName, schoolId, color, aura, godMode, birthday, grade, number, votedPolls, lastPollFinished, friends, invitedFriends, ogBadge, gender
+        case id, firstName, lastName, schoolId, color, aura, godMode, birthday, grade, number, votedPolls, lastPollFinished, friends, invitedFriends, ogBadge, gender, fcmToken
     }
 
     init(from decoder: Decoder) throws {
@@ -95,7 +98,7 @@ struct User: Codable, Equatable, FBObject {
         invitedFriends = try container.decodeIfPresent([String].self, forKey: .invitedFriends) ?? []
         ogBadge = try container.decodeIfPresent(Bool.self, forKey: .ogBadge) ?? false
         gender = try container.decodeIfPresent(String.self, forKey: .gender) ?? "Unspecified" // Default gender
-
+        fcmToken = try container.decodeIfPresent(String.self, forKey: .fcmToken) ?? ""
         // Custom decoding for lastPollFinished
         if let lastPollFinishedTimestamp = try? container.decode(Double.self, forKey: .lastPollFinished) {
             lastPollFinished = Date(timeIntervalSince1970: lastPollFinishedTimestamp)

@@ -8,7 +8,7 @@
 import Foundation
 
 class MainViewModel: ObservableObject {
-    @Published var currentPage: Page = .onboarding
+    @Published var currentPage: Page = .poll
     @Published var onboardingScreen: OnboardingScreenType = .number
     @Published var isPro = false
     @Published var showHalfOff = false 

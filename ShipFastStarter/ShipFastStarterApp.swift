@@ -15,6 +15,7 @@ import SuperwallKit
 import FirebaseCore
 import FirebaseAuth
 import UserNotifications
+import FirebaseMessaging
 
 @main
 struct ShipFastStarterApp: App {
@@ -169,7 +170,8 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         print("APNs token retrieved: \(deviceToken)")
         let tokenParts = deviceToken.map { data in String(format: "%02.2hhx", data) }
         let tokenString = tokenParts.joined()
-        
+        Messaging.messaging().apnsToken = deviceToken
+        UserDefaults.standard.setValue(deviceToken, forKey: "fcmToken")
         print("Device Token: \(tokenString)")
         
         // Now use this tokenString with CustomerIO

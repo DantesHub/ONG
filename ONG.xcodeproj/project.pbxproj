@@ -17,6 +17,7 @@
 		8838DC492C8AC9C100500C6E /* LastName.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8838DC482C8AC9C100500C6E /* LastName.swift */; };
 		8838DC4B2C8ACD5800500C6E /* UsernameScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8838DC4A2C8ACD5800500C6E /* UsernameScreen.swift */; };
 		8838DC4D2C8B864E00500C6E /* InboxViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8838DC4C2C8B864E00500C6E /* InboxViewModel.swift */; };
+		8838DC4F2C8BD43B00500C6E /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 8838DC4E2C8BD43B00500C6E /* FirebaseMessaging */; };
 		884B24732C879A1900229F1E /* HighSchoolViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B24722C879A1900229F1E /* HighSchoolViewModel.swift */; };
 		884B24752C87B96E00229F1E /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B24742C87B96E00229F1E /* User.swift */; };
 		884B24772C87B97500229F1E /* Poll.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B24762C87B97500229F1E /* Poll.swift */; };
@@ -138,6 +139,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8838DC4F2C8BD43B00500C6E /* FirebaseMessaging in Frameworks */,
 				88C1E55E2C8692C900C9317E /* FirebaseDatabase in Frameworks */,
 				88B37D3A2C240CAB000A7D91 /* RevenueCat in Frameworks */,
 				88C1E55C2C8692C900C9317E /* FirebaseAuth in Frameworks */,
@@ -399,6 +401,7 @@
 				88C1E55B2C8692C900C9317E /* FirebaseAuth */,
 				88C1E55D2C8692C900C9317E /* FirebaseDatabase */,
 				88C1E55F2C8692C900C9317E /* FirebaseFirestore */,
+				8838DC4E2C8BD43B00500C6E /* FirebaseMessaging */,
 			);
 			productName = ShipFastStarter;
 			productReference = 88B37D092C23FD60000A7D91 /* ONG.app */;
@@ -785,6 +788,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		8838DC4E2C8BD43B00500C6E /* FirebaseMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 88C1E55A2C86925D00C9317E /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseMessaging;
+		};
 		88B37D292C24018B000A7D91 /* SuperwallKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 88B37D282C24018B000A7D91 /* XCRemoteSwiftPackageReference "Superwall-iOS" */;
