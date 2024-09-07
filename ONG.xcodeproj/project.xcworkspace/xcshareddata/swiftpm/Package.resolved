@@ -1,5 +1,5 @@
 {
-  "originHash" : "acfef4602d9fdb73a7b4ddf01f577661a4accdc56d73a6224664241340d428a6",
+  "originHash" : "c8ece1df0df252b136fc8c4cdb4a90e8a03dd647f4807e58684cf5444d6534a5",
   "pins" : [
     {
       "identity" : "abseil-cpp-binary",
@@ -24,8 +24,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/AppsFlyerSDK/AppsFlyerFramework.git",
       "state" : {
-        "revision" : "a7cc77ea3c10d7281bc82f1af5798b21447de0e9",
-        "version" : "6.14.4"
+        "revision" : "304116f391a42dd2266768a30f6422501ecf7f33",
+        "version" : "6.15.2"
       }
     },
     {
@@ -106,7 +106,7 @@
       "location" : "https://github.com/mixpanel/mixpanel-swift.git",
       "state" : {
         "branch" : "master",
-        "revision" : "e7869c433ee01cdc52aa14abf636fe0b412d72f8"
+        "revision" : "61ce9b40817466fb1334db1d7a582fbaf616ab4c"
       }
     },
     {
@@ -132,8 +132,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/RevenueCat/purchases-ios-spm.git",
       "state" : {
-        "revision" : "7ec1091a6f929c40be2a1c695a63471f5d0c330d",
-        "version" : "4.43.0"
+        "revision" : "7d55b964114a3d4a76791227cdc28577617596db",
+        "version" : "4.43.2"
       }
     },
     {
@@ -141,8 +141,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/superwall/Superwall-iOS",
       "state" : {
-        "revision" : "abbbfaa8652ba51db0cb1e722145d2a35b8981bb",
-        "version" : "3.6.6"
+        "revision" : "782a00022b7eb022ec359fbbd53bad634bbc8632",
+        "version" : "3.7.4"
       }
     },
     {

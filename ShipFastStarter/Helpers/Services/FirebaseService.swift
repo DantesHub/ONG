@@ -2,6 +2,7 @@ import Firebase
 import FirebaseAuth
 import FirebaseFirestore
 import UIKit
+import FirebaseMessaging
 
 class FirebaseService {
     static let shared = FirebaseService()
@@ -86,6 +87,8 @@ class FirebaseService {
         try await batch.commit()
     }
     
+    
+    
     func addDocument(_ object: FBObject, collection: String, completion: @escaping (String?) -> Void) {
         if let dict = object.encodeToDictionary() {
             let id = dict["id"] as! String
@@ -104,6 +107,34 @@ class FirebaseService {
             print("error here")
             completion(nil)
         }
+    }
+    
+    func updateDocument(collection: String, field: String, isEqualTo: String, object: FBObject) async throws  {
+        let query = FirebaseService.db.collection(collection).whereField(field, isEqualTo: isEqualTo)
+        let querySnapshot = try await query.getDocuments()
+        
+        return try await withCheckedThrowingContinuation { continuation in
+            guard let data = object.encodeToDictionary(), let id = data["id"] as? String else {
+                continuation.resume(throwing: NSError(domain: "FirebaseService", code: 400, userInfo: [NSLocalizedDescriptionKey: "Failed to encode object to dictionary or missing id"]))
+                return
+            }
+          
+                
+                guard let document = querySnapshot.documents.first else {
+                    continuation.resume(throwing: NSError(domain: "FirebaseService", code: 404, userInfo: [NSLocalizedDescriptionKey: "No matching document found"]))
+                    return
+                }
+                
+                document.reference.setData(data, merge: true) { error in
+                    if let error = error {
+                        continuation.resume(throwing: error)
+                    } else {
+                        print("Document successfully updated")
+                        continuation.resume(returning: ())
+                    }
+                }            
+        }
+        
     }
     
      func updateDocument(collection: String, object: FBObject) async throws {
@@ -263,6 +294,40 @@ class FirebaseService {
             }
         }
     }
+    
+    //MARK: - revert
+     func updateAllObjects(collection: String) async throws {
+        let db = Firestore.firestore()
+        let documentCollection = db.collection(collection)
+
+        // Start a new write batch
+        let batch = db.batch()
+        
+        do {
+            let querySnapshot = try await documentCollection.getDocuments()
+             let documents = querySnapshot.documents
+
+            for doc in documents {
+                if var user = try? doc.data(as: User.self) {
+                    let documentRef = documentCollection.document(doc.documentID)
+                    user.fcmToken = UserDefaults.standard.string(forKey: "fcmToken") ?? "duh"
+                    if let dictObj = user.encodeToDictionary() {
+                        // Update document asynchronously
+                        
+                        try await documentRef.updateData(dictObj)
+                    }
+                  }
+              }
+                
+                
+
+            try await batch.commit()
+            print("Batch write succeeded.")
+        } catch {
+            print("Error: \(error)")
+        }
+    }
+
 }
 
 // Add this new function to the FirebaseService class

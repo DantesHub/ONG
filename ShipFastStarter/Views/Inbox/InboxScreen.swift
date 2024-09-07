@@ -19,23 +19,31 @@ struct InboxScreen: View {
 //                    Divider()
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 24) {
-                        Text("New")
-                            .font(.system(size: 22, weight: .bold))
-                            .padding(.leading, 20)
-                        
-                        ForEach(inboxVM.newUsersWhoVoted) { item in
-                            InboxItemView(item: item)
+                        if inboxVM.newUsersWhoVoted.isEmpty && inboxVM.oldUsersWhoVoted.isEmpty {
+                         
+                        } else {
+                            if !inboxVM.newUsersWhoVoted.isEmpty {
+                                Text("New")
+                                    .font(.system(size: 22, weight: .bold))
+                                    .padding(.leading, 20)
+                                
+                                ForEach(inboxVM.newUsersWhoVoted) { item in
+                                    InboxItemView(item: item)
+                                }
+                            }
+                         
+                            if !inboxVM.oldUsersWhoVoted.isEmpty {
+                                Text("Past")
+                                    .font(.system(size: 22, weight: .bold))
+                                    .padding(.leading, 20)
+                                    .padding(.top, 10)
+                                
+                                ForEach(inboxVM.oldUsersWhoVoted) { item in
+                                    InboxItemView(item: item)
+                                }
+                            }
                         }
-                        
-                        Text("Past")
-                            .font(.system(size: 22, weight: .bold))
-                            .padding(.leading, 20)
-                            .padding(.top, 10)
-                        
-                        ForEach(inboxVM.oldUsersWhoVoted) { item in
-                            InboxItemView(item: item)
-                        }
-                        
+                     
                         Spacer()
                     }
                     .padding(.top, 20)
@@ -57,6 +65,7 @@ struct InboxScreen: View {
 
 struct InboxItem: Identifiable {
     let id: String
+    let userId: String
     let firstName: String
     let aura: Int
     let time: Date
@@ -65,6 +74,7 @@ struct InboxItem: Identifiable {
     let backgroundColor: Color
     let accompanyingPoll: Poll
     let pollOption: PollOption
+    let isNew: Bool
 }
 
 struct InboxItemView: View {
@@ -121,6 +131,11 @@ struct InboxItemView: View {
                 inboxVM.selectedPollOption = item.pollOption
                 inboxVM.selectedInbox = item
                 inboxVM.tappedNotificationRow()
+                if item.isNew {
+                    Task {
+                        await inboxVM.updateViewStatus()
+                    }
+                }
             withAnimation {
                 inboxVM.tappedNotification = true
             }

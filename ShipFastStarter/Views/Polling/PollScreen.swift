@@ -80,7 +80,9 @@ struct PollScreen: View {
                                     Spacer()
                                     
                                     Button(action: {
-                                        pollVM.shuffleOptions()
+                                        if let user = mainVM.currUser {
+                                            pollVM.shuffleOptions(excludingUserId: user.id)
+                                        }
                                     }) {
                                         Image(systemName: "shuffle")
                                             .foregroundColor(.white)
@@ -131,7 +133,9 @@ struct PollScreen: View {
         }
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            moveToNextPoll()
+            if let user = mainVM.currUser {
+                moveToNextPoll(user: user)
+            }
             
             withAnimation(.easeInOut(duration: 0.3)) {
                 contentOpacity = 1
@@ -139,12 +143,12 @@ struct PollScreen: View {
         }
     }
     
-     func moveToNextPoll() {
+    func moveToNextPoll(user: User) {
         if currentPollIndex < pollVM.pollSet.count - 1 {
             currentPollIndex += 1
             pollVM.selectedPoll = pollVM.pollSet[currentPollIndex]
             Task {
-                await pollVM.getPollOptions()
+                 pollVM.getPollOptions(excludingUserId: user.id)
             }
             pollVM.showProgress = false
             pollVM.animateProgress = false

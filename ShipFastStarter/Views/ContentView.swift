@@ -74,7 +74,6 @@ struct ContentView: View {
                                 }
                             }
                         }
-                        
                     }
                 }
                 .gesture(
@@ -96,6 +95,13 @@ struct ContentView: View {
                             HStack {
                                 Text("inbox •")
                                     .sfPro(type: .bold, size: .h3p1)
+                                    .onTapGesture {
+                                        withAnimation {
+                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                            Analytics.shared.log(event: "Tabbar: Tapped Inbox")
+                                            mainVM.currentPage = .inbox
+                                        }
+                                    }
                                 Spacer()
                                 Text("play")
                                     .sfPro(type: .bold, size: .h3p1)

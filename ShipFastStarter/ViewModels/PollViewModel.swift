@@ -44,7 +44,7 @@ class PollViewModel: ObservableObject {
             
             if let first = self.pollSet.first {
                 self.selectedPoll = first
-                await self.getPollOptions()
+                self.getPollOptions(excludingUserId: user.id)
             }
             
             // Print debug information
@@ -167,7 +167,7 @@ class PollViewModel: ObservableObject {
             self.pollSet.sort { $0.createdAt > $1.createdAt }
             if let first = self.pollSet.first {
                 self.selectedPoll = first
-                await self.getPollOptions()
+                await self.getPollOptions(excludingUserId: user.id)
             }
         } catch {
             print("Error creating polls: \(error.localizedDescription)")
@@ -234,40 +234,53 @@ class PollViewModel: ObservableObject {
         return options
     }
 
-    func getPollOptions() async {
+    func getPollOptions(excludingUserId userId: String) {
         guard !selectedPoll.pollOptions.isEmpty else {
             print("Selected poll has no options")
             return
         }
-        currentFourOptions = Array(selectedPoll.pollOptions.prefix(4))
-        currentOptionIndex = 4
+        
+        // Filter out options with the user's ID
+        let availableOptions = selectedPoll.pollOptions.filter { $0.userId != userId }
+        
+        guard !availableOptions.isEmpty else {
+            print("No available options after filtering")
+            return
+        }
+        
+        // Take up to 4 options from the available options
+        currentFourOptions = Array(availableOptions.prefix(4))
+        currentOptionIndex = min(4, availableOptions.count)
+        
         updateQuestionEmoji()
         updateTotalVotes()
         resetPollState()
         
         // Print debug information
         print("getPollOptions called")
-        print("Selected poll now has \(selectedPoll.pollOptions.count) options")
+        print("Selected poll has \(selectedPoll.pollOptions.count) total options")
+        print("Available options after filtering: \(availableOptions.count)")
         print("Current four options: \(currentFourOptions.map { $0.option })")
     }
 
-    func shuffleOptions() {
+    func shuffleOptions(excludingUserId: String) {
         let totalOptions = selectedPoll.pollOptions.count
-        
+        var availableOptions = selectedPoll.pollOptions.filter { $0.userId != excludingUserId }
+
         if currentOptionIndex >= totalOptions {
-            selectedPoll.pollOptions.shuffle()
+            availableOptions.shuffle()
             currentOptionIndex = 0
         }
         
-        let endIndex = min(currentOptionIndex + 4, totalOptions)
-        currentFourOptions = Array(selectedPoll.pollOptions[currentOptionIndex..<endIndex])
+        let endIndex = min(currentOptionIndex + 4, availableOptions.count)
+        currentFourOptions = Array(availableOptions[currentOptionIndex..<endIndex])
         
         if currentFourOptions.count < 4 {
             let remainingCount = 4 - currentFourOptions.count
-            currentFourOptions += Array(selectedPoll.pollOptions[0..<remainingCount])
+            currentFourOptions += Array(availableOptions[0..<min(remainingCount, availableOptions.count)])
         }
         
-        currentOptionIndex = (currentOptionIndex + 4) % totalOptions
+        currentOptionIndex = (currentOptionIndex + 4) % max(1, availableOptions.count)
         
         updateQuestionEmoji()
         
@@ -275,7 +288,7 @@ class PollViewModel: ObservableObject {
         print("shuffleOptions called")
         print("Current four options after shuffle: \(currentFourOptions.map { $0.option })")
     }
-
+    
     func startCooldownTimer() {
         guard timer == nil else { return }
         updateTimeRemaining()

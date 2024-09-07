@@ -8,7 +8,7 @@
 import Foundation
 
 class MainViewModel: ObservableObject {
-    @Published var currentPage: Page = .poll
+    @Published var currentPage: Page = .inbox
     @Published var onboardingScreen: OnboardingScreenType = .number
     @Published var isPro = false
     @Published var showHalfOff = false 
@@ -26,6 +26,7 @@ class MainViewModel: ObservableObject {
                 if let user = users.first {
                     DispatchQueue.main.async {
                         self.currUser = user
+                        print("successfully fetched user", user.id, user.firstName)
                     }
                 } else {
                     print("No user found with the given phone number")
