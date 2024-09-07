@@ -363,6 +363,10 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         print("token",deviceToken.toJsonString())
         //Messaging.messaging().apnsToken = deviceToken
         Auth.auth().setAPNSToken(deviceToken, type: .sandbox)
+        
+        let firebaseAuth = Auth.auth()
+        firebaseAuth.setAPNSToken(deviceToken, type: .unknown)
+        // Now use this tokenString with CustomerIO
     }
 //    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
 //        

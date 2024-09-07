@@ -83,6 +83,9 @@ struct NumberScreen: View {
                 Button(action: {
                     if var user = mainVM.currUser {
                         authVM.verifyCode(code: verificationCode, user: user)
+                    } else {
+                        let user = User.exUser
+                        authVM.verifyCode(code: verificationCode, user: user)
                     }
                 }) {
                     Text("Verify")
