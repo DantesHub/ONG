@@ -17,6 +17,7 @@ struct User: Codable, Equatable, FBObject {
     var id: String
     var firstName: String
     var lastName: String
+    var username: String  // New property
     var schoolId: String
     var color: String
     var aura: Int
@@ -29,13 +30,14 @@ struct User: Codable, Equatable, FBObject {
     var friends: [String]
     var invitedFriends: [String]
     var ogBadge: Bool
-    var gender: String // New property
+    var gender: String
     var fcmToken: String
 
-    init(id: String, firstName: String, lastName: String, schoolId: String, color: String, aura: Int, godMode: Bool, birthday: String, grade: String, number: String, votedPolls: [String], lastPollFinished: Date?, friends: [String], invitedFriends: [String], ogBadge: Bool, gender: String, fcmToken: String) {
+    init(id: String, firstName: String, lastName: String, username: String, schoolId: String, color: String, aura: Int, godMode: Bool, birthday: String, grade: String, number: String, votedPolls: [String], lastPollFinished: Date?, friends: [String], invitedFriends: [String], ogBadge: Bool, gender: String, fcmToken: String) {
         self.id = id
         self.firstName = firstName
         self.lastName = lastName
+        self.username = username  // Initialize the new property
         self.schoolId = schoolId
         self.color = color
         self.aura = aura
@@ -56,6 +58,7 @@ struct User: Codable, Equatable, FBObject {
         id: UUID().uuidString,
         firstName: "Naveed",
         lastName: "Johnmo",
+        username: "naveedjohnmo",  // Example username
         schoolId: "123e4567-e89b-12d3-a456-426614174000",
         color: "#FF0000",
         aura: 100,
@@ -68,7 +71,7 @@ struct User: Codable, Equatable, FBObject {
         friends: [],
         invitedFriends: [],
         ogBadge: true,
-        gender: "Male", // Example gender
+        gender: "Male",
         fcmToken: ""
     )
 
@@ -77,7 +80,7 @@ struct User: Codable, Equatable, FBObject {
     }
 
     enum CodingKeys: String, CodingKey {
-        case id, firstName, lastName, schoolId, color, aura, godMode, birthday, grade, number, votedPolls, lastPollFinished, friends, invitedFriends, ogBadge, gender, fcmToken
+        case id, firstName, lastName, username, schoolId, color, aura, godMode, birthday, grade, number, votedPolls, lastPollFinished, friends, invitedFriends, ogBadge, gender, fcmToken
     }
 
     init(from decoder: Decoder) throws {
@@ -86,18 +89,19 @@ struct User: Codable, Equatable, FBObject {
         id = try container.decode(String.self, forKey: .id)
         firstName = try container.decode(String.self, forKey: .firstName)
         lastName = try container.decode(String.self, forKey: .lastName)
+        username = try container.decode(String.self, forKey: .username)  // Decode the new property
         schoolId = try container.decode(String.self, forKey: .schoolId)
-        color = try container.decodeIfPresent(String.self, forKey: .color) ?? "#000000" // Default black color
+        color = try container.decodeIfPresent(String.self, forKey: .color) ?? "#000000"
         aura = try container.decodeIfPresent(Int.self, forKey: .aura) ?? 0
         godMode = try container.decodeIfPresent(Bool.self, forKey: .godMode) ?? false
-        birthday = try container.decodeIfPresent(String.self, forKey: .birthday) ?? "2000-01-01" // Default birthday
-        grade = try container.decodeIfPresent(String.self, forKey: .grade) ?? "9" // Default to 9th grade
+        birthday = try container.decodeIfPresent(String.self, forKey: .birthday) ?? "2000-01-01"
+        grade = try container.decodeIfPresent(String.self, forKey: .grade) ?? "9"
         number = try container.decodeIfPresent(String.self, forKey: .number) ?? ""
         votedPolls = try container.decodeIfPresent([String].self, forKey: .votedPolls) ?? []
         friends = try container.decodeIfPresent([String].self, forKey: .friends) ?? []
         invitedFriends = try container.decodeIfPresent([String].self, forKey: .invitedFriends) ?? []
         ogBadge = try container.decodeIfPresent(Bool.self, forKey: .ogBadge) ?? false
-        gender = try container.decodeIfPresent(String.self, forKey: .gender) ?? "Unspecified" // Default gender
+        gender = try container.decodeIfPresent(String.self, forKey: .gender) ?? "Unspecified"
         fcmToken = try container.decodeIfPresent(String.self, forKey: .fcmToken) ?? ""
         // Custom decoding for lastPollFinished
         if let lastPollFinishedTimestamp = try? container.decode(Double.self, forKey: .lastPollFinished) {

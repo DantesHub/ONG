@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct OnboardingScreen: View {
+    @EnvironmentObject var mainVM: MainViewModel
+    
     var body: some View {
         ZStack {
             Color.primaryBackground.edgesIgnoringSafeArea(.all)
@@ -40,7 +42,8 @@ struct OnboardingScreen: View {
                     .padding(.top)
                 Spacer()
                 SharedComponents.PrimaryButton(title: "continue") {
-                    
+                    mainVM.currUser = User.exUser
+                    mainVM.onboardingScreen = .birthday
                 }
                 .padding(.vertical, 48)
                 .padding(.horizontal, 24)

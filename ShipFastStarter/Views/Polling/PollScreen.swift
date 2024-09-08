@@ -15,7 +15,9 @@ struct PollScreen: View {
     @State private var showTapToContinue = false
     @State private var contentOpacity: Double = 1  // Add this line
     @State private var showSplash = true  // Add this line
-
+    @State private var showError = false
+    
+    
     var body: some View {
         ZStack {
                 VStack(spacing: 0) {
@@ -43,6 +45,12 @@ struct PollScreen: View {
                                     .frame(height: 124, alignment: .top)
                                     .padding(.horizontal, 24)
                                     .multilineTextAlignment(.center)
+                            }
+                            
+                            if showError {
+                                Text("invalid username")
+                                    .sfPro(type: .semibold, size: .h3p1)
+                                    .foregroundColor(.red)
                             }
                             
                             Spacer()
@@ -95,9 +103,6 @@ struct PollScreen: View {
                                 .padding(.horizontal)
                                 .padding(.bottom, 20)
                             }
-                            
-                            
-                            
                         }
                         .opacity(contentOpacity)  // Add this line
                     } else {
@@ -169,6 +174,8 @@ struct PollOptionView: View {
     @EnvironmentObject var pollVM: PollViewModel
     @EnvironmentObject var mainVM: MainViewModel
     let option: PollOption
+    var isCompleted: Bool = false
+    var isSelected: Bool = true
     @State private var progressWidth: CGFloat = 0
     @State private var opacity: Double = 1
     
@@ -221,16 +228,13 @@ struct PollOptionView: View {
                     .padding(.horizontal, 32)
                     .frame(maxWidth: .infinity, alignment: pollVM.showProgress ? .leading : .center)
                 }
-                .onChange(of: pollVM.animateProgress) { newValue in
-                    print("animateProgress changed to: \(newValue)")
+                .onChange(of: pollVM.animateProgress) {
                     updateProgressWidth(geometry: geometry)
                 }
-                .onChange(of: pollVM.totalVotes) { newValue in
-                    print("totalVotes changed to: \(newValue)")
+                .onChange(of: pollVM.totalVotes) {
                     updateProgressWidth(geometry: geometry)
                 }
                 .onChange(of: pollVM.selectedPoll) { _ in
-                    print("selectedPoll changed")
                     updateProgressWidth(geometry: geometry)
                 }
             }
@@ -240,6 +244,7 @@ struct PollOptionView: View {
         .disabled(pollVM.showProgress)
         .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 4)
         .primaryShadow()
+        .opacity(isSelected ? 1 : 0.3)
     }
     
     private func updateProgressWidth(geometry: GeometryProxy) {
@@ -267,7 +272,7 @@ struct StoryProgressBar: View {
     
     var body: some View {
         Rectangle()
-            .fill(isComplete ? Color.black : Color.black.opacity(0.25))
+            .fill(isComplete ? Color.black : Color.black.opacity(0.15))
             .frame(height: 4)
             .cornerRadius(4)
     }

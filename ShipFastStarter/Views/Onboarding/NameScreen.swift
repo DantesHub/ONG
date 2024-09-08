@@ -11,6 +11,7 @@ struct NameScreen: View {
     @EnvironmentObject var mainVM: MainViewModel
     @State private var firstName: String = ""
     @FocusState private var isNameFocused: Bool
+    @State private var showError = false
     
     var body: some View {
         ZStack {
@@ -25,17 +26,22 @@ struct NameScreen: View {
                     .multilineTextAlignment(.center)
                 
                 Text(firstName.isEmpty ? "Type your name" : firstName)
-                    .sfPro(type: .semibold, size: .h2)
+                    .sfPro(type: .semibold, size: .h1)
                     .foregroundColor(firstName.isEmpty ? .gray : .white)
                     .padding(.vertical, 16)
                     .frame(maxWidth: .infinity)
-                    .background(Color.white.opacity(0.2))
                     .cornerRadius(16)
                     .padding(.horizontal, 24)
                     .onTapGesture {
                         isNameFocused = true
                     }
                 
+                if showError {
+                    Text("invalid name")
+                        .sfPro(type: .semibold, size: .h3p1)
+                        .foregroundColor(.red)
+                }
+            
                 Spacer()
                 
                 SharedComponents.PrimaryButton(
@@ -43,7 +49,13 @@ struct NameScreen: View {
                     action: {
                         mainVM.currUser?.firstName = firstName
                         Analytics.shared.log(event: "NameScreen: Tapped Continue")
-                        mainVM.onboardingScreen = .birthday // Assuming .birthday is the next screen
+                        if StringValidator.isValid(firstName) {
+                            mainVM.onboardingScreen = .lastName
+                        } else {
+                            // Handle invalid input
+                            showError = true
+                            print("Invalid input")
+                        }
                     }
                 )
                 .padding(.horizontal, 24)
@@ -52,9 +64,8 @@ struct NameScreen: View {
             }
         }
         .onAppear {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 isNameFocused = true
-            }
+            
         }
         .overlay(
             TextField("", text: $firstName)
@@ -62,6 +73,101 @@ struct NameScreen: View {
                 .opacity(0)
                 .autocorrectionDisabled(true)
         )
+    }
+}
+
+struct StringValidator {
+    static let curseWords = ["fuck", "shit", "ass", "bitch", "damn", "cunt", "dick", "piss", "bastard"]
+    
+    static func isValid(_ input: String) -> Bool {
+        let trimmedInput = input.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        // Check for minimum length
+        guard trimmedInput.count >= 2 else { return false }
+        
+        // Check for maximum length
+        guard trimmedInput.count <= 20 else { return false }
+        
+        // Check for special characters
+        let specialCharacters = CharacterSet(charactersIn: "!@#$%^&*()_+{}[]|\"<>,.~`/:;?=\\")
+        guard trimmedInput.rangeOfCharacter(from: specialCharacters) == nil else { return false }
+        
+        // Check for curse words
+        let lowercasedInput = trimmedInput.lowercased()
+        for word in curseWords {
+            if lowercasedInput.contains(word) {
+                return false
+            }
+        }
+        
+        // Check if it's only numbers
+        if Int(trimmedInput) != nil {
+            return false
+        }
+        
+        return true
+    }
+    
+    static func isLastNameValid(_ input: String) -> Bool {
+        let trimmedInput = input.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        // Check for minimum length
+        guard trimmedInput.count >= 1 else { return false }
+        
+        // Check for maximum length
+        guard trimmedInput.count <= 14 else { return false }
+        // Check for special characters
+        let specialCharacters = CharacterSet(charactersIn: "!@#$%^&*()_+{}[]|\"<>,.~`/:;?=\\")
+        guard trimmedInput.rangeOfCharacter(from: specialCharacters) == nil else { return false }
+        
+        // Check for curse words
+        let lowercasedInput = trimmedInput.lowercased()
+        for word in curseWords {
+            if lowercasedInput.contains(word) {
+                return false
+            }
+        }
+        
+        // Check if it's only numbers
+        if Int(trimmedInput) != nil {
+            return false
+        }
+        
+        return true
+    }
+    
+    static func isUsernameValid(_ input: String) -> Bool {
+        let usernameRegex = "^[a-zA-Z][a-zA-Z0-9$\\-_]{2,19}$"
+        let usernamePredicate = NSPredicate(format: "SELF MATCHES %@", usernameRegex)
+        let isValid = usernamePredicate.evaluate(with: input)
+        
+        if isValid {
+            let trimmedInput = input.trimmingCharacters(in: .whitespacesAndNewlines)
+            
+            // Check for minimum length
+            guard trimmedInput.count >= 1 else { return false }
+            
+            // Check for maximum length
+            guard trimmedInput.count <= 14 else { return false }
+            
+            // Check for curse words
+            let lowercasedInput = trimmedInput.lowercased()
+            for word in curseWords {
+                if lowercasedInput.contains(word) {
+                    return false
+                }
+            }
+            
+            // Check if it's only numbers
+            if Int(trimmedInput) != nil {
+                return false
+            }
+            
+            return true
+        } else {
+            return false
+        }
+       
     }
 }
 

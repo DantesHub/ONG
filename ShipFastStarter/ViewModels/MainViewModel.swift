@@ -8,8 +8,8 @@
 import Foundation
 
 class MainViewModel: ObservableObject {
-    @Published var currentPage: Page = .inbox
-    @Published var onboardingScreen: OnboardingScreenType = .number
+    @Published var currentPage: Page = .onboarding
+    @Published var onboardingScreen: OnboardingScreenType = .first
     @Published var isPro = false
     @Published var showHalfOff = false 
     @Published var onboardingProgress: Double = 0.0

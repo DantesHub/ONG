@@ -54,7 +54,7 @@ struct ContentView: View {
                     }
                 }
                 .onAppear {
-                    if !UserDefaults.standard.bool(forKey: "finishedOnboarding") {
+                    if UserDefaults.standard.bool(forKey: "finishedOnboarding") {
                         Task {
                             await mainVM.fetchUser()
                             if let user = mainVM.currUser {
@@ -65,15 +65,12 @@ struct ContentView: View {
                                     pollVM.completedPoll = false
                                     mainVM.currentPage = .cooldown
                                 } else {
-                                    if !highschoolVM.isHighSchoolLocked {
-                                        await pollVM.fetchPolls(for: user)
-                                        if pollVM.pollSet.count < 8 {
-                                            await pollVM.createPoll(user: user)
-                                        }
-                                    }
+                                    fetchPolls(user: user)
                                 }
                             }
                         }
+                    } else {
+                        
                     }
                 }
                 .gesture(
@@ -87,7 +84,13 @@ struct ContentView: View {
                         .environmentObject(mainVM)
                         .environmentObject(pollVM)
                 }
-            }    
+                .onChange(of: authVM.signInSuccessful) {
+                    UserDefaults.standard.setValue(true, forKey: "finishedOnboarding")
+                    if let user = mainVM.currUser {
+                        fetchPolls(user: user)
+                    }
+                }
+            }
             .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
                     if mainVM.currentPage != .onboarding {
@@ -105,15 +108,45 @@ struct ContentView: View {
                                 Spacer()
                                 Text("play")
                                     .sfPro(type: .bold, size: .h3p1)
+                                    .onTapGesture {
+                                        withAnimation {
+                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                            Analytics.shared.log(event: "Tabbar: Tapped Polls")
+                                            if let endTime = pollVM.cooldownEndTime {
+                                                pollVM.completedPoll = false
+                                                mainVM.currentPage = .cooldown
+                                            } else {
+                                                mainVM.currentPage = .poll
+                                            }
+                                        }
+                                    }
                                 Spacer()
                                 Text("profile")
                                     .sfPro(type: .bold, size: .h3p1)
+                                    .onTapGesture {
+                                        withAnimation {
+                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                            Analytics.shared.log(event: "Tabbar: Tapped Profile")
+                                            mainVM.currentPage = .inbox
+                                        }
+                                    }
                             }
                             .foregroundColor(.black)
                         }
                     }
-                    
                 }
+        }
+    }
+    
+    func fetchPolls(user: User) {
+        Task {
+            if !highschoolVM.isHighSchoolLocked {
+                await pollVM.fetchPolls(for: user)
+                if pollVM.pollSet.count < 8 {
+                    await pollVM.createPoll(user: user)
+                    mainVM.currentPage = .poll
+                }
+            }
         }
     }
 

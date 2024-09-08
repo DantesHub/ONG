@@ -297,7 +297,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
         FirebaseApp.configure()
-        Messaging.messaging().delegate = self
+//        Messaging.messaging().delegate = self
         UNUserNotificationCenter.current().delegate = self
         //        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
         //             if let error = error {
@@ -361,17 +361,9 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     }
     
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        // Convert token to string (if needed) and use it for testing
-        print("APNs token retrieved: \(deviceToken)")
-        let tokenParts = deviceToken.map { data in String(format: "%02.2hhx", data) }
-        let tokenString = tokenParts.joined()
-        Messaging.messaging().apnsToken = deviceToken
-        print("Device Token: \(tokenString)")
-
-        
-        let firebaseAuth = Auth.auth()
-        firebaseAuth.setAPNSToken(deviceToken, type: .unknown)
-        // Now use this tokenString with CustomerIO
+        print("token",deviceToken.toJsonString())
+        //Messaging.messaging().apnsToken = deviceToken
+        Auth.auth().setAPNSToken(deviceToken, type: .sandbox)
     }
     
     func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
@@ -388,18 +380,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 //              }
           }
       }
-//    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-//        
-//        // Convert token to string (if needed) and use it for testing
-//        print("APNs token retrieved: \(deviceToken)")
-//        let tokenParts = deviceToken.map { data in String(format: "%02.2hhx", data) }
-//        let tokenString = tokenParts.joined()
-//        
-//
-//        print("Device Token: \(tokenString)")
-//        Auth.auth().setAPNSToken(deviceToken, type: .unknown)
-//        // Now use this tokenString with CustomerIO
-//    }
+
 //   
     
     

@@ -11,6 +11,7 @@ struct LastNameScreen: View {
     @EnvironmentObject var mainVM: MainViewModel
     @State private var lastName: String = ""
     @FocusState private var isNameFocused: Bool
+    @State private var showError = false
     
     var body: some View {
         ZStack {
@@ -23,6 +24,7 @@ struct LastNameScreen: View {
                     .sfPro(type: .bold, size: .h1)
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
+                    .padding(.horizontal)
                 
                 Text(lastName.isEmpty ? "Molina" : lastName)
                     .sfPro(type: .bold, size: .h1Big)
@@ -35,7 +37,11 @@ struct LastNameScreen: View {
                     .onTapGesture {
                         isNameFocused = true
                     }
-                
+                if showError {
+                    Text("invalid name")
+                        .sfPro(type: .semibold, size: .h3p1)
+                        .foregroundColor(.red)
+                }
                 Spacer()
                 
                 SharedComponents.PrimaryButton(
@@ -43,7 +49,11 @@ struct LastNameScreen: View {
                     action: {
                         mainVM.currUser?.lastName = lastName
                         Analytics.shared.log(event: "NameScreen: Tapped Continue")
-                        mainVM.onboardingScreen = .username // Assuming .birthday is the next screen
+                        if StringValidator.isValid(lastName) {
+                            mainVM.onboardingScreen = .username // Assuming .birthday is the next screen
+                        } else {
+                            showError = true
+                        }
                     }
                 )
                 .padding(.horizontal, 24)

@@ -184,7 +184,6 @@ class InboxViewModel: ObservableObject {
 
     
    func formatRelativeTime(from date: Date) -> String {
-       print(date, "betuh")
         let now = Date()
         let calendar = Calendar.current
         let components = calendar.dateComponents([.year, .month, .day, .hour, .minute, .second], from: date, to: now)

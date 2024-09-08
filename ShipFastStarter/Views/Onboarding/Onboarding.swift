@@ -11,31 +11,41 @@ import SwiftUI
 
 struct OnboardingView: View {
     @EnvironmentObject var mainVM: MainViewModel
-    @EnvironmentObject var authVM: MainViewModel
-
+    @EnvironmentObject var authVM: AuthViewModel
+    @State private var currentProgressIndex: Int = 0
+    
+    let totalSteps = 8
+    
     var body: some View {
        ZStack {
             Color.primaryBackground.edgesIgnoringSafeArea(.all)
             VStack {
-                if mainVM.onboardingScreen != .first {
-                    HStack {
-                        Image(systemName: "arrow.left")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 24)
-                            .foregroundColor(Color.primaryForeground)
-                            .onTapGesture {
-                                Analytics.shared.log(event: "Onboarding: tapped Back")
-                                withAnimation {
-                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                    goBack()
-                                }
-                            }.padding(.leading)
-                            .padding(.trailing, 4)
-                        ProgressView(value: mainVM.onboardingProgress)
-                            .progressViewStyle(CustomProgressViewStyle())
-                            .frame(height: 24)
-                            .padding(.trailing)
+                if mainVM.onboardingScreen != .first  {
+                    HStack(alignment: .center) {
+                        if  mainVM.onboardingScreen != .birthday {
+                            Image(systemName: "arrow.left")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 24)
+                                .foregroundColor(Color.primaryForeground)
+                                .onTapGesture {
+                                    Analytics.shared.log(event: "Onboarding: tapped Back")
+                                    withAnimation {
+                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                        goBack()
+                                    }
+                                }.padding(.leading)
+                                .padding(.trailing, 4)
+                        }
+                 
+                        HStack(spacing: 4) {
+                            ForEach(0..<totalSteps, id: \.self) { index in
+                                StoryProgressBar(isComplete: index < currentProgressIndex)
+                            }
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.top, 8)
+                        .padding(.bottom, 16)
                     }.padding(.top)
                     .padding(.horizontal, 8)                  
                 }
@@ -58,43 +68,46 @@ struct OnboardingView: View {
                     case .username: UsernameScreen() 
                 }
             }
+       }.onChange(of: mainVM.onboardingScreen) { newValue in
+           updateProgressIndex(for: newValue)
        }
-            
     }
     
     func goBack() {
         switch mainVM.onboardingScreen {
             case .first:
-                mainVM.onboardingScreen = .age
+                break // Do nothing if we're already at the first screen
             case .age:
-                mainVM.onboardingScreen = .gender
+                mainVM.onboardingScreen = .first
             case .gender:
-                mainVM.onboardingScreen = .birthday
-            case .birthday:
-                mainVM.onboardingScreen = .name
-            case .name:
-                mainVM.onboardingScreen = .number
-            case .number:
-                mainVM.onboardingScreen = .contacts
-            case .contacts:
-                mainVM.onboardingScreen = .first
-            case .location:
-                mainVM.onboardingScreen = .location
-            case .grade:
-                mainVM.onboardingScreen = .location
-            case .lastName:
-                mainVM.onboardingScreen = .first
-            case .highschool:
                 mainVM.onboardingScreen = .age
-            case .username:
+            case .birthday:
+                mainVM.onboardingScreen = .gender
+            case .name:
+                mainVM.onboardingScreen = .birthday
+            case .number:
+                mainVM.onboardingScreen = .name
+            case .contacts:
+                mainVM.onboardingScreen = .number
+            case .location:
+                mainVM.onboardingScreen = .contacts
+            case .grade:
+                mainVM.onboardingScreen = .birthday
+            case .lastName:
+                mainVM.onboardingScreen = .birthday
+            case .highschool:
                 mainVM.onboardingScreen = .lastName
+            case .username:
+                mainVM.onboardingScreen = .highschool
         }
-        return
-
     }
 
-
-
+    func updateProgressIndex(for screen: OnboardingScreenType) {
+        let screenOrder: [OnboardingScreenType] = [.first, .birthday, .location, .grade, .name, .lastName, .username]
+        if let index = screenOrder.firstIndex(of: screen) {
+            currentProgressIndex = min(index, totalSteps)
+        }
+    }
 }
 
 enum OnboardingScreenType {

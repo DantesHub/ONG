@@ -33,8 +33,6 @@ class AuthViewModel: ObservableObject {
     
     @MainActor
     func verifyCode(code: String, user: User) {
-        
-
         guard let verificationID = verificationID else { return }
         FirebaseService.shared.verifyCode(verificationID: verificationID, verificationCode: code) { result in
             DispatchQueue.main.async {
@@ -43,8 +41,8 @@ class AuthViewModel: ObservableObject {
                     FirebaseService.shared.addDocument(user, collection: "users") { str in
                         self.signInSuccessful = true
                         self.isVerified = true
+                        print("Successfully verified and signed in: \(authResult.user.uid)")
                     }
-                    print("Successfully verified and signed in: \(authResult.user.uid)")
                   
                 case .failure(let error):
                     self.signInError = error

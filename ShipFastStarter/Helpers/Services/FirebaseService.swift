@@ -237,7 +237,7 @@ class FirebaseService {
         
         return try querySnapshot.documents.compactMap { document in
             let jsonData = try JSONSerialization.data(withJSONObject: document.data())
-            return try JSONDecoder().decode(T.self, from: jsonData)            
+            return try JSONDecoder().decode(T.self, from: jsonData)
         }
     }
 
@@ -328,6 +328,18 @@ class FirebaseService {
         }
     }
 
+    func isUsernameTaken(_ username: String) async throws -> Bool {
+        let usersRef = FirebaseService.db.collection("users")
+        let query = usersRef.whereField("username", isEqualTo: username)
+        
+        do {
+            let snapshot = try await query.getDocuments()
+            return !snapshot.isEmpty
+        } catch {
+            print("Error checking username: \(error.localizedDescription)")
+            throw error
+        }
+    }
 }
 
 // Add this new function to the FirebaseService class

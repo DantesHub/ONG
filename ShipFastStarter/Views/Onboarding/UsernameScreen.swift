@@ -11,7 +11,8 @@ struct UsernameScreen: View {
     @EnvironmentObject var mainVM: MainViewModel
     @State private var username: String = ""
     @FocusState private var isNameFocused: Bool
-    
+    @State private var showError = false
+
     var body: some View {
         ZStack {
             Color.primaryBackground.edgesIgnoringSafeArea(.all)
@@ -19,11 +20,11 @@ struct UsernameScreen: View {
             VStack(spacing: 24) {
                 Spacer()
                 
-                Text("what's your last name?")
+                Text("create a username")
                     .sfPro(type: .bold, size: .h1)
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
-                
+                    .padding(.horizontal)
                 Text(username.isEmpty ? "lilbro" : username)
                     .sfPro(type: .bold, size: .h1Big)
                     .foregroundColor(username.isEmpty ? .gray : .white)
@@ -35,7 +36,11 @@ struct UsernameScreen: View {
                     .onTapGesture {
                         isNameFocused = true
                     }
-                
+                if showError {
+                    Text("invalid username")
+                        .sfPro(type: .semibold, size: .h3p1)
+                        .foregroundColor(.red)
+                }
                 Spacer()
                 
                 SharedComponents.PrimaryButton(
@@ -43,7 +48,15 @@ struct UsernameScreen: View {
                     action: {
                         mainVM.currUser?.lastName = username
                         Analytics.shared.log(event: "NameScreen: Tapped Continue")
-                        mainVM.onboardingScreen = .username // Assuming .birthday is the next screen
+                        Task {
+                            if await checkIfUsernameIsTaken() {
+                                showError = false
+                                mainVM.onboardingScreen = .number // Assuming .birthday is the next screen
+                            } else {
+                                showError = true
+                            }
+                        }
+                      
                     }
                 )
                 .padding(.horizontal, 24)
@@ -62,6 +75,25 @@ struct UsernameScreen: View {
                 .opacity(0)
                 .autocorrectionDisabled(true)
         )
+    }
+    
+    func checkIfUsernameIsTaken() async -> Bool {
+        if StringValidator.isUsernameValid(username) {
+            do {
+                     let isTaken = try await FirebaseService.shared.isUsernameTaken(username)
+                     return !isTaken  // Return true if username is NOT taken
+                 } catch {
+                     print("Error checking username: \(error.localizedDescription)")
+                     return false  // Assume username is taken in case of error
+                 }
+            
+        } else {
+            await MainActor.run {
+                     showError = true
+                return false
+                 }
+        }
+        return false
     }
 }
 
