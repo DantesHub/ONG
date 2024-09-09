@@ -10,4 +10,16 @@ import Foundation
 
 struct Constants {
     static var userId = "userId"
+    static var pollIds = "pollIds"
+    static var currentIndex = "currentIndex"
+    static var colors = [
+           "blue",
+           "green",
+           "lightPurple",
+           "orange",
+           "pink",
+           "red",
+           "teal",
+           "yellow"
+       ]
 }

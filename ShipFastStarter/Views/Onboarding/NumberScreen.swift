@@ -27,6 +27,7 @@ struct NumberScreen: View {
                     .sfPro(type: .bold, size: .h1)
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
+                    .padding(.horizontal)
                 
                 if !authVM.isVerificationCodeSent {
                     HStack {
@@ -88,7 +89,8 @@ struct NumberScreen: View {
                             .onTapGesture {
                                 UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                 withAnimation {
-                                    
+                                    Analytics.shared.log(event: "NumberScreen: Tapped Resend")
+                                    authVM.resendVerificationCode()
                                 }
                             }
                     }
@@ -116,7 +118,6 @@ struct NumberScreen: View {
         }
         .onAppear {
             isPhoneNumberFocused = true
-            authVM.isVerificationCodeSent = true
         }
         .overlay(
             Group {
@@ -150,10 +151,12 @@ struct NumberScreen: View {
         Analytics.shared.logActual(event: "NumberScreen: Tapped Next", parameters: ["":""])
         let formattedNumber = "+1\(phoneNumber)"
         withAnimation {
+            mainVM.currUser?.fcmToken = UserDefaults.standard.string(forKey: "fcmToken") ?? ""
             if var user = mainVM.currUser {
                 mainVM.currUser?.number = formattedNumber
                 user.number = formattedNumber
             }
+            UserDefaults.standard.setValue(formattedNumber, forKey: "userNumber")
             authVM.signInWithPhoneNumber(phoneNumber: formattedNumber)
         }
     }

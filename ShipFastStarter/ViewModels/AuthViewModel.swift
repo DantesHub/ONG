@@ -52,4 +52,20 @@ class AuthViewModel: ObservableObject {
             }
         }
     }
+    
+    
+    func resendVerificationCode() {
+        guard let phoneNumber = UserDefaults.standard.string(forKey: "userNumber") else {
+               print("No phone number available to resend code")
+               return
+           }
+           
+           // Reset relevant states
+           self.isVerificationCodeSent = false
+           self.verificationID = nil
+           self.signInError = nil
+           
+           // Call signInWithPhoneNumber again
+           signInWithPhoneNumber(phoneNumber: phoneNumber)
+       }
 }

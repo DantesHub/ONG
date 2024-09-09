@@ -20,7 +20,14 @@ struct InboxScreen: View {
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 24) {
                         if inboxVM.newUsersWhoVoted.isEmpty && inboxVM.oldUsersWhoVoted.isEmpty {
-                         
+                            Spacer()
+                            Text("No one has voted for you yet!\n\nTip: Answer more questions to show up in more polls")
+                                .font(.system(size: 22, weight: .bold))
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal, 48)
+                                .opacity(0.3)
+                                .offset(y: 64)
+                            Spacer()
                         } else {
                             if !inboxVM.newUsersWhoVoted.isEmpty {
                                 Text("New")
@@ -31,7 +38,7 @@ struct InboxScreen: View {
                                     InboxItemView(item: item)
                                 }
                             }
-                         
+                            
                             if !inboxVM.oldUsersWhoVoted.isEmpty {
                                 Text("Past")
                                     .font(.system(size: 22, weight: .bold))

@@ -10,21 +10,21 @@ import SwiftUI
 struct PollScreen: View {
     @EnvironmentObject var mainVM: MainViewModel
     @EnvironmentObject var pollVM: PollViewModel
-    @State private var currentPollIndex = 0
     @State private var isComplete = false
     @State private var showTapToContinue = false
     @State private var contentOpacity: Double = 1  // Add this line
     @State private var showSplash = true  // Add this line
     @State private var showError = false
-    
+    @State private var randNumber = Int.random(in: 0...7)
     
     var body: some View {
         ZStack {
+            Color(Constants.colors[randNumber]).edgesIgnoringSafeArea(.all)
                 VStack(spacing: 0) {
                     // Story bar
                     HStack(spacing: 4) {
                         ForEach(0..<min(pollVM.pollSet.count, 8), id: \.self) { index in
-                            StoryProgressBar(isComplete: index <= currentPollIndex || (index == currentPollIndex && isComplete))
+                            StoryProgressBar(isComplete: index <= pollVM.currentPollIndex || (index == pollVM.currentPollIndex && isComplete))
                         }
                     }
                     .padding(.horizontal, 16)
@@ -39,7 +39,6 @@ struct PollScreen: View {
                             VStack(spacing: 0) {
                                 Text(pollVM.questionEmoji)
                                     .font(.system(size: 64))
-                                    .padding(.top)
                                 Text(pollVM.selectedPoll.title)
                                     .sfPro(type: .bold, size: .h1)
                                     .frame(height: 124, alignment: .top)
@@ -74,30 +73,92 @@ struct PollScreen: View {
                                     .padding(.bottom, 20)
                                 
                             } else {
-                                HStack {
-                                    Button(action: {
-                                        skipPoll()
-                                    }) {
-                                        Text("Skip")
-                                            .foregroundColor(.white)
-                                            .padding()
-                                            .background(Color.black.opacity(0.5))
-                                            .cornerRadius(20)
-                                    }
-                                    
-                                    Spacer()
-                                    
+                                HStack(alignment: .center) {
                                     Button(action: {
                                         if let user = mainVM.currUser {
                                             pollVM.shuffleOptions(excludingUserId: user.id)
                                         }
                                     }) {
-                                        Image(systemName: "shuffle")
-                                            .foregroundColor(.white)
-                                            .padding()
-                                            .background(Color.black.opacity(0.5))
-                                            .cornerRadius(20)
-                                    }
+                                        ZStack {
+                                            RoundedRectangle(cornerRadius: 16)
+                                                .fill(Color.white)
+                                                .overlay(
+                                                    RoundedRectangle(cornerRadius: 16)
+                                                        .stroke(Color.black.opacity(1), lineWidth: 5)
+                                                        .padding(1)
+                                                        .mask(RoundedRectangle(cornerRadius: 16))
+                                                )
+                                            Image(systemName: "shuffle")
+                                                .resizable()
+                                                .aspectRatio(contentMode: .fit)
+                                                .frame(width: 24, height: 24)
+//                                                .padding()
+                                                .foregroundColor(Color.black)
+                                        }
+                                       
+                                    }.frame(width: 48, height: 48)
+                                    .primaryShadow()
+                                    
+                                    Spacer()
+                                    HStack(alignment: .center, spacing: 8) {
+                                        HStack(spacing: -16) {
+                                            ForEach(pollVM.randomizedPeople.indices.prefix(4), id: \.self) { index in
+                                                let person = pollVM.randomizedPeople[index]
+                                                ZStack {
+                                                    Circle()
+                                                        .fill(Color(person.1 ))
+                                                        .stroke(Color(.black), lineWidth: 1)
+                                                        .overlay(
+                                                            Circle()
+                                                                .stroke(Color.black.opacity(1), lineWidth: 1)
+                                                                .padding(1)
+                                                                .mask(RoundedRectangle(cornerRadius: 20))
+                                                        )
+                                                        .frame(width: 36, height: 36)
+                                                        .drawingGroup()
+                                                        .shadow(color: Color.black, radius: 0, x: 0, y: 2)
+                                                    Text("\(person.0 == "boy" ? "👦" : "👧")")
+                                                        .font(.system(size: 16))
+                                                    //                                                      .padding(24)
+                                                }
+                                            }
+                                        }
+                                        .padding(.horizontal, 4)
+                                        .padding(.vertical, 8)
+                                        .cornerRadius(20)
+                                        .padding(.bottom, 8)
+                                        Text("4 answering rn")
+                                            .sfPro(type: .medium, size: .p3)
+                                            .font(.system(size: 14, weight: .medium))
+                                            .foregroundColor(.black)
+                                    }.offset(y: 6)
+                                
+                                    
+                                    Spacer()
+                                    Button(action: {
+                                        skipPoll()
+                                    }) {
+                                        ZStack {
+                                            RoundedRectangle(cornerRadius: 16)
+                                                .fill(Color.white)
+                                                .overlay(
+                                                    RoundedRectangle(cornerRadius: 16)
+                                                        .stroke(Color.black.opacity(1), lineWidth: 5)
+                                                        .padding(1)
+                                                        .mask(RoundedRectangle(cornerRadius: 16))
+                                                )
+                                            Image(systemName: "forward.fill")
+                                                .resizable()
+                                                .aspectRatio(contentMode: .fit)
+                                                .frame(width: 24, height: 24)
+//                                                .padding()
+                                                .foregroundColor(Color.black)
+                                        }
+                                       
+                                    }.frame(width: 48, height: 48)
+                                    .primaryShadow()
+                                    
+                                 
                                 }
                                 .frame(height: 64)
                                 .padding(.horizontal)
@@ -112,12 +173,11 @@ struct PollScreen: View {
                     }
                 }.onTapGesture {
                     if pollVM.showProgress {
+                        
                         animateTransition()
                     }
                 }
-            
         }
-        
     }
 
     
@@ -127,13 +187,14 @@ struct PollScreen: View {
     }
     
      func updateProgressBar() {
-        if currentPollIndex < pollVM.pollSet.count - 1 {
+        if pollVM.currentPollIndex < pollVM.pollSet.count - 1 {
             isComplete = true
         }
     }
     
      func animateTransition() {
         withAnimation(.easeInOut(duration: 0.3)) {
+            randNumber = Int.random(in: 0...7)
             contentOpacity = 0
         }
         
@@ -149,12 +210,14 @@ struct PollScreen: View {
     }
     
     func moveToNextPoll(user: User) {
-        if currentPollIndex < pollVM.pollSet.count - 1 {
-            currentPollIndex += 1
-            pollVM.selectedPoll = pollVM.pollSet[currentPollIndex]
+        if pollVM.currentPollIndex < pollVM.pollSet.count - 1 {
+            pollVM.currentPollIndex += 1
+            UserDefaults.standard.setValue(pollVM.currentPollIndex, forKey: Constants.currentIndex)
+            pollVM.selectedPoll = pollVM.pollSet[pollVM.currentPollIndex]
             Task {
                  pollVM.getPollOptions(excludingUserId: user.id)
             }
+            print("over here")
             pollVM.showProgress = false
             pollVM.animateProgress = false
             isComplete = false // Reset completion state for the new poll
@@ -164,6 +227,7 @@ struct PollScreen: View {
             pollVM.completedPoll = true
             mainVM.currentPage = .cooldown
             if let user = mainVM.currUser {
+                UserDefaults.standard.setValue(0, forKey: Constants.currentIndex)
                 pollVM.finishPoll(user: user)
             }
         }
@@ -252,20 +316,26 @@ struct PollOptionView: View {
             withAnimation(.easeInOut(duration: 0.5)) {
                 progressWidth = geometry.size.width * progress
             }
-            print("Updated progress width: \(progressWidth)")
         } else {
             progressWidth = 0
-            print("Reset progress width to 0")
         }
     }
     
     private var progress: Double {
         guard pollVM.totalVotes > 0 else { return 0 }
-        let optionVotes = pollVM.selectedPoll.pollOptions.first(where: { $0.id == option.id })?.votes?.count ?? 0
+        let optionVotes = calculateOptionVotes()
         let progress = Double(optionVotes) / Double(pollVM.totalVotes)
-        print("Calculated progress for \(option.option): \(progress)")
         return progress
-    }}
+    }
+    
+    private func calculateOptionVotes() -> Int {
+        return pollVM.selectedPoll.pollOptions
+            .first(where: { $0.id == option.id })?
+            .votes?
+            .values
+            .reduce(0) { $0 + (Int($1["numVotes"] ?? "0") ?? 0) } ?? 0
+    }
+}
 
 struct StoryProgressBar: View {
     var isComplete: Bool

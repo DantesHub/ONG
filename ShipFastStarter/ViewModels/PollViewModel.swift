@@ -7,6 +7,7 @@
 
 import Foundation
 import FirebaseFirestore
+import SwiftUI
 
 @MainActor
 class PollViewModel: ObservableObject {
@@ -22,15 +23,65 @@ class PollViewModel: ObservableObject {
     @Published var totalVotes: Int = 0
     @Published var cooldownEndTime: Date?
     @Published var timeRemaining: TimeInterval = 0
+    @Published var randomizedPeople: [(String, String)] = []
+    @Published var currentPollOptionIndex: Int = 0
+    @Published var currentPollIndex: Int = 0
     
-    private var currentOptionIndex: Int = 0
     private var timer: Timer?
 
     init() {
         updateQuestionEmoji()
+        randomizePeople()
+    }
+    
+    func randomizePeople() {
+       let randomNumber = Int.random(in: 2...4)
+ 
+       
+       let randomPerson = 0
+        
+        for _ in 0..<randomNumber {
+            var randGender = Int.random(in: 0...1)
+            var color = Int.random(in: 0...7)
+            print(randGender, color, "what is going on?")
+            randomizedPeople.append((randGender == 0 ? "boy" : "girl", Constants.colors[color]))
+         }
+    }
+    
+    func updateRandomPeople() {
+        
     }
 
     func fetchPolls(for user: User) async {
+        if UserDefaults.standard.integer(forKey: Constants.currentIndex) != 0 {
+            currentPollIndex = UserDefaults.standard.integer(forKey: Constants.currentIndex)
+            if pollSet.isEmpty {
+                if let pollIds = UserDefaults.standard.array(forKey: Constants.pollIds) {
+                    for poll in pollIds {
+                        do {
+                            let polls: [Poll] = try await FirebaseService.shared.fetchDocuments(
+                                collection: "polls",
+                                whereField: "id",
+                                isEqualTo: poll
+                            )
+                            if let first = polls.first {
+                                pollSet.append(first)
+                            }
+                        } catch {
+                            print(error.localizedDescription, "Error fetching polls")
+                        }
+                       
+                    }
+                    self.pollSet.sort { $0.createdAt > $1.createdAt }
+                    self.selectedPoll = pollSet[currentPollIndex]
+                    self.getPollOptions(excludingUserId: user.id)
+                    updateQuestionEmoji()
+                    
+                }
+            }
+            return
+        }
+        
         do {
             let polls: [Poll] = try await FirebaseService.shared.fetchDocuments(
                 collection: "polls",
@@ -42,16 +93,20 @@ class PollViewModel: ObservableObject {
             self.pollSet = polls.filter { !$0.usersWhoVoted.contains(user.id) }
             self.pollSet.sort { $0.createdAt > $1.createdAt }
             
+            if pollSet.count < 8 {
+                await createPoll(user: user)
+            }
+            
+            // create array of poll ids
+            let pollIds = pollSet.map { $0.id }
+            UserDefaults.standard.setValue(pollIds, forKey: Constants.pollIds)
+
             if let first = self.pollSet.first {
                 self.selectedPoll = first
                 self.getPollOptions(excludingUserId: user.id)
+                updateQuestionEmoji()
             }
-            
-            // Print debug information
-            print("Fetched \(self.allPolls.count) polls")
-            print("PollSet contains \(self.pollSet.count) polls")
-            print("Selected poll has \(self.selectedPoll.pollOptions.count) options")
-            print("Current four options: \(self.currentFourOptions.map { $0.option })")
+          
         } catch {
             print("Error fetching polls: \(error.localizedDescription)")
         }
@@ -69,11 +124,23 @@ class PollViewModel: ObservableObject {
             if updatedPoll.pollOptions[optionIndex].votes == nil {
                 updatedPoll.pollOptions[optionIndex].votes = [:]
             }
-            updatedPoll.pollOptions[optionIndex].votes?[user.id] = [
-                "date": dateString,
-                "numVotes": "1",
-                "viewedNotification": "false"
-            ]
+            if var voteObj = updatedPoll.pollOptions[optionIndex].votes?[user.id] {
+                var currentVotes = Int(voteObj["numVotes"] ?? "1") ?? 1
+                currentVotes += 1
+                updatedPoll.pollOptions[optionIndex].votes?[user.id] = [
+                    "date": dateString,
+                    "numVotes": String(currentVotes),
+                    "viewedNotification": "false"
+                ]
+            } else {
+                updatedPoll.pollOptions[optionIndex].votes?[user.id] = [
+                    "date": dateString,
+                    "numVotes": "1",
+                    "viewedNotification": "false"
+                ]
+            }
+            
+          
             
             updatedPoll.usersWhoVoted.append(user.id)
             
@@ -167,7 +234,7 @@ class PollViewModel: ObservableObject {
             self.pollSet.sort { $0.createdAt > $1.createdAt }
             if let first = self.pollSet.first {
                 self.selectedPoll = first
-                await self.getPollOptions(excludingUserId: user.id)
+                self.getPollOptions(excludingUserId: user.id)
             }
         } catch {
             print("Error creating polls: \(error.localizedDescription)")
@@ -250,7 +317,7 @@ class PollViewModel: ObservableObject {
         
         // Take up to 4 options from the available options
         currentFourOptions = Array(availableOptions.prefix(4))
-        currentOptionIndex = min(4, availableOptions.count)
+        currentPollOptionIndex = min(4, availableOptions.count)
         
         updateQuestionEmoji()
         updateTotalVotes()
@@ -267,20 +334,20 @@ class PollViewModel: ObservableObject {
         let totalOptions = selectedPoll.pollOptions.count
         var availableOptions = selectedPoll.pollOptions.filter { $0.userId != excludingUserId }
 
-        if currentOptionIndex >= totalOptions {
+        if currentPollOptionIndex >= totalOptions {
             availableOptions.shuffle()
-            currentOptionIndex = 0
+            currentPollOptionIndex = 0
         }
         
-        let endIndex = min(currentOptionIndex + 4, availableOptions.count)
-        currentFourOptions = Array(availableOptions[currentOptionIndex..<endIndex])
+        let endIndex = min(currentPollOptionIndex + 4, availableOptions.count)
+        currentFourOptions = Array(availableOptions[currentPollOptionIndex..<endIndex])
         
         if currentFourOptions.count < 4 {
             let remainingCount = 4 - currentFourOptions.count
             currentFourOptions += Array(availableOptions[0..<min(remainingCount, availableOptions.count)])
         }
         
-        currentOptionIndex = (currentOptionIndex + 4) % max(1, availableOptions.count)
+        currentPollOptionIndex = (currentPollOptionIndex + 4) % max(1, availableOptions.count)
         
         updateQuestionEmoji()
         

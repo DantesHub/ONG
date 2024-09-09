@@ -89,7 +89,7 @@ struct User: Codable, Equatable, FBObject {
         id = try container.decode(String.self, forKey: .id)
         firstName = try container.decode(String.self, forKey: .firstName)
         lastName = try container.decode(String.self, forKey: .lastName)
-        username = try container.decode(String.self, forKey: .username)  // Decode the new property
+        username = try container.decodeIfPresent(String.self, forKey: .username) ?? ""  // Decode the new property 
         schoolId = try container.decode(String.self, forKey: .schoolId)
         color = try container.decodeIfPresent(String.self, forKey: .color) ?? "#000000"
         aura = try container.decodeIfPresent(Int.self, forKey: .aura) ?? 0

@@ -277,8 +277,8 @@ private extension ShipFastStarterApp {
         Mixpanel.initialize(token: "", trackAutomaticEvents: false)
         Mixpanel.mainInstance().track(event: "App Start")
         Mixpanel.mainInstance().identify(distinctId: userId)
-        
-//        UserDefaults.standard.setValue("2234567890", forKey: "userNumber")
+        UserDefaults.standard.setValue(true, forKey: "finishedOnboarding")
+        UserDefaults.standard.setValue("+12016009948", forKey: "userNumber")
     }
 }
 

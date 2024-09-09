@@ -46,7 +46,7 @@ struct UsernameScreen: View {
                 SharedComponents.PrimaryButton(
                     title: "Continue",
                     action: {
-                        mainVM.currUser?.lastName = username
+                        mainVM.currUser?.username = username
                         Analytics.shared.log(event: "NameScreen: Tapped Continue")
                         Task {
                             if await checkIfUsernameIsTaken() {

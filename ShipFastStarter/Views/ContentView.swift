@@ -44,6 +44,11 @@ struct ContentView: View {
                         InboxScreen()
                             .environmentObject(mainVM)
                             .environmentObject(inboxVM)
+                    case .profile:
+                        ProfileScreen()
+                            .environmentObject(mainVM)
+                            .environmentObject(authVM)
+
                     }
                 }
                 .onChange(of: mainVM.currUser) {
@@ -66,6 +71,7 @@ struct ContentView: View {
                                     mainVM.currentPage = .cooldown
                                 } else {
                                     fetchPolls(user: user)
+                                    mainVM.currentPage = .poll
                                 }
                             }
                         }
@@ -96,7 +102,7 @@ struct ContentView: View {
                     if mainVM.currentPage != .onboarding {
                         ToolbarItem(placement: .principal) {
                             HStack {
-                                Text("inbox •")
+                                Text("inbox") 
                                     .sfPro(type: .bold, size: .h3p1)
                                     .onTapGesture {
                                         withAnimation {
@@ -104,7 +110,7 @@ struct ContentView: View {
                                             Analytics.shared.log(event: "Tabbar: Tapped Inbox")
                                             mainVM.currentPage = .inbox
                                         }
-                                    }
+                                    }.opacity(mainVM.currentPage == .inbox ? 1 : 0.3)
                                 Spacer()
                                 Text("play")
                                     .sfPro(type: .bold, size: .h3p1)
@@ -119,7 +125,7 @@ struct ContentView: View {
                                                 mainVM.currentPage = .poll
                                             }
                                         }
-                                    }
+                                    }.opacity(mainVM.currentPage == .poll || mainVM.currentPage == .cooldown ? 1 : 0.3)
                                 Spacer()
                                 Text("profile")
                                     .sfPro(type: .bold, size: .h3p1)
@@ -127,9 +133,10 @@ struct ContentView: View {
                                         withAnimation {
                                             UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                             Analytics.shared.log(event: "Tabbar: Tapped Profile")
-                                            mainVM.currentPage = .inbox
+                                            mainVM.currentPage = .profile
                                         }
                                     }
+                                    .opacity(mainVM.currentPage == .profile ? 1 : 0.3)
                             }
                             .foregroundColor(.black)
                         }
@@ -140,12 +147,11 @@ struct ContentView: View {
     
     func fetchPolls(user: User) {
         Task {
-            if !highschoolVM.isHighSchoolLocked {
-                await pollVM.fetchPolls(for: user)
-                if pollVM.pollSet.count < 8 {
-                    await pollVM.createPoll(user: user)
-                    mainVM.currentPage = .poll
-                }
+            await pollVM.fetchPolls(for: user)
+      
+            
+            withAnimation {
+                mainVM.currentPage = .poll
             }
         }
     }

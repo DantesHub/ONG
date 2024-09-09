@@ -9,17 +9,7 @@ import SwiftUI
 
 struct ColorScreen: View {
     @EnvironmentObject var mainVM: MainViewModel
-    
-    let colors: [String] = [
-           "blue",
-           "green",
-           "lightPurple",
-           "orange",
-           "pink",
-           "red",
-           "teal",
-           "yellow"
-       ]
+  
     let columns = [
          GridItem(.flexible()),
          GridItem(.flexible())
@@ -35,21 +25,19 @@ struct ColorScreen: View {
             VStack {
                 HStack {
                     LazyVGrid(columns: columns, spacing: 20) {
-                        ForEach(colors.indices, id: \.self) { index in
-                            borderedRectangle(color: Color(colors[index]))
+                        ForEach(Constants.colors.indices, id: \.self) { index in
+                            borderedRectangle(color: Color(Constants.colors[index]))
                                 .aspectRatio(1, contentMode: .fit)
                                 .onTapGesture {
                                     UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                     withAnimation {
                                         Analytics.shared.log(event: "ColorsScreen: Tapped Color")
-                                        mainVM.currUser?.color = colors[index]
+                                        mainVM.currUser?.color = Constants.colors[index]
                                         mainVM.currentPage = .poll
                                     }
                                 }
                         }
-                    }
-                    .padding()
-
+                    }.padding()
                 }
             }
         }
