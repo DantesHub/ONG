@@ -76,7 +76,7 @@ struct ProfileScreen: View {
         }
         .onAppear {
             if let user = mainVM.currUser {
-                mainVM.currUser = user
+                self.user = user
             }
         }
         .actionSheet(isPresented: $showingActionSheet) {
@@ -100,9 +100,7 @@ struct ProfileScreen: View {
             }
         }
         .onAppear {
-//            if let user = mainVM.currUser {
-//                profileVM.fetchUserProfilePicture(user: user)
-//            }
+            
         }
     }
     

@@ -27,7 +27,7 @@ struct ContentView: View {
         NavigationView {
             GeometryReader { _ in
                 ZStack {
-                    Color(.primaryBackground).edgesIgnoringSafeArea(.all)
+//                    Color(.primaryBackground).edgesIgnoringSafeArea(.all)
                     switch mainVM.currentPage {
                     case .onboarding:
                         OnboardingView()

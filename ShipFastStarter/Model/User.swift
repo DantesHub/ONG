@@ -17,7 +17,7 @@ struct User: Codable, Equatable, FBObject {
     var id: String
     var firstName: String
     var lastName: String
-    var username: String  // New property
+    var username: String
     var schoolId: String
     var color: String
     var aura: Int
@@ -32,13 +32,14 @@ struct User: Codable, Equatable, FBObject {
     var ogBadge: Bool
     var gender: String
     var fcmToken: String
-    var proPic: Bool  // Changed to Bool
+    var proPic: Bool
+    var referral: Int  // New property
 
-    init(id: String, firstName: String, lastName: String, username: String, schoolId: String, color: String, aura: Int, godMode: Bool, birthday: String, grade: String, number: String, votedPolls: [String], lastPollFinished: Date?, friends: [String], invitedFriends: [String], ogBadge: Bool, gender: String, fcmToken: String, proPic: Bool = false) {
+    init(id: String, firstName: String, lastName: String, username: String, schoolId: String, color: String, aura: Int, godMode: Bool, birthday: String, grade: String, number: String, votedPolls: [String], lastPollFinished: Date?, friends: [String], invitedFriends: [String], ogBadge: Bool, gender: String, fcmToken: String, proPic: Bool = false, referral: Int = 0) {
         self.id = id
         self.firstName = firstName
         self.lastName = lastName
-        self.username = username  // Initialize the new property
+        self.username = username
         self.schoolId = schoolId
         self.color = color
         self.aura = aura
@@ -54,13 +55,14 @@ struct User: Codable, Equatable, FBObject {
         self.gender = gender
         self.fcmToken = fcmToken
         self.proPic = proPic
+        self.referral = referral
     }
 
     static var exUser = User(
         id: UUID().uuidString,
         firstName: "Naveed",
         lastName: "Johnmo",
-        username: "naveedjohnmo",  // Example username
+        username: "naveedjohnmo",
         schoolId: "123e4567-e89b-12d3-a456-426614174000",
         color: "#FF0000",
         aura: 100,
@@ -75,7 +77,8 @@ struct User: Codable, Equatable, FBObject {
         ogBadge: true,
         gender: "Male",
         fcmToken: "",
-        proPic: false
+        proPic: false,
+        referral: 0
     )
 
     static func == (lhs: User, rhs: User) -> Bool {
@@ -83,7 +86,7 @@ struct User: Codable, Equatable, FBObject {
     }
 
     enum CodingKeys: String, CodingKey {
-        case id, firstName, lastName, username, schoolId, color, aura, godMode, birthday, grade, number, votedPolls, lastPollFinished, friends, invitedFriends, ogBadge, gender, fcmToken, proPic
+        case id, firstName, lastName, username, schoolId, color, aura, godMode, birthday, grade, number, votedPolls, lastPollFinished, friends, invitedFriends, ogBadge, gender, fcmToken, proPic, referral
     }
 
     init(from decoder: Decoder) throws {
@@ -106,7 +109,8 @@ struct User: Codable, Equatable, FBObject {
         ogBadge = try container.decodeIfPresent(Bool.self, forKey: .ogBadge) ?? false
         gender = try container.decodeIfPresent(String.self, forKey: .gender) ?? "Unspecified"
         fcmToken = try container.decodeIfPresent(String.self, forKey: .fcmToken) ?? ""
-        proPic = try container.decodeIfPresent(Bool.self, forKey: .proPic) ?? false  // Changed to Bool
+        proPic = try container.decodeIfPresent(Bool.self, forKey: .proPic) ?? false
+        referral = try container.decodeIfPresent(Int.self, forKey: .referral) ?? 0  // New property
         // Custom decoding for lastPollFinished
         if let lastPollFinishedTimestamp = try? container.decode(Double.self, forKey: .lastPollFinished) {
             lastPollFinished = Date(timeIntervalSince1970: lastPollFinishedTimestamp)

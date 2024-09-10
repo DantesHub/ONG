@@ -99,7 +99,7 @@ struct InboxItemView: View {
                         .mask(RoundedRectangle(cornerRadius: 16))
                 )
             HStack(spacing: 20) {
-                Text(item.gender == "male" ? "👦🏼" : "👧🏼")
+                Text(item.gender == "boy" ? "👦🏼" : "👧🏼")
                     .font(.system(size: 40))
                     .frame(width: 60, height: 60)
                     .background(item.backgroundColor)
