@@ -14,6 +14,8 @@ struct ContentView: View {
     @StateObject var pollVM = PollViewModel()
     @StateObject var inboxVM = InboxViewModel()
     @StateObject var highschoolVM = HighSchoolViewModel()
+    @StateObject var profileVM = ProfileViewModel()
+    
     @Environment(\.modelContext) private var modelContext
     @Query private var items: [Item]
     
@@ -31,6 +33,7 @@ struct ContentView: View {
                         OnboardingView()
                             .environmentObject(authVM)
                             .environmentObject(mainVM)
+                            .environmentObject(pollVM)
                     case .home:
                         HomeScreen()
                     case .poll:
@@ -48,6 +51,7 @@ struct ContentView: View {
                         ProfileScreen()
                             .environmentObject(mainVM)
                             .environmentObject(authVM)
+                            .environmentObject(profileVM)
 
                     }
                 }
@@ -59,6 +63,7 @@ struct ContentView: View {
                     }
                 }
                 .onAppear {
+                    authVM.isUserSignedIn()
                     if UserDefaults.standard.bool(forKey: "finishedOnboarding") {
                         Task {
                             await mainVM.fetchUser()
@@ -72,6 +77,9 @@ struct ContentView: View {
                                 } else {
                                     fetchPolls(user: user)
                                     mainVM.currentPage = .poll
+                                }
+                                if user.proPic {
+                                    profileVM.fetchUserProfilePicture(user: user)
                                 }
                             }
                         }
@@ -90,12 +98,7 @@ struct ContentView: View {
                         .environmentObject(mainVM)
                         .environmentObject(pollVM)
                 }
-                .onChange(of: authVM.signInSuccessful) {
-                    UserDefaults.standard.setValue(true, forKey: "finishedOnboarding")
-                    if let user = mainVM.currUser {
-                        fetchPolls(user: user)
-                    }
-                }
+          
             }
             .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
@@ -148,8 +151,6 @@ struct ContentView: View {
     func fetchPolls(user: User) {
         Task {
             await pollVM.fetchPolls(for: user)
-      
-            
             withAnimation {
                 mainVM.currentPage = .poll
             }

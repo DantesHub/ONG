@@ -25,7 +25,7 @@ struct UsernameScreen: View {
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal)
-                Text(username.isEmpty ? "lilbro" : username)
+                Text(username.isEmpty ? "lilbro" : username.lowercased())
                     .sfPro(type: .bold, size: .h1Big)
                     .foregroundColor(username.isEmpty ? .gray : .white)
                     .padding(.vertical, 16)

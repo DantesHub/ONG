@@ -10,11 +10,14 @@ import SwiftUI
 struct NumberScreen: View {
     @EnvironmentObject var authVM: AuthViewModel
     @EnvironmentObject var mainVM: MainViewModel
+    @EnvironmentObject var pollVM: PollViewModel
     @State private var phoneNumber = ""
     @State private var verificationCode = ""
     @FocusState private var isPhoneNumberFocused: Bool
     @FocusState private var isVerificationCodeFocused: Bool
     @State private var showError = false
+    @State private var isLoading = false
+    @State private var isVerifying = false
     
     var body: some View {
         ZStack {
@@ -28,7 +31,7 @@ struct NumberScreen: View {
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal)
-                
+                    .frame(height: 120)
                 if !authVM.isVerificationCodeSent {
                     HStack {
                         Text("🇺🇸 +1")
@@ -56,6 +59,7 @@ struct NumberScreen: View {
                     Text("Remember - never sign up\nwith another person's phone number.")
                         .sfPro(type: .medium, size: .p2)
                         .multilineTextAlignment(.center)
+                        .frame(height: 45)
                         .foregroundColor(.gray)
                         .padding(.top, 8)
                 } else {
@@ -66,17 +70,19 @@ struct NumberScreen: View {
                         .frame(maxWidth: .infinity)
                         .cornerRadius(16)
                         .padding(.horizontal, 24)
-                        .onTapGesture {
-                            isVerificationCodeFocused = true
+                        .onAppear {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                isVerificationCodeFocused = true
+                            }
                         }
 //                    Text("sent to \(phoneNumber)")
                     if showError {
-                        Text("Invalid verification code")
-                            .sfPro(type: .semibold, size: .h3p1)
+                        Text(authVM.errorString)
+                            .sfPro(type: .semibold, size: .p2)
                             .foregroundColor(.red)
                     }
                     
-                    VStack(spacing: 0) {
+                    HStack(spacing: 4) {
                         Text("didn't get a code?")
                             .sfPro(type: .medium, size: .p2)
                             .multilineTextAlignment(.center)
@@ -91,13 +97,13 @@ struct NumberScreen: View {
                                 withAnimation {
                                     Analytics.shared.log(event: "NumberScreen: Tapped Resend")
                                     authVM.resendVerificationCode()
+                                    sendVerificationCode()
+                                    
                                 }
                             }
                     }
-                  
-
                 }
-            
+                
                 Spacer()
                 
                 SharedComponents.PrimaryButton(
@@ -115,30 +121,38 @@ struct NumberScreen: View {
                 .disabled(authVM.isVerificationCodeSent ? verificationCode.count != 6 : phoneNumber.count != 10)
                 .opacity(!authVM.isVerificationCodeSent && phoneNumber.count != 10 ? 0.5 : 1)
             }
+            .overlay(
+                Group {
+                    if !authVM.isVerificationCodeSent {
+                        TextField("", text: $phoneNumber)
+                            .focused($isPhoneNumberFocused)
+                            .keyboardType(.numberPad)
+                            .onChange(of: phoneNumber) {
+                                validatePhoneNumber(phoneNumber)
+                            }
+                    } else {
+                        TextField("", text: $verificationCode)
+                            .focused($isVerificationCodeFocused)
+                            .keyboardType(.numberPad)
+                            .onChange(of: verificationCode) {
+                                verificationCode = String(verificationCode.prefix(6))
+                            }
+                    }
+                }
+                .opacity(0)
+            )
+            .disabled(isLoading || isVerifying)
+            
+            if isLoading || isVerifying {
+                Color.black.opacity(0.5).edgesIgnoringSafeArea(.all)
+                ProgressView()
+                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                    .scaleEffect(1.5)
+            }
         }
         .onAppear {
             isPhoneNumberFocused = true
         }
-        .overlay(
-            Group {
-                if !authVM.isVerificationCodeSent {
-                    TextField("", text: $phoneNumber)
-                        .focused($isPhoneNumberFocused)
-                        .keyboardType(.numberPad)
-                        .onChange(of: phoneNumber) { newValue in
-                            validatePhoneNumber(newValue)
-                        }
-                } else {
-                    TextField("", text: $verificationCode)
-                        .focused($isVerificationCodeFocused)
-                        .keyboardType(.numberPad)
-                        .onChange(of: verificationCode) { newValue in
-                            verificationCode = String(newValue.prefix(6))
-                        }
-                }
-            }
-            .opacity(0)
-        )
     }
     
     private func validatePhoneNumber(_ number: String) {
@@ -151,20 +165,54 @@ struct NumberScreen: View {
         Analytics.shared.logActual(event: "NumberScreen: Tapped Next", parameters: ["":""])
         let formattedNumber = "+1\(phoneNumber)"
         withAnimation {
+            isLoading = true
             mainVM.currUser?.fcmToken = UserDefaults.standard.string(forKey: "fcmToken") ?? ""
             if var user = mainVM.currUser {
                 mainVM.currUser?.number = formattedNumber
                 user.number = formattedNumber
             }
             UserDefaults.standard.setValue(formattedNumber, forKey: "userNumber")
-            authVM.signInWithPhoneNumber(phoneNumber: formattedNumber)
+            authVM.signInWithPhoneNumber(phoneNumber: formattedNumber) { result in
+                DispatchQueue.main.async {
+                    isLoading = false
+                    if case .success = result {
+                        isVerificationCodeFocused = true
+                    }
+                }
+            }
         }
     }
     
     private func verifyCode() {
+        isVerifying = true
         mainVM.currUser?.fcmToken = UserDefaults.standard.string(forKey: "fcmToken") ?? ""
         if var user = mainVM.currUser {
-            authVM.verifyCode(code: verificationCode, user: user)
+            authVM.verifyCode(verificationCode: verificationCode) { result in
+                DispatchQueue.main.async {
+                    isVerifying = false
+                    switch result {
+                    case .success(let authResult):
+                        FirebaseService.shared.addDocument(user, collection: "users") { str in
+                            authVM.signInSuccessful = true
+                            authVM.isVerified = true
+                            Task {
+                                if let user = mainVM.currUser {
+                                    await pollVM.fetchPolls(for: user)
+                                }
+                            }
+                            withAnimation {
+                                mainVM.onboardingScreen = .gender
+                            }
+                            print("Successfully verified and signed in: \(authResult.user.uid)")
+                        }
+                      
+                    case .failure(let error):
+                        authVM.errorString = error.localizedDescription
+                        showError = true
+                        print("Error verifying code: \(error.localizedDescription)")
+                    }
+                }
+            }
         }
     }
 }

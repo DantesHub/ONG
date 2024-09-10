@@ -16,7 +16,8 @@ struct PollScreen: View {
     @State private var showSplash = true  // Add this line
     @State private var showError = false
     @State private var randNumber = Int.random(in: 0...7)
-    
+    @State private var randPplNumber = Int.random(in: 0...2)
+
     var body: some View {
         ZStack {
             Color(Constants.colors[randNumber]).edgesIgnoringSafeArea(.all)
@@ -65,7 +66,7 @@ struct PollScreen: View {
                             if pollVM.showProgress {
                                 HStack {
                                     Text("Tap to continue")
-                                        .foregroundColor(.white)
+                                        .foregroundColor(.black)
                                         .sfPro(type: .bold, size: .h2)
                                         .padding(.bottom, 20)
                                 }.frame(height: 64)
@@ -101,36 +102,39 @@ struct PollScreen: View {
                                     
                                     Spacer()
                                     HStack(alignment: .center, spacing: 8) {
-                                        HStack(spacing: -16) {
-                                            ForEach(pollVM.randomizedPeople.indices.prefix(4), id: \.self) { index in
-                                                let person = pollVM.randomizedPeople[index]
-                                                ZStack {
-                                                    Circle()
-                                                        .fill(Color(person.1 ))
-                                                        .stroke(Color(.black), lineWidth: 1)
-                                                        .overlay(
-                                                            Circle()
-                                                                .stroke(Color.black.opacity(1), lineWidth: 1)
-                                                                .padding(1)
-                                                                .mask(RoundedRectangle(cornerRadius: 20))
-                                                        )
-                                                        .frame(width: 36, height: 36)
-                                                        .drawingGroup()
-                                                        .shadow(color: Color.black, radius: 0, x: 0, y: 2)
-                                                    Text("\(person.0 == "boy" ? "👦" : "👧")")
-                                                        .font(.system(size: 16))
-                                                    //                                                      .padding(24)
+                                        if randPplNumber != 0 {
+                                            HStack(spacing: -16) {
+                                                ForEach(pollVM.randomizedPeople.indices.prefix(randPplNumber), id: \.self) { index in
+                                                    let person = pollVM.randomizedPeople[index]
+                                                    ZStack {
+                                                        Circle()
+                                                            .fill(Color(person.1 ))
+                                                            .stroke(Color(.black), lineWidth: 1)
+                                                            .overlay(
+                                                                Circle()
+                                                                    .stroke(Color.black.opacity(1), lineWidth: 1)
+                                                                    .padding(1)
+                                                                    .mask(RoundedRectangle(cornerRadius: 20))
+                                                            )
+                                                            .frame(width: 36, height: 36)
+                                                            .drawingGroup()
+                                                            .shadow(color: Color.black, radius: 0, x: 0, y: 2)
+                                                        Text("\(person.0 == "boy" ? "👦" : "👧")")
+                                                            .font(.system(size: 16))
+                                                        //                                                      .padding(24)
+                                                    }
                                                 }
                                             }
+                                            .padding(.horizontal, 4)
+                                            .padding(.vertical, 8)
+                                            .cornerRadius(20)
+                                            .padding(.bottom, 8)
+                                            Text("\(randPplNumber) answering rn")
+                                                .sfPro(type: .medium, size: .p3)
+                                                .font(.system(size: 14, weight: .medium))
+                                                .foregroundColor(.black)
                                         }
-                                        .padding(.horizontal, 4)
-                                        .padding(.vertical, 8)
-                                        .cornerRadius(20)
-                                        .padding(.bottom, 8)
-                                        Text("4 answering rn")
-                                            .sfPro(type: .medium, size: .p3)
-                                            .font(.system(size: 14, weight: .medium))
-                                            .foregroundColor(.black)
+                                 
                                     }.offset(y: 6)
                                 
                                     
@@ -195,6 +199,9 @@ struct PollScreen: View {
      func animateTransition() {
         withAnimation(.easeInOut(duration: 0.3)) {
             randNumber = Int.random(in: 0...7)
+            if pollVM.currentPollIndex ==  5  || pollVM.currentPollIndex == 2 {
+                randPplNumber = Int.random(in: 0...2)
+            }
             contentOpacity = 0
         }
         

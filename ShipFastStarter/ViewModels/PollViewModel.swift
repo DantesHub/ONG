@@ -73,6 +73,11 @@ class PollViewModel: ObservableObject {
                        
                     }
                     self.pollSet.sort { $0.createdAt > $1.createdAt }
+                    // Limit pollSet to the first 8 polls
+                    self.pollSet = Array(self.pollSet.prefix(8))
+                    // create array of poll ids
+                    let pollIds = pollSet.map { $0.id }
+                    UserDefaults.standard.setValue(pollIds, forKey: Constants.pollIds)
                     self.selectedPoll = pollSet[currentPollIndex]
                     self.getPollOptions(excludingUserId: user.id)
                     updateQuestionEmoji()
@@ -96,9 +101,11 @@ class PollViewModel: ObservableObject {
             if pollSet.count < 8 {
                 await createPoll(user: user)
             }
-            
+            // Limit pollSet to the first 8 polls
+            self.pollSet = Array(self.pollSet.prefix(8))
             // create array of poll ids
             let pollIds = pollSet.map { $0.id }
+            
             UserDefaults.standard.setValue(pollIds, forKey: Constants.pollIds)
 
             if let first = self.pollSet.first {

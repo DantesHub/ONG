@@ -9,7 +9,8 @@ import SwiftUI
 
 struct ColorScreen: View {
     @EnvironmentObject var mainVM: MainViewModel
-  
+    @EnvironmentObject var pollVM: PollViewModel
+
     let columns = [
          GridItem(.flexible()),
          GridItem(.flexible())
@@ -33,6 +34,8 @@ struct ColorScreen: View {
                                     withAnimation {
                                         Analytics.shared.log(event: "ColorsScreen: Tapped Color")
                                         mainVM.currUser?.color = Constants.colors[index]
+                                        UserDefaults.standard.setValue(true, forKey: "finishedOnboarding")
+                                      
                                         mainVM.currentPage = .poll
                                     }
                                 }

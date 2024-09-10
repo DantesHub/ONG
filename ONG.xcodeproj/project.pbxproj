@@ -20,6 +20,10 @@
 		8838DC4F2C8BD43B00500C6E /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 8838DC4E2C8BD43B00500C6E /* FirebaseMessaging */; };
 		8838DC512C8D11EA00500C6E /* ColorScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8838DC502C8D11EA00500C6E /* ColorScreen.swift */; };
 		8838DC572C8E454A00500C6E /* NotificationScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8838DC562C8E454A00500C6E /* NotificationScreen.swift */; };
+		8838DC592C8EA7CB00500C6E /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8838DC582C8EA7CB00500C6E /* NotificationManager.swift */; };
+		8838DC692C8F994B00500C6E /* ProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8838DC682C8F994B00500C6E /* ProfileViewModel.swift */; };
+		8838DC6B2C8F9AC400500C6E /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 8838DC6A2C8F9AC400500C6E /* FirebaseStorage */; };
+		8838DC6D2C8F9C1D00500C6E /* Image.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8838DC6C2C8F9C1D00500C6E /* Image.swift */; };
 		884B24732C879A1900229F1E /* HighSchoolViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B24722C879A1900229F1E /* HighSchoolViewModel.swift */; };
 		884B24752C87B96E00229F1E /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B24742C87B96E00229F1E /* User.swift */; };
 		884B24772C87B97500229F1E /* Poll.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B24762C87B97500229F1E /* Poll.swift */; };
@@ -88,6 +92,9 @@
 		8838DC4C2C8B864E00500C6E /* InboxViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InboxViewModel.swift; sourceTree = "<group>"; };
 		8838DC502C8D11EA00500C6E /* ColorScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorScreen.swift; sourceTree = "<group>"; };
 		8838DC562C8E454A00500C6E /* NotificationScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationScreen.swift; sourceTree = "<group>"; };
+		8838DC582C8EA7CB00500C6E /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
+		8838DC682C8F994B00500C6E /* ProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewModel.swift; sourceTree = "<group>"; };
+		8838DC6C2C8F9C1D00500C6E /* Image.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Image.swift; sourceTree = "<group>"; };
 		884B24722C879A1900229F1E /* HighSchoolViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighSchoolViewModel.swift; sourceTree = "<group>"; };
 		884B24742C87B96E00229F1E /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		884B24762C87B97500229F1E /* Poll.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Poll.swift; sourceTree = "<group>"; };
@@ -145,6 +152,7 @@
 			files = (
 				8838DC4F2C8BD43B00500C6E /* FirebaseMessaging in Frameworks */,
 				88C1E55E2C8692C900C9317E /* FirebaseDatabase in Frameworks */,
+				8838DC6B2C8F9AC400500C6E /* FirebaseStorage in Frameworks */,
 				88B37D3A2C240CAB000A7D91 /* RevenueCat in Frameworks */,
 				88C1E55C2C8692C900C9317E /* FirebaseAuth in Frameworks */,
 				88B37D302C24052B000A7D91 /* Mixpanel in Frameworks */,
@@ -245,6 +253,7 @@
 				884B24722C879A1900229F1E /* HighSchoolViewModel.swift */,
 				884B247E2C87BECE00229F1E /* PollViewModel.swift */,
 				8838DC4C2C8B864E00500C6E /* InboxViewModel.swift */,
+				8838DC682C8F994B00500C6E /* ProfileViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -270,6 +279,7 @@
 				88B37D462C2410AF000A7D91 /* Extensions */,
 				88B37D352C2407D0000A7D91 /* Services */,
 				88B37D312C2406DA000A7D91 /* Constants.swift */,
+				8838DC582C8EA7CB00500C6E /* NotificationManager.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -379,6 +389,7 @@
 				88B37D4B2C241110000A7D91 /* Array.swift */,
 				88B37D4D2C241127000A7D91 /* Color.swift */,
 				8838DC442C8A944900500C6E /* Date.swift */,
+				8838DC6C2C8F9C1D00500C6E /* Image.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -408,6 +419,7 @@
 				88C1E55D2C8692C900C9317E /* FirebaseDatabase */,
 				88C1E55F2C8692C900C9317E /* FirebaseFirestore */,
 				8838DC4E2C8BD43B00500C6E /* FirebaseMessaging */,
+				8838DC6A2C8F9AC400500C6E /* FirebaseStorage */,
 			);
 			productName = ShipFastStarter;
 			productReference = 88B37D092C23FD60000A7D91 /* ONG.app */;
@@ -485,6 +497,7 @@
 				8838DC432C8A908400500C6E /* InboxScreen.swift in Sources */,
 				88B37D542C2411FC000A7D91 /* Extensions.swift in Sources */,
 				8838DC4B2C8ACD5800500C6E /* UsernameScreen.swift in Sources */,
+				8838DC592C8EA7CB00500C6E /* NotificationManager.swift in Sources */,
 				88B37D342C240761000A7D91 /* RCPurchaseController.swift in Sources */,
 				884B24862C87E7BB00229F1E /* PollComplete.swift in Sources */,
 				88B37D572C241321000A7D91 /* NetworkManger.swift in Sources */,
@@ -501,6 +514,7 @@
 				8838DC362C8921D400500C6E /* ShadowModifier.swift in Sources */,
 				888FF3C62C867E0F0025EC1B /* NumberScreen.swift in Sources */,
 				88B37D482C2410BE000A7D91 /* UIDevice.swift in Sources */,
+				8838DC692C8F994B00500C6E /* ProfileViewModel.swift in Sources */,
 				88B37D4E2C241127000A7D91 /* Color.swift in Sources */,
 				888FF3C22C867DC50025EC1B /* GenderScreen.swift in Sources */,
 				884B24772C87B97500229F1E /* Poll.swift in Sources */,
@@ -520,6 +534,7 @@
 				884B24882C8803D300229F1E /* Question.swift in Sources */,
 				888FF3BE2C867CEF0025EC1B /* Onboarding.swift in Sources */,
 				88C1E5662C86A6C400C9317E /* AuthViewModel.swift in Sources */,
+				8838DC6D2C8F9C1D00500C6E /* Image.swift in Sources */,
 				884B24842C87E44500229F1E /* PollScreen.swift in Sources */,
 				88B37D502C24118F000A7D91 /* API.swift in Sources */,
 				88B37D592C241355000A7D91 /* ResponseModel.swift in Sources */,
@@ -800,6 +815,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 88C1E55A2C86925D00C9317E /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseMessaging;
+		};
+		8838DC6A2C8F9AC400500C6E /* FirebaseStorage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 88C1E55A2C86925D00C9317E /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseStorage;
 		};
 		88B37D292C24018B000A7D91 /* SuperwallKit */ = {
 			isa = XCSwiftPackageProductDependency;

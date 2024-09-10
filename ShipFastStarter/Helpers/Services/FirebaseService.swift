@@ -3,10 +3,12 @@ import FirebaseAuth
 import FirebaseFirestore
 import UIKit
 import FirebaseMessaging
+import FirebaseStorage
 
 class FirebaseService {
     static let shared = FirebaseService()
     static let db = Firestore.firestore()
+    private let storage = Storage.storage().reference()
 
     private init() {}
     
@@ -61,19 +63,6 @@ class FirebaseService {
     func signOut() throws {
         try Auth.auth().signOut()
     }
-    
-    // MARK: - Database Operations
-    
-    func fetchData(collection: String, document: String, completion: @escaping (Result<[String: Any], Error>) -> Void) {
-        // Implement Firestore data fetching
-    }
-    
-    func saveData(collection: String, document: String, data: [String: Any], completion: @escaping (Result<Void, Error>) -> Void) {
-        // Implement Firestore data saving
-    }
-    
-    // Add more methods as needed for your specific Firebase interactions
-    
     
     //MARK: - Firestore database
      func batchSave(documents: [(collection: String, data: [String: Any])]) async throws {
@@ -168,7 +157,6 @@ class FirebaseService {
             }
         }
     }
-    
     
     //MARK: - get methods
     static func getUser(completion: @escaping (Result<User, Error>) -> Void) {
@@ -340,12 +328,57 @@ class FirebaseService {
             throw error
         }
     }
+
+  func uploadImage(_ image: UIImage, path: String, completion: @escaping (Result<String, Error>) -> Void) {
+    print("Starting image upload process for path: \(path)")
+    
+    guard let imageData = image.jpegData(compressionQuality: 0.5) else {
+        print("Failed to convert image to JPEG data")
+        completion(.failure(NSError(domain: "FirebaseService", code: 0, userInfo: [NSLocalizedDescriptionKey: "Failed to convert image to data"])))
+        return
+    }
+    
+    print("Image converted to JPEG data. Size: \(imageData.count) bytes")
+
+    let imageRef = storage.child(path)
+    print("Uploading image to Firebase Storage at path: \(path)")
+    
+    imageRef.putData(imageData, metadata: nil) { metadata, error in
+        if let error = error {
+            print("Error uploading image: \(error.localizedDescription)")
+            completion(.failure(error))
+            return
+        }
+        
+        print("Image uploaded successfully. Metadata: \(String(describing: metadata))")
+        
+        // Instead of fetching the download URL, we return the file name (which serves as the file ID)
+        let fileID = imageRef.name
+        print("File ID: \(fileID)")
+        completion(.success(fileID))
+    }
 }
 
-// Add this new function to the FirebaseService class
+    func fetchImage(path: String, completion: @escaping (Result<UIImage, Error>) -> Void) {
+        let imageRef = storage.child(path)
+        
+        imageRef.getData(maxSize: 1024 * 1024) { data, error in
+            if let error = error {
+                completion(.failure(error))
+                return
+            }
+            
+            guard let imageData = data, let image = UIImage(data: imageData) else {
+                completion(.failure(NSError(domain: "FirebaseService", code: 0, userInfo: [NSLocalizedDescriptionKey: "Failed to convert data to image"])))
+                return
+            }
+            
+            completion(.success(image))
+        }
+    }
 
-// MARK: - PhoneAuthUIDelegate
 
+}
 class PhoneAuthUIDelegate: NSObject, AuthUIDelegate {
     func present(_ viewControllerToPresent: UIViewController, animated flag: Bool, completion: (() -> Void)? = nil) {
         if let topController = UIApplication.shared.windows.first?.rootViewController {

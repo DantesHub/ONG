@@ -12,13 +12,18 @@ import SwiftUI
 struct OnboardingView: View {
     @EnvironmentObject var mainVM: MainViewModel
     @EnvironmentObject var authVM: AuthViewModel
+    @EnvironmentObject var pollVM: AuthViewModel
     @State private var currentProgressIndex: Int = 0
     
     let totalSteps = 8
     
     var body: some View {
        ZStack {
-            Color.primaryBackground.edgesIgnoringSafeArea(.all)
+           if mainVM.onboardingScreen == .color {
+               Color.white.edgesIgnoringSafeArea(.all)
+           } else {
+               Color.primaryBackground.edgesIgnoringSafeArea(.all)
+           }
             VStack {
                 if mainVM.onboardingScreen != .first  {
                     HStack(alignment: .center) {
@@ -65,7 +70,8 @@ struct OnboardingView: View {
                     case .highschool: HighSchoolScreen()
                     case .grade: GradeScreen() 
                     case .lastName: LastNameScreen()
-                    case .username: UsernameScreen() 
+                    case .username: UsernameScreen()
+                    case .color: ColorScreen()
                 }
             }
        }.onChange(of: mainVM.onboardingScreen) { newValue in
@@ -80,7 +86,7 @@ struct OnboardingView: View {
             case .age:
                 mainVM.onboardingScreen = .first
             case .gender:
-                mainVM.onboardingScreen = .age
+                mainVM.onboardingScreen = .gender
             case .birthday:
                 mainVM.onboardingScreen = .gender
             case .name:
@@ -99,6 +105,8 @@ struct OnboardingView: View {
                 mainVM.onboardingScreen = .lastName
             case .username:
                 mainVM.onboardingScreen = .highschool
+            case .color:
+                mainVM.onboardingScreen = .gender
         }
     }
 
@@ -123,6 +131,7 @@ enum OnboardingScreenType {
     case grade
     case lastName
     case username
+    case color
 }
 
 struct CustomProgressViewStyle: ProgressViewStyle {

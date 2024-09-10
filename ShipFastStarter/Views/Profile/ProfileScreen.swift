@@ -7,17 +7,179 @@
 
 import Foundation
 import SwiftUI
+import PhotosUI
+import AVFoundation
 
 struct ProfileScreen: View {
     @EnvironmentObject var mainVM: MainViewModel
     @EnvironmentObject var authVM: AuthViewModel
-
+    @EnvironmentObject var profileVM: ProfileViewModel
+    @State private var showingActionSheet = false
+    @State private var showingImagePicker = false
+    @State private var showingCamera = false
+    @State private var sourceType: UIImagePickerController.SourceType = .photoLibrary
+    @State private var user = User.exUser
     var body: some View {
         ZStack {
             Color.white.edgesIgnoringSafeArea(.all)
             VStack {
-                Text("Profile Screen")
+                // profile image
+                ZStack {
+                    // Dotted line box
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(style: StrokeStyle(lineWidth: 2, dash: [7]))
+                        .foregroundColor(.black)
+                        .frame(width: 124, height: 124)
+                    
+                    if let image = profileVM.profileImage {
+                        Image(uiImage: image)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 124, height: 124)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                    } else {
+                        // Plus sign
+                        Image(systemName: "plus")
+                            .font(.system(size: 30, weight: .bold))
+                            .foregroundColor(.black)
+                    }
+                }
+                .onTapGesture {
+                    withAnimation {
+                        Analytics.shared.log(event: "ProfileScreen: Tapped Image")
+                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                        showingActionSheet = true
+                    }
+                }
+                .padding(.bottom)
+                .rotationEffect(.degrees(-12))
+                Text("\(user.firstName) \(user.lastName)")
+                    .sfPro(type: .bold, size: .h1)
+                    .foregroundColor(Color.black)
+                    .padding(.top)
+                Text("@\(user.username)")
+                    .sfPro(type: .bold, size: .h2)
+                    .foregroundColor(Color.black.opacity(0.4))
+                    .padding(.bottom, 32)
+                HStack {
+                    SharedComponents.SecondaryButton(title: "add friend +") {
+                        
+                    }
+                    SharedComponents.SecondaryButton(title: "mark as crush 😻") {
+                        
+                    }
+                }.padding(.horizontal)
+                SharedComponents.Divider()
+            }
+            
+            // show highschool.
+        }
+        .onAppear {
+            if let user = mainVM.currUser {
+                mainVM.currUser = user
+            }
+        }
+        .actionSheet(isPresented: $showingActionSheet) {
+            ActionSheet(title: Text("Select Profile Picture"), buttons: [
+                .default(Text("Take a Photo")) {
+                    checkCameraPermission()
+                },
+                .default(Text("Choose from Library")) {
+                    checkPhotoLibraryPermission()
+                },
+                .cancel()
+            ])
+        }
+        .sheet(isPresented: $showingImagePicker) {
+            ImagePicker(sourceType: sourceType, selectedImage: $profileVM.profileImage)
+        }
+        .onChange(of: profileVM.profileImage) {
+            if let user = mainVM.currUser {
+                UserDefaults.standard.setValue(true, forKey: "uploadedProPic")
+                mainVM.currUser = profileVM.uploadUserProfilePicture(image: profileVM.profileImage!, user: user)
+            }
+        }
+        .onAppear {
+//            if let user = mainVM.currUser {
+//                profileVM.fetchUserProfilePicture(user: user)
+//            }
+        }
+    }
+    
+
+    
+    private func checkCameraPermission() {
+        AVCaptureDevice.requestAccess(for: .video) { granted in
+            DispatchQueue.main.async {
+                if granted {
+                    self.sourceType = .camera
+                    self.showingImagePicker = true
+                } else {
+                    // Handle camera permission denied
+                    print("Camera permission denied")
+                }
             }
         }
     }
+    
+    private func checkPhotoLibraryPermission() {
+        PHPhotoLibrary.requestAuthorization { status in
+            DispatchQueue.main.async {
+                switch status {
+                case .authorized, .limited:
+                    self.sourceType = .photoLibrary
+                    self.showingImagePicker = true
+                case .denied, .restricted:
+                    // Handle photo library permission denied
+                    print("Photo library permission denied")
+                case .notDetermined:
+                    // This shouldn't be reached, but handle just in case
+                    print("Photo library permission not determined")
+                @unknown default:
+                    break
+                }
+            }
+        }
+    }
+}
+
+struct ImagePicker: UIViewControllerRepresentable {
+    var sourceType: UIImagePickerController.SourceType
+    @Binding var selectedImage: UIImage?
+    @Environment(\.presentationMode) private var presentationMode
+    
+    func makeUIViewController(context: UIViewControllerRepresentableContext<ImagePicker>) -> UIImagePickerController {
+        let imagePicker = UIImagePickerController()
+        imagePicker.sourceType = sourceType
+        imagePicker.delegate = context.coordinator
+        return imagePicker
+    }
+    
+    func updateUIViewController(_ uiViewController: UIImagePickerController, context: UIViewControllerRepresentableContext<ImagePicker>) {}
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+    
+    final class Coordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+        var parent: ImagePicker
+        
+        init(_ parent: ImagePicker) {
+            self.parent = parent
+        }
+        
+        func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+            if let image = info[.originalImage] as? UIImage {
+                parent.selectedImage = image
+            }
+            parent.presentationMode.wrappedValue.dismiss()
+        }
+    }
+}
+
+#Preview {
+    ProfileScreen()
+        .environmentObject(MainViewModel())
+        .environmentObject(AuthViewModel())
+        .environmentObject(ProfileViewModel())
 }

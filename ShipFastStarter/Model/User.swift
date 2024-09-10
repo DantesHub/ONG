@@ -32,8 +32,9 @@ struct User: Codable, Equatable, FBObject {
     var ogBadge: Bool
     var gender: String
     var fcmToken: String
+    var proPic: Bool  // Changed to Bool
 
-    init(id: String, firstName: String, lastName: String, username: String, schoolId: String, color: String, aura: Int, godMode: Bool, birthday: String, grade: String, number: String, votedPolls: [String], lastPollFinished: Date?, friends: [String], invitedFriends: [String], ogBadge: Bool, gender: String, fcmToken: String) {
+    init(id: String, firstName: String, lastName: String, username: String, schoolId: String, color: String, aura: Int, godMode: Bool, birthday: String, grade: String, number: String, votedPolls: [String], lastPollFinished: Date?, friends: [String], invitedFriends: [String], ogBadge: Bool, gender: String, fcmToken: String, proPic: Bool = false) {
         self.id = id
         self.firstName = firstName
         self.lastName = lastName
@@ -52,6 +53,7 @@ struct User: Codable, Equatable, FBObject {
         self.ogBadge = ogBadge
         self.gender = gender
         self.fcmToken = fcmToken
+        self.proPic = proPic
     }
 
     static var exUser = User(
@@ -72,7 +74,8 @@ struct User: Codable, Equatable, FBObject {
         invitedFriends: [],
         ogBadge: true,
         gender: "Male",
-        fcmToken: ""
+        fcmToken: "",
+        proPic: false
     )
 
     static func == (lhs: User, rhs: User) -> Bool {
@@ -80,7 +83,7 @@ struct User: Codable, Equatable, FBObject {
     }
 
     enum CodingKeys: String, CodingKey {
-        case id, firstName, lastName, username, schoolId, color, aura, godMode, birthday, grade, number, votedPolls, lastPollFinished, friends, invitedFriends, ogBadge, gender, fcmToken
+        case id, firstName, lastName, username, schoolId, color, aura, godMode, birthday, grade, number, votedPolls, lastPollFinished, friends, invitedFriends, ogBadge, gender, fcmToken, proPic
     }
 
     init(from decoder: Decoder) throws {
@@ -89,7 +92,7 @@ struct User: Codable, Equatable, FBObject {
         id = try container.decode(String.self, forKey: .id)
         firstName = try container.decode(String.self, forKey: .firstName)
         lastName = try container.decode(String.self, forKey: .lastName)
-        username = try container.decodeIfPresent(String.self, forKey: .username) ?? ""  // Decode the new property 
+        username = try container.decodeIfPresent(String.self, forKey: .username) ?? ""
         schoolId = try container.decode(String.self, forKey: .schoolId)
         color = try container.decodeIfPresent(String.self, forKey: .color) ?? "#000000"
         aura = try container.decodeIfPresent(Int.self, forKey: .aura) ?? 0
@@ -103,6 +106,7 @@ struct User: Codable, Equatable, FBObject {
         ogBadge = try container.decodeIfPresent(Bool.self, forKey: .ogBadge) ?? false
         gender = try container.decodeIfPresent(String.self, forKey: .gender) ?? "Unspecified"
         fcmToken = try container.decodeIfPresent(String.self, forKey: .fcmToken) ?? ""
+        proPic = try container.decodeIfPresent(Bool.self, forKey: .proPic) ?? false  // Changed to Bool
         // Custom decoding for lastPollFinished
         if let lastPollFinishedTimestamp = try? container.decode(Double.self, forKey: .lastPollFinished) {
             lastPollFinished = Date(timeIntervalSince1970: lastPollFinishedTimestamp)

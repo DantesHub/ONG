@@ -277,7 +277,7 @@ private extension ShipFastStarterApp {
         Mixpanel.initialize(token: "", trackAutomaticEvents: false)
         Mixpanel.mainInstance().track(event: "App Start")
         Mixpanel.mainInstance().identify(distinctId: userId)
-        UserDefaults.standard.setValue(true, forKey: "finishedOnboarding")
+//        UserDefaults.standard.setValue(true, forKey: "finishedOnboarding")
         UserDefaults.standard.setValue("+12016009948", forKey: "userNumber")
     }
 }
@@ -297,7 +297,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
         FirebaseApp.configure()
-//        Messaging.messaging().delegate = self
+        Messaging.messaging().delegate = self
         UNUserNotificationCenter.current().delegate = self
         //        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
         //             if let error = error {
@@ -362,7 +362,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         print("token",deviceToken.toJsonString())
-        //Messaging.messaging().apnsToken = deviceToken
+        Messaging.messaging().apnsToken = deviceToken
         Auth.auth().setAPNSToken(deviceToken, type: .sandbox)
     }
     

@@ -20,7 +20,7 @@ struct LastNameScreen: View {
             VStack(spacing: 24) {
                 Spacer()
                 
-                Text("what's your last name?")
+                Text("what's your\nlast name?")
                     .sfPro(type: .bold, size: .h1)
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
