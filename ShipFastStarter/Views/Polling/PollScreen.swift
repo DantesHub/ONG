@@ -17,7 +17,8 @@ struct PollScreen: View {
     @State private var showError = false
     @State private var randNumber = Int.random(in: 0...7)
     @State private var randPplNumber = Int.random(in: 0...2)
-
+    @State private var shuffleCounter = 0
+    
     var body: some View {
         ZStack {
             Color(Constants.colors[randNumber]).edgesIgnoringSafeArea(.all)
@@ -75,30 +76,32 @@ struct PollScreen: View {
                                 
                             } else {
                                 HStack(alignment: .center) {
-                                    Button(action: {
-                                        if let user = mainVM.currUser {
-                                            pollVM.shuffleOptions(excludingUserId: user.id)
-                                        }
-                                    }) {
-                                        ZStack {
-                                            RoundedRectangle(cornerRadius: 16)
-                                                .fill(Color.white)
-                                                .overlay(
-                                                    RoundedRectangle(cornerRadius: 16)
-                                                        .stroke(Color.black.opacity(1), lineWidth: 5)
-                                                        .padding(1)
-                                                        .mask(RoundedRectangle(cornerRadius: 16))
-                                                )
-                                            Image(systemName: "shuffle")
-                                                .resizable()
-                                                .aspectRatio(contentMode: .fit)
-                                                .frame(width: 24, height: 24)
-//                                                .padding()
-                                                .foregroundColor(Color.black)
-                                        }
-                                       
-                                    }.frame(width: 48, height: 48)
-                                    .primaryShadow()
+                                    if shuffleCounter < 2 {
+                                        Button(action: {
+                                            if let user = mainVM.currUser {
+                                                pollVM.shuffleOptions(excludingUserId: user.id)
+                                                shuffleCounter += 1
+                                            }
+                                        }) {
+                                            ZStack {
+                                                RoundedRectangle(cornerRadius: 16)
+                                                    .fill(Color.white)
+                                                    .overlay(
+                                                        RoundedRectangle(cornerRadius: 16)
+                                                            .stroke(Color.black.opacity(1), lineWidth: 5)
+                                                            .padding(1)
+                                                            .mask(RoundedRectangle(cornerRadius: 16))
+                                                    )
+                                                Image(systemName: "shuffle")
+                                                    .resizable()
+                                                    .aspectRatio(contentMode: .fit)
+                                                    .frame(width: 24, height: 24)
+                                                    .foregroundColor(Color.black)
+                                            }
+                                            
+                                        }.frame(width: 48, height: 48)
+                                            .primaryShadow()
+                                    }
                                     
                                     Spacer()
                                     HStack(alignment: .center, spacing: 8) {
@@ -177,7 +180,7 @@ struct PollScreen: View {
                     }
                 }.onTapGesture {
                     if pollVM.showProgress {
-                        
+                        shuffleCounter = 0
                         animateTransition()
                     }
                 }
@@ -221,10 +224,11 @@ struct PollScreen: View {
             pollVM.currentPollIndex += 1
             UserDefaults.standard.setValue(pollVM.currentPollIndex, forKey: Constants.currentIndex)
             pollVM.selectedPoll = pollVM.pollSet[pollVM.currentPollIndex]
+            
             Task {
                  pollVM.getPollOptions(excludingUserId: user.id)
             }
-            print("over here")
+
             pollVM.showProgress = false
             pollVM.animateProgress = false
             isComplete = false // Reset completion state for the new poll

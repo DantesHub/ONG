@@ -82,7 +82,7 @@ struct User: Codable, Equatable, FBObject {
         ogBadge: true,
         gender: "Male",
         fcmToken: "",
-        proPic: "",
+        proPic: "https://firebasestorage.googleapis.com/v0/b/ongod-fce40.appspot.com/o/profileImages%2FOkl?alt=media&token=000ea88e-bce7-4167-b332-5df492744d68",
         referral: 0,
         crushId: "",
         friendRequests: [:]

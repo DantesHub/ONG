@@ -150,7 +150,7 @@ class FirebaseService {
                     if let error = error {
                         continuation.resume(throwing: error)
                     } else {
-                        print("Document successfully updated")
+                        print(document["friends"], "Document successfully updated")
                         continuation.resume(returning: ())
                     }
                 }
@@ -388,8 +388,19 @@ class FirebaseService {
         }
     }
 
-
+    func updateField(collection: String, documentId: String, field: String, value: Any) async throws {
+        let docRef = FirebaseService.db.collection(collection).document(documentId)
+        
+        do {
+            try await docRef.updateData([field: value])
+            print("Document successfully updated")
+        } catch {
+            print("Error updating document: \(error)")
+            throw error
+        }
+    }
 }
+
 class PhoneAuthUIDelegate: NSObject, AuthUIDelegate {
     func present(_ viewControllerToPresent: UIViewController, animated flag: Bool, completion: (() -> Void)? = nil) {
         if let topController = UIApplication.shared.windows.first?.rootViewController {

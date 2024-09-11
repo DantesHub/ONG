@@ -21,7 +21,7 @@ class ProfileViewModel: ObservableObject {
     }
     
     // MARK: - visiting profile functions
-    func tappedAdd(currUser: User, friend: User, currentStatus: String) async {
+    func tappedAdd(currUser: User, friend: User, currentStatus: String) async -> User {
         var newUser = currUser
         // fetch other user
         var selectedFriend = friend
@@ -64,6 +64,11 @@ class ProfileViewModel: ObservableObject {
         } catch {
             print(error.localizedDescription)
         }
+        
+        if let index = peopleList.firstIndex(where: { $0.id == selectedFriend.id }) {
+            peopleList[index] = selectedFriend
+        }
+        return newUser
     }
     
     func loadImages() async {
@@ -104,11 +109,13 @@ class ProfileViewModel: ObservableObject {
                 peopleList[index] = newPerson
             }
         }
+        
         await loadImages()
         // Update the UI on the main thread
               DispatchQueue.main.async {
                   self.objectWillChange.send()
         }
+        
     }
     
     func fetchUserProfile(id: String) {

@@ -39,7 +39,10 @@ struct ContentView: View {
                     case .home:
                         HomeScreen()
                     case .poll:
-                        PollScreen()
+                        PeopleScreen()
+                            .environmentObject(profileVM)
+                            .environmentObject(authVM)
+                            .environmentObject(mainVM)
                             .environmentObject(pollVM)
                     case .cooldown:
                         PollCooldownScreen()
@@ -84,6 +87,8 @@ struct ContentView: View {
                                 }
                             }
                         }
+                    } else {
+                        mainVM.currentPage = .onboarding
                     }
                 }
                 .gesture(

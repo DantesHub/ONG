@@ -107,7 +107,7 @@ struct FriendRow: View {
                                 status = "Sent 💌"
                             }
                             
-                            await profileVM.tappedAdd(currUser: currUser, friend: user, currentStatus: user.friendsStatus)
+                            mainVM.currUser = await profileVM.tappedAdd(currUser: currUser, friend: user, currentStatus: user.friendsStatus)
                         }
                     }
                 }

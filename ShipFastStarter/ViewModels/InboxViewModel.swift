@@ -9,6 +9,14 @@ import Foundation
 import FirebaseFirestore
 import SwiftUI
 
+struct FriendRequest: Identifiable {
+    let id: String
+    var user: User
+    let time: Date
+    
+    static var exRequest = FriendRequest(id: UUID().uuidString, user: User.exUser, time: Date())
+}
+
 @MainActor
 class InboxViewModel: ObservableObject {
     @Published var tappedNotification: Bool = false
@@ -20,7 +28,8 @@ class InboxViewModel: ObservableObject {
     @Published var oldUsersWhoVoted: [InboxItem] = []
     @Published var newUsersWhoVoted: [InboxItem] = []
     @Published var currentFourOptions: [PollOption] = []
-    
+    @Published var friendRequests: [FriendRequest] = [FriendRequest.exRequest]
+
     func tappedNotificationRow() {
         if let option = selectedPollOption, let poll = selectedPoll {
             currentFourOptions = [option]
@@ -41,6 +50,23 @@ class InboxViewModel: ObservableObject {
             }
         }
 
+    }
+    
+    func fetchFriendRequests(for user: User) async {
+        do {
+            for friendRequest in user.friendRequests {
+                // fetch friend
+                let friendArray: [User] = try await FirebaseService.shared.fetchDocuments(collection: "users", whereField: "id", isEqualTo: friendRequest.key)
+                if let friend = friendArray.first {
+                    let timeStamp = Date.fromString((user.friendRequests[friend.id] ?? "")) ?? Date()
+                    let request = FriendRequest(id: UUID().uuidString, user: friend, time: timeStamp)
+                    friendRequests.append(request)
+                }
+                // request
+            }
+        } catch {
+            print(error.localizedDescription)
+        }
     }
     
     @MainActor
@@ -114,6 +140,8 @@ class InboxViewModel: ObservableObject {
         } catch {
             print("Error fetching notifications: \(error.localizedDescription)")
         }
+        
+        await fetchFriendRequests(for: user)
     }
     
     func updateViewStatus() async {
@@ -233,11 +261,29 @@ class InboxViewModel: ObservableObject {
     }
     
     //MARK: - Friend requests
-    func tappedAcceptFriendRequest() {
+    func tappedAcceptFriendRequest(currUser: User, requestedUser: User) async {
+ 
+        var updatedRequestedUser = requestedUser
+        updatedRequestedUser.friends[currUser.id] = Date().toString()
         
+        do {
+            try await FirebaseService.shared.updateDocument(collection: "users", object: currUser)
+            try await FirebaseService.shared.updateField(collection: "users", documentId: updatedRequestedUser.id, field: "friends", value: updatedRequestedUser.friends)
+        } catch {
+            print(error.localizedDescription)
+        }
     }
     
-    func tappedDeclineFriendRequest() {
-        
+    func tappedDeclineFriendRequest(currUser: User, requestedUser: User) async {
+        var updatedRequestedUser = requestedUser
+        updatedRequestedUser.friends.removeValue(forKey: currUser.id)
+        print(updatedRequestedUser.friends, "cmon man")
+        // update in firebase
+        do {
+            try await FirebaseService.shared.updateDocument(collection: "users", object: currUser)
+            try await FirebaseService.shared.updateField(collection: "users", documentId: updatedRequestedUser.id, field: "friends", value: updatedRequestedUser.friends)
+        } catch {
+            print(error.localizedDescription)
+        }
     }
 }

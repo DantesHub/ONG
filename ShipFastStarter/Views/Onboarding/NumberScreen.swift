@@ -193,6 +193,7 @@ struct NumberScreen: View {
                     switch result {
                     case .success(let authResult):
                         FirebaseService.shared.addDocument(user, collection: "users") { str in
+                            UserDefaults.standard.setValue(user.id, forKey: Constants.userId)
                             authVM.signInSuccessful = true
                             authVM.isVerified = true
                             Task {
