@@ -231,4 +231,13 @@ class InboxViewModel: ObservableObject {
         
         return "just now"
     }
+    
+    //MARK: - Friend requests
+    func tappedAcceptFriendRequest() {
+        
+    }
+    
+    func tappedDeclineFriendRequest() {
+        
+    }
 }

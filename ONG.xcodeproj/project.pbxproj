@@ -24,6 +24,9 @@
 		8838DC692C8F994B00500C6E /* ProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8838DC682C8F994B00500C6E /* ProfileViewModel.swift */; };
 		8838DC6B2C8F9AC400500C6E /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 8838DC6A2C8F9AC400500C6E /* FirebaseStorage */; };
 		8838DC6D2C8F9C1D00500C6E /* Image.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8838DC6C2C8F9C1D00500C6E /* Image.swift */; };
+		8838DC6F2C90043500500C6E /* PeopleScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8838DC6E2C90043500500C6E /* PeopleScreen.swift */; };
+		8838DC712C90F0B100500C6E /* CachedImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8838DC702C90F0B100500C6E /* CachedImage.swift */; };
+		8838DC742C911A9600500C6E /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8838DC732C911A9600500C6E /* String.swift */; };
 		884B24732C879A1900229F1E /* HighSchoolViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B24722C879A1900229F1E /* HighSchoolViewModel.swift */; };
 		884B24752C87B96E00229F1E /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B24742C87B96E00229F1E /* User.swift */; };
 		884B24772C87B97500229F1E /* Poll.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B24762C87B97500229F1E /* Poll.swift */; };
@@ -95,6 +98,9 @@
 		8838DC582C8EA7CB00500C6E /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
 		8838DC682C8F994B00500C6E /* ProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewModel.swift; sourceTree = "<group>"; };
 		8838DC6C2C8F9C1D00500C6E /* Image.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Image.swift; sourceTree = "<group>"; };
+		8838DC6E2C90043500500C6E /* PeopleScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeopleScreen.swift; sourceTree = "<group>"; };
+		8838DC702C90F0B100500C6E /* CachedImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CachedImage.swift; sourceTree = "<group>"; };
+		8838DC732C911A9600500C6E /* String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
 		884B24722C879A1900229F1E /* HighSchoolViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighSchoolViewModel.swift; sourceTree = "<group>"; };
 		884B24742C87B96E00229F1E /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		884B24762C87B97500229F1E /* Poll.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Poll.swift; sourceTree = "<group>"; };
@@ -268,6 +274,7 @@
 				88B37D262C23FFE9000A7D91 /* Home */,
 				88B37D252C23FFE5000A7D91 /* Onboarding */,
 				8838DC3F2C8A8F7D00500C6E /* SplashScreen.swift */,
+				8838DC6E2C90043500500C6E /* PeopleScreen.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -280,6 +287,7 @@
 				88B37D352C2407D0000A7D91 /* Services */,
 				88B37D312C2406DA000A7D91 /* Constants.swift */,
 				8838DC582C8EA7CB00500C6E /* NotificationManager.swift */,
+				8838DC702C90F0B100500C6E /* CachedImage.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -390,6 +398,7 @@
 				88B37D4D2C241127000A7D91 /* Color.swift */,
 				8838DC442C8A944900500C6E /* Date.swift */,
 				8838DC6C2C8F9C1D00500C6E /* Image.swift */,
+				8838DC732C911A9600500C6E /* String.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -505,6 +514,7 @@
 				88B37D0F2C23FD60000A7D91 /* ContentView.swift in Sources */,
 				88C1E5682C86D86800C9317E /* HighSchoolScreen.swift in Sources */,
 				8838DC472C8ABCE400500C6E /* GradeScreen.swift in Sources */,
+				8838DC6F2C90043500500C6E /* PeopleScreen.swift in Sources */,
 				884B24732C879A1900229F1E /* HighSchoolViewModel.swift in Sources */,
 				8838DC452C8A944900500C6E /* Date.swift in Sources */,
 				88B37D522C2411A4000A7D91 /* Types.swift in Sources */,
@@ -528,6 +538,7 @@
 				8838DC4D2C8B864E00500C6E /* InboxViewModel.swift in Sources */,
 				88B37D3E2C240CFF000A7D91 /* FirstOnboardingScreen.swift in Sources */,
 				8838DC3E2C8A5B7B00500C6E /* PollCooldownScreen.swift in Sources */,
+				8838DC742C911A9600500C6E /* String.swift in Sources */,
 				88B37D0D2C23FD60000A7D91 /* ShipFastStarterApp.swift in Sources */,
 				884B247D2C87B99D00229F1E /* VibeCheck.swift in Sources */,
 				88B37D372C2407DF000A7D91 /* AnalyticsService.swift in Sources */,
@@ -541,6 +552,7 @@
 				888FF3C02C867DBC0025EC1B /* BirthdayScreen.swift in Sources */,
 				88B37D242C23FDF8000A7D91 /* MainViewModel.swift in Sources */,
 				884B24752C87B96E00229F1E /* User.swift in Sources */,
+				8838DC712C90F0B100500C6E /* CachedImage.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -673,7 +685,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = ONG.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "\"ShipFastStarter/Preview Content\"";
 				DEVELOPMENT_TEAM = VY92D2R4AT;
 				ENABLE_PREVIEWS = YES;
@@ -692,7 +704,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ong.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -712,7 +724,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = ONG.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "\"ShipFastStarter/Preview Content\"";
 				DEVELOPMENT_TEAM = VY92D2R4AT;
 				ENABLE_PREVIEWS = YES;
@@ -731,7 +743,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ong.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";

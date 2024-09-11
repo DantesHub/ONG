@@ -296,14 +296,12 @@ class FirebaseService {
              let documents = querySnapshot.documents
 
             for doc in documents {
-                if var user = try? doc.data(as: User.self) {
+                if var user = try? doc.data() {
                     let documentRef = documentCollection.document(doc.documentID)
-                    user.fcmToken = UserDefaults.standard.string(forKey: "fcmToken") ?? "duh"
-                    if let dictObj = user.encodeToDictionary() {
-                        // Update document asynchronously
-                        
-                        try await documentRef.updateData(dictObj)
-                    }
+                    user["friendRequests"] = [:]
+                    user["friends"] = [:]
+                    print(doc.documentID, "documentID")
+                    try await documentRef.updateData(user)
                   }
               }
                 
@@ -352,10 +350,23 @@ class FirebaseService {
         
         print("Image uploaded successfully. Metadata: \(String(describing: metadata))")
         
-        // Instead of fetching the download URL, we return the file name (which serves as the file ID)
-        let fileID = imageRef.name
-        print("File ID: \(fileID)")
-        completion(.success(fileID))
+        // Fetch the download URL
+        imageRef.downloadURL { url, error in
+            if let error = error {
+                print("Error getting download URL: \(error.localizedDescription)")
+                completion(.failure(error))
+                return
+            }
+            
+            guard let downloadURL = url else {
+                print("Download URL is nil")
+                completion(.failure(NSError(domain: "FirebaseService", code: 0, userInfo: [NSLocalizedDescriptionKey: "Failed to get download URL"])))
+                return
+            }
+            
+            print("Download URL obtained successfully: \(downloadURL.absoluteString)")
+            completion(.success(downloadURL.absoluteString))
+        }
     }
 }
 

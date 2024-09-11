@@ -3,7 +3,8 @@ import SwiftUI
 struct InboxScreen: View {
     @EnvironmentObject var inboxVM: InboxViewModel
     @EnvironmentObject var mainVM: MainViewModel
-    
+    @EnvironmentObject var profileVM: ProfileViewModel
+
 //    let inboxItems = [
 //        InboxItem(fromUser: "a girl", aura: 500, time: "now", emoji: "👧🏼", backgroundColor: Color.pink.opacity(0.3)),
 //        InboxItem(fromUser: "a guy", aura: 1, time: "2m ago", emoji: "👦🏼", backgroundColor: Color.blue.opacity(0.3)),
@@ -15,58 +16,59 @@ struct InboxScreen: View {
     var body: some View {
         ZStack {
             Color.white.edgesIgnoringSafeArea(.all)
-            VStack {
-//                    Divider()
-                ScrollView(showsIndicators: false) {
-                    VStack(alignment: .leading, spacing: 24) {
-                        if inboxVM.newUsersWhoVoted.isEmpty && inboxVM.oldUsersWhoVoted.isEmpty {
-                            Spacer()
-                            Text("No one has voted for you yet!\n\nTip: Answer more questions to show up in more polls")
-                                .font(.system(size: 22, weight: .bold))
-                                .multilineTextAlignment(.center)
-                                .padding(.horizontal, 48)
-                                .opacity(0.3)
-                                .offset(y: 64)
-                            Spacer()
-                        } else {
-                            if !inboxVM.newUsersWhoVoted.isEmpty {
-                                Text("New")
+            if let currUser = mainVM.currUser, profileVM.friends.isEmpty { // show highschool screen
+                PeopleScreen()
+                    .environmentObject(profileVM)
+                    .environmentObject(mainVM)
+            } else {
+                VStack {
+    //                    Divider()
+                    ScrollView(showsIndicators: false) {
+                        VStack(alignment: .leading, spacing: 24) {
+                            if inboxVM.newUsersWhoVoted.isEmpty && inboxVM.oldUsersWhoVoted.isEmpty {
+                                Spacer()
+                                Text("No one has voted for you yet!\n\nTip: Answer more questions to show up in more polls")
                                     .font(.system(size: 22, weight: .bold))
-                                    .padding(.leading, 20)
+                                    .multilineTextAlignment(.center)
+                                    .padding(.horizontal, 48)
+                                    .opacity(0.3)
+                                    .offset(y: 64)
+                                Spacer()
+                            } else {
+                                if !inboxVM.newUsersWhoVoted.isEmpty {
+                                    Text("New")
+                                        .font(.system(size: 22, weight: .bold))
+                                        .padding(.leading, 20)
+                                    
+                                    ForEach(inboxVM.newUsersWhoVoted) { item in
+                                        InboxItemView(item: item)
+                                    }
+                                }
                                 
-                                ForEach(inboxVM.newUsersWhoVoted) { item in
-                                    InboxItemView(item: item)
+                                if !inboxVM.oldUsersWhoVoted.isEmpty {
+                                    Text("Past")
+                                        .font(.system(size: 22, weight: .bold))
+                                        .padding(.leading, 20)
+                                        .padding(.top, 10)
+                                    
+                                    ForEach(inboxVM.oldUsersWhoVoted) { item in
+                                        InboxItemView(item: item)
+                                    }
                                 }
                             }
-                            
-                            if !inboxVM.oldUsersWhoVoted.isEmpty {
-                                Text("Past")
-                                    .font(.system(size: 22, weight: .bold))
-                                    .padding(.leading, 20)
-                                    .padding(.top, 10)
-                                
-                                ForEach(inboxVM.oldUsersWhoVoted) { item in
-                                    InboxItemView(item: item)
-                                }
-                            }
+                         
+                            Spacer()
                         }
-                     
-                        Spacer()
+                        .padding(.top, 20)
                     }
-                    .padding(.top, 20)
                 }
             }
+           
         }
         .onAppear {
-            // fetch notifications
-            if let user = mainVM.currUser {
-                Task {
-                    await inboxVM.fetchNotifications(for: user)
-                }
-            }
         }.sheet(isPresented: $inboxVM.tappedNotification) {
             PollAnswerDetailView()
-        }
+        }.onAppearAnalytics(event: "InboxScreen: Screenload")
     }
 }
 
@@ -147,8 +149,6 @@ struct InboxItemView: View {
                 inboxVM.tappedNotification = true
             }
         }
-
-        
     }
 }
 

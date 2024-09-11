@@ -27,15 +27,18 @@ struct User: Codable, Equatable, FBObject {
     var number: String
     var votedPolls: [String]
     var lastPollFinished: Date?
-    var friends: [String]
+    var friends: [String: String]  // Changed to dictionary
     var invitedFriends: [String]
     var ogBadge: Bool
     var gender: String
     var fcmToken: String
-    var proPic: Bool
-    var referral: Int  // New property
+    var proPic: String
+    var referral: Int
+    var crushId: String
+    var friendsStatus: String = "Add +"
+    var friendRequests: [String: String]  // New property added
 
-    init(id: String, firstName: String, lastName: String, username: String, schoolId: String, color: String, aura: Int, godMode: Bool, birthday: String, grade: String, number: String, votedPolls: [String], lastPollFinished: Date?, friends: [String], invitedFriends: [String], ogBadge: Bool, gender: String, fcmToken: String, proPic: Bool = false, referral: Int = 0) {
+    init(id: String, firstName: String, lastName: String, username: String, schoolId: String, color: String, aura: Int, godMode: Bool, birthday: String, grade: String, number: String, votedPolls: [String], lastPollFinished: Date?, friends: [String: String], invitedFriends: [String], ogBadge: Bool, gender: String, fcmToken: String, proPic: String, referral: Int = 0, crushId: String = "", friendRequests: [String: String]) {
         self.id = id
         self.firstName = firstName
         self.lastName = lastName
@@ -56,6 +59,8 @@ struct User: Codable, Equatable, FBObject {
         self.fcmToken = fcmToken
         self.proPic = proPic
         self.referral = referral
+        self.crushId = crushId
+        self.friendRequests = friendRequests  // Initialize the new property
     }
 
     static var exUser = User(
@@ -72,13 +77,15 @@ struct User: Codable, Equatable, FBObject {
         number: "1234567890",
         votedPolls: [],
         lastPollFinished: nil,
-        friends: [],
+        friends: ["609AFD46-62E4-4A82-A900-C120EBC4FEF6": "Sent 💌", "88528186-09F7-4AF8-B5EB-6DF6DCBCB8A5": "Friends ✅"],
         invitedFriends: [],
         ogBadge: true,
         gender: "Male",
         fcmToken: "",
-        proPic: false,
-        referral: 0
+        proPic: "",
+        referral: 0,
+        crushId: "",
+        friendRequests: [:]
     )
 
     static func == (lhs: User, rhs: User) -> Bool {
@@ -86,7 +93,7 @@ struct User: Codable, Equatable, FBObject {
     }
 
     enum CodingKeys: String, CodingKey {
-        case id, firstName, lastName, username, schoolId, color, aura, godMode, birthday, grade, number, votedPolls, lastPollFinished, friends, invitedFriends, ogBadge, gender, fcmToken, proPic, referral
+        case id, firstName, lastName, username, schoolId, color, aura, godMode, birthday, grade, number, votedPolls, lastPollFinished, friends, invitedFriends, ogBadge, gender, fcmToken, proPic, referral, crushId, friendRequests
     }
 
     init(from decoder: Decoder) throws {
@@ -104,13 +111,15 @@ struct User: Codable, Equatable, FBObject {
         grade = try container.decodeIfPresent(String.self, forKey: .grade) ?? "9"
         number = try container.decodeIfPresent(String.self, forKey: .number) ?? ""
         votedPolls = try container.decodeIfPresent([String].self, forKey: .votedPolls) ?? []
-        friends = try container.decodeIfPresent([String].self, forKey: .friends) ?? []
+        friends = try container.decodeIfPresent([String: String].self, forKey: .friends) ?? [:]  // Changed to dictionary
         invitedFriends = try container.decodeIfPresent([String].self, forKey: .invitedFriends) ?? []
         ogBadge = try container.decodeIfPresent(Bool.self, forKey: .ogBadge) ?? false
         gender = try container.decodeIfPresent(String.self, forKey: .gender) ?? "Unspecified"
         fcmToken = try container.decodeIfPresent(String.self, forKey: .fcmToken) ?? ""
-        proPic = try container.decodeIfPresent(Bool.self, forKey: .proPic) ?? false
-        referral = try container.decodeIfPresent(Int.self, forKey: .referral) ?? 0  // New property
+        proPic = try container.decodeIfPresent(String.self, forKey: .proPic) ?? ""
+        referral = try container.decodeIfPresent(Int.self, forKey: .referral) ?? 0
+        crushId = try container.decodeIfPresent(String.self, forKey: .crushId) ?? ""
+        friendRequests = try container.decodeIfPresent([String: String].self, forKey: .friendRequests) ?? ["shiva":"shiva2"]  // Changed to dictionary
         // Custom decoding for lastPollFinished
         if let lastPollFinishedTimestamp = try? container.decode(Double.self, forKey: .lastPollFinished) {
             lastPollFinished = Date(timeIntervalSince1970: lastPollFinishedTimestamp)

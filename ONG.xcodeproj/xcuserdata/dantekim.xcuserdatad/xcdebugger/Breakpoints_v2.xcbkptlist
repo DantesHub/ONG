@@ -3,4 +3,52 @@
    uuid = "04B7ACA1-4F47-44EA-9230-5B6472DF61AB"
    type = "1"
    version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "2DE366A2-5C28-41C1-B9A9-A84F32AB793D"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ShipFastStarter/Helpers/Services/FirebaseService.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "301"
+            endingLineNumber = "301"
+            landmarkName = "updateAllObjects(collection:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "2DE366A2-5C28-41C1-B9A9-A84F32AB793D - 184bdab0b3232cf4"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(3) suspend resume partial function for ONG.FirebaseService.updateAllObjects(collection: Swift.String) async throws -&gt; ()"
+                  moduleName = "ONG"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/dantekim/Documents/Projects/ONG/ShipFastStarter/Helpers/Services/FirebaseService.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "301"
+                  endingLineNumber = "301">
+               </Location>
+               <Location
+                  uuid = "2DE366A2-5C28-41C1-B9A9-A84F32AB793D - ab480cddd55a600a"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(5) suspend resume partial function for ONG.FirebaseService.updateAllObjects(collection: Swift.String) async throws -&gt; ()"
+                  moduleName = "ONG"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/dantekim/Documents/Projects/ONG/ShipFastStarter/Helpers/Services/FirebaseService.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "301"
+                  endingLineNumber = "301">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
 </Bucket>

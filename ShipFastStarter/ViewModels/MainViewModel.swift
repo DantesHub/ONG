@@ -8,7 +8,7 @@
 import Foundation
 
 class MainViewModel: ObservableObject {
-    @Published var currentPage: Page = .onboarding
+    @Published var currentPage: Page = .splash
     @Published var onboardingScreen: OnboardingScreenType = .first
     @Published var isPro = false
     @Published var showHalfOff = false 
@@ -68,4 +68,5 @@ enum Page: String {
     case cooldown = "Cooldown"
     case inbox = "Inbox"
     case profile = "Profile"
+    case splash = "Splash"
 }

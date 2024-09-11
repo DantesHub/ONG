@@ -29,6 +29,8 @@ struct ContentView: View {
                 ZStack {
 //                    Color(.primaryBackground).edgesIgnoringSafeArea(.all)
                     switch mainVM.currentPage {
+                    case .splash:
+                        SplashScreen()
                     case .onboarding:
                         OnboardingView()
                             .environmentObject(authVM)
@@ -47,6 +49,7 @@ struct ContentView: View {
                         InboxScreen()
                             .environmentObject(mainVM)
                             .environmentObject(inboxVM)
+                            .environmentObject(profileVM)
                     case .profile:
                         ProfileScreen()
                             .environmentObject(mainVM)
@@ -55,10 +58,10 @@ struct ContentView: View {
 
                     }
                 }
-                .onChange(of: mainVM.currUser) {
-                    if let currUser = mainVM.currUser, mainVM.currentPage == .inbox {
+                .onChange(of: mainVM.currUser) { newUser in
+                    if let user = newUser, mainVM.currentPage == .inbox {
                         Task {
-                            await inboxVM.fetchNotifications(for: currUser)
+                            await fetchUserData(user)
                         }
                     }
                 }
@@ -67,7 +70,9 @@ struct ContentView: View {
                     if UserDefaults.standard.bool(forKey: "finishedOnboarding") {
                         Task {
                             await mainVM.fetchUser()
+                            
                             if let user = mainVM.currUser {
+                                await fetchUserData(user)
                                 pollVM.checkCooldown(user: user)
                                 highschoolVM.checkHighSchoolLock(for: user)
                                 
@@ -75,16 +80,10 @@ struct ContentView: View {
                                     pollVM.completedPoll = false
                                     mainVM.currentPage = .cooldown
                                 } else {
-                                    fetchPolls(user: user)
-                                    mainVM.currentPage = .poll
-                                }
-                                if user.proPic {
-                                    profileVM.fetchUserProfilePicture(user: user)
+                                    await fetchPolls(user: user)
                                 }
                             }
                         }
-                    } else {
-                        
                     }
                 }
                 .gesture(
@@ -102,7 +101,7 @@ struct ContentView: View {
             }
             .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
-                    if mainVM.currentPage != .onboarding {
+                    if mainVM.currentPage != .onboarding && mainVM.currentPage != .splash {
                         ToolbarItem(placement: .principal) {
                             HStack {
                                 Text("inbox") 
@@ -148,12 +147,24 @@ struct ContentView: View {
         }
     }
     
-    func fetchPolls(user: User) {
-        Task {
-            await pollVM.fetchPolls(for: user)
-            withAnimation {
-                mainVM.currentPage = .poll
-            }
+    private func fetchUserData(_ user: User) async {
+        async let notifications = inboxVM.fetchNotifications(for: user)
+        async let peopleList = profileVM.fetchPeopleList(user: user)
+//        do {
+//            try await FirebaseService.shared.updateAllObjects(collection: "users")
+//
+//        } catch {
+//            print(error.localizedDescription)
+//        }
+
+        // Wait for both tasks to complete
+        _ = await (notifications, peopleList)
+    }
+    
+    private func fetchPolls(user: User) async {
+        await pollVM.fetchPolls(for: user)
+        withAnimation {
+            mainVM.currentPage = .poll
         }
     }
 

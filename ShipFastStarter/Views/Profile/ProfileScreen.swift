@@ -31,17 +31,33 @@ struct ProfileScreen: View {
                         .foregroundColor(.black)
                         .frame(width: 124, height: 124)
                     
-                    if let image = profileVM.profileImage {
-                        Image(uiImage: image)
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 124, height: 124)
-                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                    if !user.proPic.isEmpty {
+                        CachedAsyncImage(url: URL(string: user.proPic)) { phase in
+                            switch phase {
+                            case .success(let image):
+                                image
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 124, height: 124)
+                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                            case .failure:
+                                Image(systemName: "person.fill")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 124, height: 124)
+                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                            case .empty:
+                                ProgressView()
+                            @unknown default:
+                                EmptyView()
+                            }
+                        }
                     } else {
-                        // Plus sign
-                        Image(systemName: "plus")
-                            .font(.system(size: 30, weight: .bold))
-                            .foregroundColor(.black)
+                        Image(systemName: "person.fill")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 32, height: 32)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
                     }
                 }
                 .onTapGesture {
@@ -61,14 +77,19 @@ struct ProfileScreen: View {
                     .sfPro(type: .bold, size: .h2)
                     .foregroundColor(Color.black.opacity(0.4))
                     .padding(.bottom, 32)
-                HStack {
-                    SharedComponents.SecondaryButton(title: "add friend +") {
-                        
-                    }
-                    SharedComponents.SecondaryButton(title: "mark as crush 😻") {
-                        
-                    }
-                }.padding(.horizontal)
+                if profileVM.isVisitingProfile {
+                    HStack {
+                        SharedComponents.SecondaryButton(title: profileVM.isFriend ? "friends" : "add friend +") {
+                            Analytics.shared.log(event: profileVM.isFriend ? "ProfileScreen: Tapped Unfriend" : "ProfileScreen: Tapped Add Friend")
+                            
+                        }
+                        SharedComponents.SecondaryButton(title: profileVM.isCrush ? "crush ❤️" : "mark as crush 😻") {
+                            Analytics.shared.log(event: profileVM.isFriend ? "ProfileScreen: Tapped Unmark crush" : "ProfileScreen: Tapped Mark Crush")
+                                                        
+                        }
+                    }.padding(.horizontal)
+                }
+              
                 SharedComponents.Divider()
             }
             
