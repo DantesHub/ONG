@@ -182,7 +182,6 @@ struct NumberScreen: View {
             }
         }
     }
-    
     private func verifyCode() {
         isVerifying = true
         mainVM.currUser?.fcmToken = UserDefaults.standard.string(forKey: "fcmToken") ?? ""
@@ -192,20 +191,44 @@ struct NumberScreen: View {
                     isVerifying = false
                     switch result {
                     case .success(let authResult):
-                        FirebaseService.shared.addDocument(user, collection: "users") { str in
-                            authVM.signInSuccessful = true
-                            authVM.isVerified = true
-                            Task {
-                                if let user = mainVM.currUser {
-                                    await pollVM.fetchPolls(for: user)
+                        
+                        FirebaseService.getUser { result in
+                            switch result {
+                                
+                            case .failure(let error):
+                                if let referrerUsername = UserDefaults.standard.string(forKey: "referrerUsername") {
+                                    FirebaseService.shared.incrementReferralCount(forUsername: referrerUsername) { result in
+                                        switch result {
+                                        case .success():
+                                            print("Referral count incremented successfully.")
+                                        case .failure(let error):
+                                            print("Failed to increment referral count: \(error.localizedDescription)")
+                                        }
+                                    }
                                 }
+                            case .success(let user):
+                                UserDefaults.standard.set("", forKey: "referrerUsername")
+
+                                print(#function)
                             }
-                            withAnimation {
-                                mainVM.onboardingScreen = .gender
+                            
+                            FirebaseService.shared.addDocument(user, collection: "users") { str in
+                                authVM.signInSuccessful = true
+                                authVM.isVerified = true
+                                Task {
+                                    if let user = mainVM.currUser {
+                                        await pollVM.fetchPolls(for: user)
+                                    }
+                                }
+                                withAnimation {
+                                    mainVM.onboardingScreen = .gender
+                                }
+                                print("Successfully verified and signed in: \(authResult.user.uid)")
+        
                             }
-                            print("Successfully verified and signed in: \(authResult.user.uid)")
                         }
-                      
+                        
+                        
                     case .failure(let error):
                         authVM.errorString = error.localizedDescription
                         showError = true

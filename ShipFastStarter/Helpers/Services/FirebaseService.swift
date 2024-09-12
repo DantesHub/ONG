@@ -378,6 +378,37 @@ class FirebaseService {
     }
 
 
+    func incrementReferralCount(forUsername username: String, completion: @escaping (Result<Void, Error>) -> Void) {
+        UserDefaults.standard.set("", forKey: "referrerUsername")
+
+        let db = Firestore.firestore()
+        
+        // Query to find the user document based on the username
+        let userDoc = db.collection("users").whereField("username", isEqualTo: username)
+        
+        userDoc.getDocuments { (querySnapshot, error) in
+            if let error = error {
+                completion(.failure(error))
+                return
+            }
+            
+            guard let document = querySnapshot?.documents.first else {
+                print("No user found with username: \(username)")
+                completion(.failure(NSError(domain: "", code: 404, userInfo: [NSLocalizedDescriptionKey: "User not found"])))
+                return
+            }
+            
+            // Increment the 'referral' key in the user document
+            document.reference.updateData(["referral": FieldValue.increment(Int64(1))]) { error in
+                if let error = error {
+                    completion(.failure(error))
+                } else {
+                    completion(.success(()))
+                }
+            }
+        }
+    }
+    
 }
 class PhoneAuthUIDelegate: NSObject, AuthUIDelegate {
     func present(_ viewControllerToPresent: UIViewController, animated flag: Bool, completion: (() -> Void)? = nil) {

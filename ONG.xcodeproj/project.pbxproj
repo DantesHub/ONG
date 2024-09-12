@@ -77,6 +77,8 @@
 		88C1E56A2C86D95B00C9317E /* NetworkViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88C1E5692C86D95B00C9317E /* NetworkViewModel.swift */; };
 		88C1E5732C876CF100C9317E /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 88C1E5712C876CF100C9317E /* GoogleService-Info.plist */; };
 		88C1E5782C876E7500C9317E /* ONG-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 88C1E5772C876E7500C9317E /* ONG-Info.plist */; };
+		C45CF5572C9166E900D58633 /* FirebaseDynamicLinks in Frameworks */ = {isa = PBXBuildFile; productRef = C45CF5562C9166E900D58633 /* FirebaseDynamicLinks */; };
+		C45CF55A2C91C24700D58633 /* FacebookShare in Frameworks */ = {isa = PBXBuildFile; productRef = C45CF5592C91C24700D58633 /* FacebookShare */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -157,8 +159,10 @@
 				88C1E55C2C8692C900C9317E /* FirebaseAuth in Frameworks */,
 				88B37D302C24052B000A7D91 /* Mixpanel in Frameworks */,
 				88B37D2A2C24018B000A7D91 /* SuperwallKit in Frameworks */,
+				C45CF55A2C91C24700D58633 /* FacebookShare in Frameworks */,
 				88B37D2D2C2404D5000A7D91 /* AppsFlyerLib in Frameworks */,
 				88C1E5602C8692C900C9317E /* FirebaseFirestore in Frameworks */,
+				C45CF5572C9166E900D58633 /* FirebaseDynamicLinks in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -420,6 +424,8 @@
 				88C1E55F2C8692C900C9317E /* FirebaseFirestore */,
 				8838DC4E2C8BD43B00500C6E /* FirebaseMessaging */,
 				8838DC6A2C8F9AC400500C6E /* FirebaseStorage */,
+				C45CF5562C9166E900D58633 /* FirebaseDynamicLinks */,
+				C45CF5592C91C24700D58633 /* FacebookShare */,
 			);
 			productName = ShipFastStarter;
 			productReference = 88B37D092C23FD60000A7D91 /* ONG.app */;
@@ -455,6 +461,7 @@
 				88B37D2B2C2404D5000A7D91 /* XCRemoteSwiftPackageReference "AppsFlyerFramework" */,
 				88B37D2E2C24052B000A7D91 /* XCRemoteSwiftPackageReference "mixpanel-swift" */,
 				88C1E55A2C86925D00C9317E /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				C45CF5582C91C24700D58633 /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */,
 			);
 			productRefGroup = 88B37D0A2C23FD60000A7D91 /* Products */;
 			projectDirPath = "";
@@ -808,6 +815,14 @@
 				minimumVersion = 11.1.0;
 			};
 		};
+		C45CF5582C91C24700D58633 /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/facebook/facebook-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 14.1.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -855,6 +870,15 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 88C1E55A2C86925D00C9317E /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseFirestore;
+		};
+		C45CF5562C9166E900D58633 /* FirebaseDynamicLinks */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FirebaseDynamicLinks;
+		};
+		C45CF5592C91C24700D58633 /* FacebookShare */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C45CF5582C91C24700D58633 /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */;
+			productName = FacebookShare;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

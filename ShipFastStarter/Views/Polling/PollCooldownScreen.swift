@@ -6,6 +6,8 @@
 //
 
 import SwiftUI
+import FirebaseDynamicLinks
+import FacebookShare
 
 struct PollCooldownScreen: View {
     @Environment(\.presentationMode) var presentationMode
@@ -43,7 +45,33 @@ struct PollCooldownScreen: View {
                             SharedComponents.PrimaryButton(
                                 title: "Invite a friend",
                                 action: {
-                                    // Implement skip the wait functionality
+                                    createDynamicLink(username: mainVM.currUser?.username ?? "") { url in
+                                        guard let url = url else { return }
+                                        let image = UIImage(named: "AppIcon")
+                                        let content = "I'm inviting you to download and install the ong app"
+                                        
+                                        let activityVC = UIActivityViewController(activityItems: [ url, image, content], applicationActivities: nil)
+                                        
+                                        activityVC.setValue("ONG", forKey: "subject")
+                                        
+                                        UIApplication.shared.windows.first?.rootViewController?.present(activityVC, animated: true, completion: nil)
+                                        
+                                    }
+                                }
+                            )
+                            SharedComponents.PrimaryButton(
+                                title: "share on facebook",
+                                action: {
+                                     createDynamicLink(username: "Test_user1") { url in
+                                        guard let url = url else { return }
+                                        
+                                        let content = "I'm inviting you to download and install the ong app"
+                                        shareToFacebook(quote: content, url: url)
+                                       
+                                        //
+                                        //
+                                        //
+                                    }
                                 }
                             )
                         }
@@ -70,8 +98,54 @@ struct PollCooldownScreen: View {
         .onDisappear {
             timer?.invalidate()
         }
-     
     }
+    func shareToFacebook(quote: String, url: URL) {
+           // Create the content to share
+           let content = ShareLinkContent()
+           content.contentURL = url // Replace with your content URL
+        
+           content.quote = quote // Optional: Add a quote
+        
+           // Configure the share dialog
+           let dialog = ShareDialog(
+            viewController: UIApplication.shared.windows.first?.rootViewController,
+               content: content,
+               delegate: nil
+           )
+
+           // Show the share dialog if possible
+           if dialog.canShow {
+               
+
+               dialog.show()
+           } else {
+               print("Unable to show the Facebook share dialog.")
+           }
+       }
+    
+    
+    func createDynamicLink(username: String, completion: @escaping (URL?) -> Void) {
+         let link = "https://ongapp.page.link/share?user_name=\(username)"
+         let dynamicLinksDomainURIPrefix = "https://ongapp.page.link"
+         let linkBuilder = DynamicLinkComponents(link: URL(string: link)!, domainURIPrefix: dynamicLinksDomainURIPrefix)
+         
+         // Configure iOS parameters
+         let iosParameters = DynamicLinkIOSParameters(bundleID: "com.ong.app")
+         iosParameters.appStoreID = "6673430933" // Ensure this is the correct App Store ID
+         linkBuilder?.iOSParameters = iosParameters
+         
+         // Shorten the link
+         linkBuilder?.shorten { (shortURL, warnings, error) in
+             if let error = error {
+                 print("Error creating dynamic link: \(error.localizedDescription)")
+                 completion(nil)
+             } else if let shortURL = shortURL {
+                 print("Dynamic link created: \(shortURL.absoluteString)")
+                 completion(shortURL)
+             }
+         }
+     }
+    
     
     private func startTimer() {
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
