@@ -123,7 +123,7 @@ struct OnboardingView: View {
     func updateProgressIndex(for screen: OnboardingScreenType) {
 //        let screenOrder: [OnboardingScreenType] = [.first, .birthday, .location, .grade, .name, .lastName, .username]
 
-        let screenOrder: [OnboardingScreenType] = [.first, .birthday, .grade, .name, .lastName, .username, .number, .uploadProfile, .addFriends, .notification, .color]
+        let screenOrder: [OnboardingScreenType] = [.first, .birthday, .grade, .gender, .name, .lastName, .username, .number, .uploadProfile, .addFriends, .notification, .color]
         if let index = screenOrder.firstIndex(of: screen) {
             currentProgressIndex = min(index, totalSteps)
         }

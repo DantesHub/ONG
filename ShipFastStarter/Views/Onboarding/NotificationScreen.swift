@@ -92,17 +92,19 @@ struct NotificationScreen: View {
     
     private func requestNotificationPermission() {
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
-            if granted {
-                print("Notification permission granted.")
-                // Handle the next steps after permission is granted
-                Analytics.shared.log(event: "Notifications: Granted Permission")
-            } else {
-                print("Notification permission denied.")
-                Analytics.shared.log(event: "Notifications: Denied Permission")
-                // Handle the case when permission is denied
-            }
-            withAnimation {
-                mainVM.onboardingScreen = .color
+            DispatchQueue.main.async {
+                if granted {
+                    print("Notification permission granted.")
+                    Analytics.shared.log(event: "Notifications: Granted Permission")
+                } else {
+                    print("Notification permission denied.")
+                    Analytics.shared.log(event: "Notifications: Denied Permission")
+                }
+                
+                // Move to the next screen regardless of the permission result
+                withAnimation {
+                    mainVM.onboardingScreen = .addFriends
+                }
             }
         }
     }

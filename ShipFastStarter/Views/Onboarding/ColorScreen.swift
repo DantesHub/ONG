@@ -35,7 +35,13 @@ struct ColorScreen: View {
                                         Analytics.shared.log(event: "ColorsScreen: Tapped Color")
                                         mainVM.currUser?.color = Constants.colors[index]
                                         UserDefaults.standard.setValue(true, forKey: "finishedOnboarding")
-                                      
+                                        
+                                        if let currUser = mainVM.currUser {
+                                            Task {
+                                                try await FirebaseService.shared.updateDocument(collection: "users", object: currUser)
+                                            }                                  
+                                        }
+                                        
                                         mainVM.currentPage = .poll
                                     }
                                 }

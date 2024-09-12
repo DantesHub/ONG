@@ -9,7 +9,7 @@ import Foundation
 
 class MainViewModel: ObservableObject {
     @Published var currentPage: Page = .splash
-    @Published var onboardingScreen: OnboardingScreenType = .first
+    @Published var onboardingScreen: OnboardingScreenType = .notification
     @Published var isPro = false
     @Published var showHalfOff = false 
     @Published var onboardingProgress: Double = 0.0

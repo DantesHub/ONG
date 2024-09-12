@@ -11,6 +11,7 @@ struct NumberScreen: View {
     @EnvironmentObject var authVM: AuthViewModel
     @EnvironmentObject var mainVM: MainViewModel
     @EnvironmentObject var pollVM: PollViewModel
+    @EnvironmentObject var profileVM: ProfileViewModel
     @State private var phoneNumber = ""
     @State private var verificationCode = ""
     @FocusState private var isPhoneNumberFocused: Bool
@@ -184,6 +185,19 @@ struct NumberScreen: View {
         }
     }
     
+    func fetchUserData(_ user: User) async {
+       async let peopleList = profileVM.fetchPeopleList(user: user)
+//        do {
+//            try await FirebaseService.shared.updateAllObjects(collection: "users")
+//
+//        } catch {
+//            print(error.localizedDescription)
+//        }
+
+       // Wait for both tasks to complete
+       _ = await (peopleList)
+   }
+    
     private func verifyCode() {
         isVerifying = true
         mainVM.currUser?.fcmToken = UserDefaults.standard.string(forKey: "fcmToken") ?? ""
@@ -199,12 +213,13 @@ struct NumberScreen: View {
                             authVM.isVerified = true
                             Task {
                                 if let user = mainVM.currUser {
+                                    await fetchUserData(user)
                                     await pollVM.fetchPolls(for: user)
                                 }
                             }
                             
                             withAnimation {
-                                mainVM.onboardingScreen = .gender
+                                mainVM.onboardingScreen = .uploadProfile
                             }
                             
                             print("Successfully verified and signed in: \(authResult.user.uid)")

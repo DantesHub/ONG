@@ -40,7 +40,7 @@ struct ContentView: View {
                     case .home:
                         HomeScreen()
                     case .poll:
-                        PeopleScreen()
+                        PollScreen()
                             .environmentObject(profileVM)
                             .environmentObject(authVM)
                             .environmentObject(mainVM)

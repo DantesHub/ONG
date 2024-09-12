@@ -62,7 +62,7 @@ struct GenderButton: View {
                 withAnimation(.spring()) {
                     self.opacity = 1
                     mainVM.currUser?.gender = String(gender.rawValue.dropFirst(2))
-                    mainVM.onboardingScreen = .color
+                    mainVM.onboardingScreen = .name
                 }
             }
         }) {

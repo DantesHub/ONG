@@ -29,7 +29,7 @@ struct ProfileScreen: View {
                         .foregroundColor(.black)
                         .frame(width: 124, height: 124)
                     
-                    if user.proPic.isEmpty {
+                    if !user.proPic.isEmpty {
                         CachedAsyncImage(url: URL(string: user.proPic)) { phase in
                             switch phase {
                             case .success(let image):

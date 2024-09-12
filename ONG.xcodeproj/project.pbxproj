@@ -283,7 +283,6 @@
 				88B37D262C23FFE9000A7D91 /* Home */,
 				88B37D252C23FFE5000A7D91 /* Onboarding */,
 				8838DC3F2C8A8F7D00500C6E /* SplashScreen.swift */,
-				8838DC6E2C90043500500C6E /* PeopleScreen.swift */,
 				8838DC772C9251BA00500C6E /* InviteFriendsModal.swift */,
 			);
 			path = Views;
@@ -356,6 +355,7 @@
 				8838DC482C8AC9C100500C6E /* LastName.swift */,
 				8838DC4A2C8ACD5800500C6E /* UsernameScreen.swift */,
 				8838DC502C8D11EA00500C6E /* ColorScreen.swift */,
+				8838DC6E2C90043500500C6E /* PeopleScreen.swift */,
 				8838DC562C8E454A00500C6E /* NotificationScreen.swift */,
 				8838DC752C923C0E00500C6E /* LockedHighschoolScreen.swift */,
 				8838DC792C9293CC00500C6E /* UploadProfileScreen.swift */,

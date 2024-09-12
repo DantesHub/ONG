@@ -34,7 +34,7 @@ struct GradeScreen: View {
                                 let newGrade = String(grade.dropLast(2))
                                 Analytics.shared.logActual(event: "GradeScreen: Tapped Grade", parameters: ["grade":newGrade])
                                 mainVM.currUser?.grade = newGrade
-                                mainVM.onboardingScreen = .name
+                                mainVM.onboardingScreen = .gender
                             }
                         )
                     }

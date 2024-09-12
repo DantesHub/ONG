@@ -95,8 +95,7 @@ private extension ShipFastStarterApp {
 //        AppsFlyerLib.shared().customerUserID = userId
 //        AppsFlyerLib.shared().logEvent("App Started", withValues: [:])
 //        AppsFlyerLib.shared().isDebug = false
-//        AppsFlyerLib.shared().start()
-//
+//        AppsFlyerLib.shared().
         
         Mixpanel.initialize(token: "", trackAutomaticEvents: false)
         Mixpanel.mainInstance().track(event: "App Start")

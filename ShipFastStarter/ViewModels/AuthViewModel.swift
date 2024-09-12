@@ -76,9 +76,6 @@ class AuthViewModel: ObservableObject {
                 completion(.success(authResult))
             }
         }
-       
-        
-       
     }
     
     func resendVerificationCode() {

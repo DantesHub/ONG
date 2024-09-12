@@ -9,8 +9,8 @@ import Foundation
 import UIKit
 import FirebaseAuth
 class ProfileViewModel: ObservableObject, ImageUploadable {
-@Published var profileImage: UIImage?
-    @Published var peopleList: [User] = [User.exUser, User.exUser0, User.exUser1, User.exUser2, User.exUser3]
+    @Published var profileImage: UIImage?
+    @Published var peopleList: [User] = []
     @Published var friends: [User] = []
     @Published var isVisitingProfile: Bool = false
     @Published var isCrush: Bool = false
@@ -32,13 +32,13 @@ class ProfileViewModel: ObservableObject, ImageUploadable {
         for friend in users {
             var newFriend = friend
             newUser.friends[friend.id] = Date().toString()
-            newFriend.friendRequests[newUser.id] = Date().toString()
+            newFriend.friendRequests[newUser.id] = Date().toString(format: "yyyy-MM-dd HH:mm:ss")
             newFriends.append(newFriend)
         }
         newFriends.append(newUser)
         
         do {
-            try await FirebaseService.shared.batchUpdate(collection: "users", objects: newFriends)
+            try await FirebaseService.shared.updateField(collection: "users", documentId: currUser.id, field: "friends", value: newUser.friends)
         } catch {
             print(error.localizedDescription)
         }

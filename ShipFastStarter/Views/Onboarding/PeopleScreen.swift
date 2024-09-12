@@ -124,6 +124,9 @@ struct PeopleScreen: View {
                 
                 SharedComponents.PrimaryButton(title: "next") {
                     if let user = mainVM.currUser {
+                        withAnimation {
+                            mainVM.onboardingScreen = .color
+                        }
                         Task {
                             mainVM.currUser = await profileVM.addFriends(currUser: user, users: selectedFriends)
                         }
