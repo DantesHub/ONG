@@ -102,7 +102,7 @@ private extension ShipFastStarterApp {
         Mixpanel.mainInstance().track(event: "App Start")
         Mixpanel.mainInstance().identify(distinctId: userId)
 //        UserDefaults.standard.setValue(true, forKey: "finishedOnboarding")
-        UserDefaults.standard.setValue("0234567890", forKey: "userNumber")
+        UserDefaults.standard.setValue("+12012222222", forKey: "userNumber")
     }
 }
 
@@ -143,10 +143,10 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         
         application.registerForRemoteNotifications()
         let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
-        UNUserNotificationCenter.current().requestAuthorization(
-          options: authOptions,
-          completionHandler: { _, _ in }
-        )
+//        UNUserNotificationCenter.current().requestAuthorization(
+//          options: authOptions,
+//          completionHandler: { _, _ in }
+//        )
 
         
         return true

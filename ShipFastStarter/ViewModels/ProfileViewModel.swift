@@ -8,16 +8,41 @@
 import Foundation
 import UIKit
 import FirebaseAuth
-class ProfileViewModel: ObservableObject {
-    @Published var profileImage: UIImage?
-    @Published var peopleList: [User] = [User.exUser, User.exUser]
+class ProfileViewModel: ObservableObject, ImageUploadable {
+@Published var profileImage: UIImage?
+    @Published var peopleList: [User] = [User.exUser, User.exUser0, User.exUser1, User.exUser2, User.exUser3]
     @Published var friends: [User] = []
     @Published var isVisitingProfile: Bool = false
     @Published var isCrush: Bool = false
     @Published var isFriend: Bool = false
-
+    @Published var showingImagePicker = false
+    @Published var sourceType: UIImagePickerController.SourceType = .photoLibrary
+    
     init() {
         
+    }
+    
+    
+    
+
+    func addFriends(currUser: User, users: [User]) async  -> User{
+        // we have to update each document sepeartely
+        var newUser = currUser
+        var newFriends: [User] = []
+        for friend in users {
+            var newFriend = friend
+            newUser.friends[friend.id] = Date().toString()
+            newFriend.friendRequests[newUser.id] = Date().toString()
+            newFriends.append(newFriend)
+        }
+        newFriends.append(newUser)
+        
+        do {
+            try await FirebaseService.shared.batchUpdate(collection: "users", objects: newFriends)
+        } catch {
+            print(error.localizedDescription)
+        }
+        return newUser
     }
     
     // MARK: - visiting profile functions
@@ -70,6 +95,7 @@ class ProfileViewModel: ObservableObject {
         }
         return newUser
     }
+    
     
     func loadImages() async {
         // Fetch users from your data source

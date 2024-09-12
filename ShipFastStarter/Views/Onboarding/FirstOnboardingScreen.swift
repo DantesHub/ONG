@@ -121,3 +121,20 @@ struct StrokeModifier: ViewModifier {
         }
     }
 }
+
+extension View {
+    /// Adds a stroke to the view with a linear gradient.
+    func gradientStroke(colors: [Color], lineWidth: CGFloat) -> some View {
+        self.overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(
+                    LinearGradient(
+                        gradient: Gradient(colors: colors),
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: lineWidth
+                )
+        )
+    }
+}

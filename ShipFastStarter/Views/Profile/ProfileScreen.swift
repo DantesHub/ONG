@@ -15,9 +15,7 @@ struct ProfileScreen: View {
     @EnvironmentObject var authVM: AuthViewModel
     @EnvironmentObject var profileVM: ProfileViewModel
     @State private var showingActionSheet = false
-    @State private var showingImagePicker = false
-    @State private var showingCamera = false
-    @State private var sourceType: UIImagePickerController.SourceType = .photoLibrary
+
     @State private var user = User.exUser
     var body: some View {
         ZStack {
@@ -103,16 +101,16 @@ struct ProfileScreen: View {
         .actionSheet(isPresented: $showingActionSheet) {
             ActionSheet(title: Text("Select Profile Picture"), buttons: [
                 .default(Text("Take a Photo")) {
-                    checkCameraPermission()
+                    profileVM.checkCameraPermission()
                 },
                 .default(Text("Choose from Library")) {
-                    checkPhotoLibraryPermission()
+                    profileVM.checkPhotoLibraryPermission()
                 },
                 .cancel()
             ])
         }
-        .sheet(isPresented: $showingImagePicker) {
-            ImagePicker(sourceType: sourceType, selectedImage: $profileVM.profileImage)
+        .sheet(isPresented: $profileVM.showingImagePicker) {
+            ImagePicker(sourceType: profileVM.sourceType, selectedImage: $profileVM.profileImage)
         }
         .onChange(of: profileVM.profileImage) {
             if let user = mainVM.currUser {
@@ -122,42 +120,6 @@ struct ProfileScreen: View {
         }
         .onAppear {
             
-        }
-    }
-    
-
-    
-    private func checkCameraPermission() {
-        AVCaptureDevice.requestAccess(for: .video) { granted in
-            DispatchQueue.main.async {
-                if granted {
-                    self.sourceType = .camera
-                    self.showingImagePicker = true
-                } else {
-                    // Handle camera permission denied
-                    print("Camera permission denied")
-                }
-            }
-        }
-    }
-    
-    private func checkPhotoLibraryPermission() {
-        PHPhotoLibrary.requestAuthorization { status in
-            DispatchQueue.main.async {
-                switch status {
-                case .authorized, .limited:
-                    self.sourceType = .photoLibrary
-                    self.showingImagePicker = true
-                case .denied, .restricted:
-                    // Handle photo library permission denied
-                    print("Photo library permission denied")
-                case .notDetermined:
-                    // This shouldn't be reached, but handle just in case
-                    print("Photo library permission not determined")
-                @unknown default:
-                    break
-                }
-            }
         }
     }
 }

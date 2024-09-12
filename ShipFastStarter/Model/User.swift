@@ -87,6 +87,106 @@ struct User: Codable, Equatable, FBObject {
         crushId: "",
         friendRequests: [:]
     )
+    
+    static var exUser0 = User(
+        id: "0",
+        firstName: "Naveed",
+        lastName: "Johnmo",
+        username: "naveedjohnmo",
+        schoolId: "123e4567-e89b-12d3-a456-426614174000",
+        color: "#FF0000",
+        aura: 100,
+        godMode: false,
+        birthday: "2000-01-01",
+        grade: "11",
+        number: "1234567890",
+        votedPolls: [],
+        lastPollFinished: nil,
+        friends: ["609AFD46-62E4-4A82-A900-C120EBC4FEF6": "Sent 💌", "88528186-09F7-4AF8-B5EB-6DF6DCBCB8A5": "Friends ✅"],
+        invitedFriends: [],
+        ogBadge: true,
+        gender: "Male",
+        fcmToken: "",
+        proPic: "https://firebasestorage.googleapis.com/v0/b/ongod-fce40.appspot.com/o/profileImages%2FOkl?alt=media&token=000ea88e-bce7-4167-b332-5df492744d68",
+        referral: 0,
+        crushId: "",
+        friendRequests: [:]
+    )
+    static var exUser1 = User(
+        id: "1",
+        firstName: "Naveed",
+        lastName: "Johnmo",
+        username: "naveedjohnmo",
+        schoolId: "123e4567-e89b-12d3-a456-426614174000",
+        color: "#FF0000",
+        aura: 100,
+        godMode: false,
+        birthday: "2000-01-01",
+        grade: "11",
+        number: "1234567890",
+        votedPolls: [],
+        lastPollFinished: nil,
+        friends: ["609AFD46-62E4-4A82-A900-C120EBC4FEF6": "Sent 💌", "88528186-09F7-4AF8-B5EB-6DF6DCBCB8A5": "Friends ✅"],
+        invitedFriends: [],
+        ogBadge: true,
+        gender: "Male",
+        fcmToken: "",
+        proPic: "https://firebasestorage.googleapis.com/v0/b/ongod-fce40.appspot.com/o/profileImages%2FOkl?alt=media&token=000ea88e-bce7-4167-b332-5df492744d68",
+        referral: 0,
+        crushId: "",
+        friendRequests: [:]
+    )
+    static var exUser2 = User(
+        id: "2",
+        firstName: "Naveed",
+        lastName: "Johnmo",
+        username: "naveedjohnmo",
+        schoolId: "123e4567-e89b-12d3-a456-426614174000",
+        color: "#FF0000",
+        aura: 100,
+        godMode: false,
+        birthday: "2000-01-01",
+        grade: "11",
+        number: "1234567890",
+        votedPolls: [],
+        lastPollFinished: nil,
+        friends: ["609AFD46-62E4-4A82-A900-C120EBC4FEF6": "Sent 💌", "88528186-09F7-4AF8-B5EB-6DF6DCBCB8A5": "Friends ✅"],
+        invitedFriends: [],
+        ogBadge: true,
+        gender: "Male",
+        fcmToken: "",
+        proPic: "https://firebasestorage.googleapis.com/v0/b/ongod-fce40.appspot.com/o/profileImages%2FOkl?alt=media&token=000ea88e-bce7-4167-b332-5df492744d68",
+        referral: 0,
+        crushId: "",
+        friendRequests: [:]
+    )
+    static var exUser3 = User(
+        id: "3",
+        firstName: "Naveed",
+        lastName: "Johnmo",
+        username: "naveedjohnmo",
+        schoolId: "123e4567-e89b-12d3-a456-426614174000",
+        color: "#FF0000",
+        aura: 100,
+        godMode: false,
+        birthday: "2000-01-01",
+        grade: "11",
+        number: "1234567890",
+        votedPolls: [],
+        lastPollFinished: nil,
+        friends: ["609AFD46-62E4-4A82-A900-C120EBC4FEF6": "Sent 💌", "88528186-09F7-4AF8-B5EB-6DF6DCBCB8A5": "Friends ✅"],
+        invitedFriends: [],
+        ogBadge: true,
+        gender: "Male",
+        fcmToken: "",
+        proPic: "https://firebasestorage.googleapis.com/v0/b/ongod-fce40.appspot.com/o/profileImages%2FOkl?alt=media&token=000ea88e-bce7-4167-b332-5df492744d68",
+        referral: 0,
+        crushId: "",
+        friendRequests: [:]
+    )
+    
+    
+
 
     static func == (lhs: User, rhs: User) -> Bool {
         return lhs.id == rhs.id

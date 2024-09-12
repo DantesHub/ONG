@@ -75,6 +75,22 @@ class FirebaseService {
         
         try await batch.commit()
     }
+
+    
+    // Batch update function
+    func batchUpdate<T: FBObject>(collection: String, objects: [T]) async throws {
+        let batch = Firestore.firestore().batch()
+        
+        for object in objects {
+            guard let data = object.encodeToDictionary() else {
+                throw NSError(domain: "FirebaseService", code: 400, userInfo: [NSLocalizedDescriptionKey: "Failed to encode object to dictionary"])
+            }
+            let ref = Firestore.firestore().collection(collection).document(object.id)
+            batch.setData(data, forDocument: ref, merge: true)
+        }
+        
+        try await batch.commit()
+    }
     
     
     

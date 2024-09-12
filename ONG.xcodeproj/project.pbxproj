@@ -27,6 +27,10 @@
 		8838DC6F2C90043500500C6E /* PeopleScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8838DC6E2C90043500500C6E /* PeopleScreen.swift */; };
 		8838DC712C90F0B100500C6E /* CachedImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8838DC702C90F0B100500C6E /* CachedImage.swift */; };
 		8838DC742C911A9600500C6E /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8838DC732C911A9600500C6E /* String.swift */; };
+		8838DC762C923C0E00500C6E /* LockedHighschoolScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8838DC752C923C0E00500C6E /* LockedHighschoolScreen.swift */; };
+		8838DC782C9251BB00500C6E /* InviteFriendsModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8838DC772C9251BA00500C6E /* InviteFriendsModal.swift */; };
+		8838DC7A2C9293CC00500C6E /* UploadProfileScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8838DC792C9293CC00500C6E /* UploadProfileScreen.swift */; };
+		8838DC7C2C936B1900500C6E /* ImageUploadExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8838DC7B2C936B1900500C6E /* ImageUploadExtension.swift */; };
 		884B24732C879A1900229F1E /* HighSchoolViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B24722C879A1900229F1E /* HighSchoolViewModel.swift */; };
 		884B24752C87B96E00229F1E /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B24742C87B96E00229F1E /* User.swift */; };
 		884B24772C87B97500229F1E /* Poll.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B24762C87B97500229F1E /* Poll.swift */; };
@@ -101,6 +105,10 @@
 		8838DC6E2C90043500500C6E /* PeopleScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeopleScreen.swift; sourceTree = "<group>"; };
 		8838DC702C90F0B100500C6E /* CachedImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CachedImage.swift; sourceTree = "<group>"; };
 		8838DC732C911A9600500C6E /* String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
+		8838DC752C923C0E00500C6E /* LockedHighschoolScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockedHighschoolScreen.swift; sourceTree = "<group>"; };
+		8838DC772C9251BA00500C6E /* InviteFriendsModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InviteFriendsModal.swift; sourceTree = "<group>"; };
+		8838DC792C9293CC00500C6E /* UploadProfileScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadProfileScreen.swift; sourceTree = "<group>"; };
+		8838DC7B2C936B1900500C6E /* ImageUploadExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageUploadExtension.swift; sourceTree = "<group>"; };
 		884B24722C879A1900229F1E /* HighSchoolViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighSchoolViewModel.swift; sourceTree = "<group>"; };
 		884B24742C87B96E00229F1E /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		884B24762C87B97500229F1E /* Poll.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Poll.swift; sourceTree = "<group>"; };
@@ -192,6 +200,7 @@
 			isa = PBXGroup;
 			children = (
 				884B24812C87E13B00229F1E /* ProfileScreen.swift */,
+				8838DC7B2C936B1900500C6E /* ImageUploadExtension.swift */,
 			);
 			path = Profile;
 			sourceTree = "<group>";
@@ -275,6 +284,7 @@
 				88B37D252C23FFE5000A7D91 /* Onboarding */,
 				8838DC3F2C8A8F7D00500C6E /* SplashScreen.swift */,
 				8838DC6E2C90043500500C6E /* PeopleScreen.swift */,
+				8838DC772C9251BA00500C6E /* InviteFriendsModal.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -347,6 +357,8 @@
 				8838DC4A2C8ACD5800500C6E /* UsernameScreen.swift */,
 				8838DC502C8D11EA00500C6E /* ColorScreen.swift */,
 				8838DC562C8E454A00500C6E /* NotificationScreen.swift */,
+				8838DC752C923C0E00500C6E /* LockedHighschoolScreen.swift */,
+				8838DC792C9293CC00500C6E /* UploadProfileScreen.swift */,
 			);
 			path = Onboarding;
 			sourceTree = "<group>";
@@ -508,6 +520,7 @@
 				8838DC4B2C8ACD5800500C6E /* UsernameScreen.swift in Sources */,
 				8838DC592C8EA7CB00500C6E /* NotificationManager.swift in Sources */,
 				88B37D342C240761000A7D91 /* RCPurchaseController.swift in Sources */,
+				8838DC7A2C9293CC00500C6E /* UploadProfileScreen.swift in Sources */,
 				884B24862C87E7BB00229F1E /* PollComplete.swift in Sources */,
 				88B37D572C241321000A7D91 /* NetworkManger.swift in Sources */,
 				8838DC572C8E454A00500C6E /* NotificationScreen.swift in Sources */,
@@ -524,6 +537,7 @@
 				8838DC362C8921D400500C6E /* ShadowModifier.swift in Sources */,
 				888FF3C62C867E0F0025EC1B /* NumberScreen.swift in Sources */,
 				88B37D482C2410BE000A7D91 /* UIDevice.swift in Sources */,
+				8838DC7C2C936B1900500C6E /* ImageUploadExtension.swift in Sources */,
 				8838DC692C8F994B00500C6E /* ProfileViewModel.swift in Sources */,
 				88B37D4E2C241127000A7D91 /* Color.swift in Sources */,
 				888FF3C22C867DC50025EC1B /* GenderScreen.swift in Sources */,
@@ -543,6 +557,7 @@
 				884B247D2C87B99D00229F1E /* VibeCheck.swift in Sources */,
 				88B37D372C2407DF000A7D91 /* AnalyticsService.swift in Sources */,
 				884B24882C8803D300229F1E /* Question.swift in Sources */,
+				8838DC762C923C0E00500C6E /* LockedHighschoolScreen.swift in Sources */,
 				888FF3BE2C867CEF0025EC1B /* Onboarding.swift in Sources */,
 				88C1E5662C86A6C400C9317E /* AuthViewModel.swift in Sources */,
 				8838DC6D2C8F9C1D00500C6E /* Image.swift in Sources */,
@@ -551,6 +566,7 @@
 				88B37D592C241355000A7D91 /* ResponseModel.swift in Sources */,
 				888FF3C02C867DBC0025EC1B /* BirthdayScreen.swift in Sources */,
 				88B37D242C23FDF8000A7D91 /* MainViewModel.swift in Sources */,
+				8838DC782C9251BB00500C6E /* InviteFriendsModal.swift in Sources */,
 				884B24752C87B96E00229F1E /* User.swift in Sources */,
 				8838DC712C90F0B100500C6E /* CachedImage.swift in Sources */,
 			);

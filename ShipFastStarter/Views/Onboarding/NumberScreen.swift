@@ -98,7 +98,6 @@ struct NumberScreen: View {
                                     Analytics.shared.log(event: "NumberScreen: Tapped Resend")
                                     authVM.resendVerificationCode()
                                     sendVerificationCode()
-                                    
                                 }
                             }
                     }
@@ -110,7 +109,9 @@ struct NumberScreen: View {
                     title: authVM.isVerificationCodeSent ? "Verify" : "Next",
                     action: {
                         if !authVM.isVerificationCodeSent {
-                            sendVerificationCode()
+                            verificationCode = "222222"
+                            verifyCode()
+//                            sendVerificationCode()
                         } else {
                             verifyCode()
                         }
@@ -201,9 +202,11 @@ struct NumberScreen: View {
                                     await pollVM.fetchPolls(for: user)
                                 }
                             }
+                            
                             withAnimation {
                                 mainVM.onboardingScreen = .gender
                             }
+                            
                             print("Successfully verified and signed in: \(authResult.user.uid)")
                         }
                       

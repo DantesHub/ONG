@@ -230,7 +230,7 @@ class PollViewModel: ObservableObject {
                 batchDocuments.append((collection: "polls", data: pollData))
             }
         }
-
+  
         do {
             // Perform batch save
             try await FirebaseService.shared.batchSave(documents: batchDocuments)

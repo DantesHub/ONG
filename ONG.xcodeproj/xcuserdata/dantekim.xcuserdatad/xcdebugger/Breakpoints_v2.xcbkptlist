@@ -16,8 +16,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "301"
             endingLineNumber = "301"
-            landmarkName = "updateAllObjects(collection:)"
-            landmarkType = "7">
+            landmarkName = "FirebaseService"
+            landmarkType = "3">
             <Locations>
                <Location
                   uuid = "2DE366A2-5C28-41C1-B9A9-A84F32AB793D - 184bdab0b3232cf4"

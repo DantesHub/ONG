@@ -7,116 +7,80 @@
 
 import SwiftUI
 
-struct PushableButton: View {
-    @EnvironmentObject var profileVM: ProfileViewModel
-    @EnvironmentObject var mainVM: MainViewModel
-    
-    @Binding var title: String
-    let action: () -> Void
-    @State private var isPressed = false
-
-    var body: some View {
-        Button(action: {
-            withAnimation(.easeInOut(duration: 0.1)) {
-                self.isPressed = true
-            }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                withAnimation(.easeInOut(duration: 0.1)) {
-                    self.isPressed = false
-                    self.action()
-                }
-            }
-        }) {
-            Text(title)
-                .sfPro(type: .bold, size: .p3)
-                .foregroundColor(Color.blue)
-                .frame(width: 96, height: 32)
-                .background(
-                    ZStack {
-                        Capsule()
-                            .fill(.white)
-                        Capsule()
-                            .stroke(Color.black, lineWidth: 2)
-                            .cornerRadius(16)
-                    }
-                )
-                .offset(y: isPressed ? 4 : 0)
-        }
-        .buttonStyle(PlainButtonStyle())
-        .drawingGroup()
-        .shadow(color: Color.black, radius: 0, x: 0, y: isPressed ? 1 : 5)
-    }
-}
-
-struct FriendRow: View {
-    @EnvironmentObject var profileVM: ProfileViewModel
-    @EnvironmentObject var mainVM: MainViewModel
-    @State private var status: String = ""
+struct FriendButton: View {
+    @Binding var selectedFriends: [User]
     let user: User
     
+    private var isSelected: Bool {
+        selectedFriends.contains { $0.id == user.id }
+    }
+    
     var body: some View {
-        HStack(alignment: .center) {
+        VStack(spacing: 8) {
             ZStack {
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(Color.black.opacity(0.2), lineWidth: 2)
-                    .foregroundColor(.black)
-                    .frame(width: 56, height: 56)
-                
-                if !user.proPic.isEmpty {
-                                CachedAsyncImage(url: URL(string: user.proPic)) { phase in
-                                    switch phase {
-                                    case .success(let image):
-                                        image
-                                            .resizable()
-                                            .scaledToFill()
-                                            .frame(width: 56, height: 56)
-                                            .clipShape(RoundedRectangle(cornerRadius: 8))
-                                    case .failure:
-                                        Image(systemName: "person.fill")
-                                            .font(.system(size: 30))
-                                            .foregroundColor(.gray)
-                                    case .empty:
-                                        ProgressView()
-                                    @unknown default:
-                                        EmptyView()
-                                    }
-                                }
-                            } else {
-                                Image(systemName: "person.fill")
-                                    .font(.system(size: 30))
-                                    .foregroundColor(.gray)
-                            }
-        }
-            .padding(.bottom)
-            .rotationEffect(.degrees(-12))
-            
-            HStack {
-                Text("\(user.firstName) \(user.lastName)")
-                    .sfPro(type: .medium, size: .h3p1)
-                    .foregroundColor(Color.black)
-                    .padding(.leading)
-                Spacer()
-                PushableButton(title: $status) {
-                    if let currUser = mainVM.currUser {
-                        Task {
-                            if status == "Sent 💌" {
-                                status = "Add +"
-                            } else if  status == "Friends ✅" {
-                                status = "Add +"
-                            } else {
-                                status = "Sent 💌"
-                            }
-                            
-                            mainVM.currUser = await profileVM.tappedAdd(currUser: currUser, friend: user, currentStatus: user.friendsStatus)
+                ZStack {
+                    if let url = URL(string: user.proPic), !user.proPic.isEmpty {
+                        AsyncImage(url: url) { image in
+                            image
+                                .resizable()
+                                .scaledToFill()
+                        } placeholder: {
+                            ProgressView()
                         }
+                        .frame(width: 64, height: 64)
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                    } else {
+                        Image(systemName: "person.fill")
+                            .font(.system(size: 40))
+                            .foregroundColor(.gray)
                     }
+              
+         
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(.clear)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16)
+                                .stroke(Color.black.opacity(1), lineWidth: 4)
+                                .padding(1)
+                                .mask(RoundedRectangle(cornerRadius: 16))
+                        )
                 }
-            }.offset(y: -8)
+                .frame(width: 64, height: 64)
+                .cornerRadius(16)
+                .primaryShadow()
+                .opacity(isSelected ? 1 : 0.5)
+                .rotationEffect(.degrees(-8))
+                if isSelected {
+                    Image(systemName: "checkmark.circle.fill")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .font(Font.title.weight(.bold))
+                        .frame(width: 32)
+                        .foregroundColor(.brightGreen)
+                        .padding(2)
+                        .background(Circle()
+                            .fill(.darkGreen)
+                            .stroke(color: .darkGreen))
+                        .cornerRadius(40)
+                        .offset(x: 35, y: 30)
+                }
+            }
+            
+            Text("\(user.firstName)")
+                .sfPro(type: .bold, size: .p2)
+                .foregroundColor(.white)
+                .padding(.top, 8)
         }
-        .padding(.horizontal, 32)
-        .padding(.top)
-        .onAppear {
-            self.status = user.friendsStatus
+        .onTapGesture {
+            withAnimation {
+                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                if isSelected {
+                    selectedFriends.removeAll { $0.id == user.id }
+                } else {
+                    selectedFriends.append(user)
+                }
+            }
+       
         }
     }
 }
@@ -124,28 +88,60 @@ struct FriendRow: View {
 struct PeopleScreen: View {
     @EnvironmentObject var profileVM: ProfileViewModel
     @EnvironmentObject var mainVM: MainViewModel
+    @State private var selectedFriends: [User] = []
+    
+    let columns = [
+        GridItem(.flexible(), spacing: -24),
+        GridItem(.flexible(), spacing: -24),
+        GridItem(.flexible(), spacing: -24),
+        GridItem(.flexible(), spacing: -24)
+    ]
     
     var body: some View {
         ZStack {
-            Color.white.edgesIgnoringSafeArea(.all)
-            VStack {                        
+            Color.primaryBackground.edgesIgnoringSafeArea(.all)
+            
+            VStack(spacing: 16) {
+                Spacer()
+                Text("add friends")
+                    .sfPro(type: .bold, size: .h1)
+                    .multilineTextAlignment(.center)
+                    .foregroundColor(Color.white)
+                    .padding(.horizontal)
+                Text("here’s some people you may know. tap to select and unselect. tap next when done.")
+                    .sfPro(type: .medium, size: .p2)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 56)
+                    .foregroundColor(Color.white)
                 ScrollView {
-                    LazyVStack(spacing: 16) {
+                    LazyVGrid(columns: columns, spacing: 12) {
                         ForEach(profileVM.peopleList, id: \.id) { user in
-                            FriendRow(user: user)
+                            FriendButton(selectedFriends: $selectedFriends, user: user)
                         }
                     }
+                    .padding(.vertical)
                 }
-                Text("add friends to show up in their polls more!")
-                    .sfPro(type: .bold, size: .p2)
-                    .foregroundColor(Color.black)
-                    .padding()
+                
+                SharedComponents.PrimaryButton(title: "next") {
+                    if let user = mainVM.currUser {
+                        Task {
+                            mainVM.currUser = await profileVM.addFriends(currUser: user, users: selectedFriends)
+                        }
+                    }
+                }.padding(.horizontal, 32)
+                .padding(.bottom)
+                
+                
             }
         }
+        .navigationTitle("People")
     }
 }
 
-#Preview {
-    PeopleScreen()
-        .environmentObject(ProfileViewModel())
+struct PeopleScreen_Previews: PreviewProvider {
+    static var previews: some View {
+        PeopleScreen()
+            .environmentObject(ProfileViewModel())
+            .environmentObject(MainViewModel())
+    }
 }

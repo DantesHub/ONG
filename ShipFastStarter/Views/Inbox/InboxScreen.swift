@@ -36,9 +36,12 @@ struct InboxScreen: View {
                                         .font(.system(size: 22, weight: .bold))
                                         .padding(.leading, 20)
                                 }
+                                  
+                                VStack(spacing: 24) {
                                     ForEach(inboxVM.friendRequests) { request in
                                         FriendRequestView(request: request)
                                     }
+                                }
                                 if !inboxVM.newUsersWhoVoted.isEmpty {
                                     ForEach(inboxVM.newUsersWhoVoted) { item in
                                         InboxItemView(item: item)
@@ -271,31 +274,32 @@ struct FriendRequestView: View {
             .cornerRadius(16)
             .primaryShadow()
             .padding(.horizontal)
-        }
-        // Circle X mark
-        Image(systemName: "xmark.circle.fill")
-            .foregroundColor(.gray)
-            .font(.system(size: 24))
-            .background(Circle().fill(Color.white))
-            .offset(x: 8, y: -8)
-            .position(x: UIScreen.main.bounds.width - 30, y: -105)
-            .onTapGesture {
-                UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                    if let user = mainVM.currUser {
-                        Analytics.shared.log(event: "InboxScreen: Tapped Decline")
-                        mainVM.currUser?.friendRequests.removeValue(forKey: request.user.id)
-                        
-                        Task {
-                            await inboxVM.tappedDeclineFriendRequest(currUser: user, requestedUser: request.user)
+            // Circle X mark
+            Image(systemName: "xmark.circle.fill")
+                .foregroundColor(.gray)
+                .font(.system(size: 24))
+                .background(Circle().fill(Color.white))
+                .offset(x: 8, y: -8)
+                .position(x: UIScreen.main.bounds.width - 30, y: 12)
+                .onTapGesture {
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                        if let user = mainVM.currUser {
+                            Analytics.shared.log(event: "InboxScreen: Tapped Decline")
+                            mainVM.currUser?.friendRequests.removeValue(forKey: request.user.id)
+                            
+                            Task {
+                                await inboxVM.tappedDeclineFriendRequest(currUser: user, requestedUser: request.user)
+                            }
                         }
-                    }
-                    withAnimation {
-                        inboxVM.friendRequests.removeAll { request in
-                            request.user.id ==  mainVM.currUser?.id
+                        withAnimation {
+                            inboxVM.friendRequests.removeAll { request in
+                                request.user.id ==  mainVM.currUser?.id
+                            }
                         }
-                    }
+                }
             }
         }
+    
 }
 
 struct ProfilePictureView: View {
