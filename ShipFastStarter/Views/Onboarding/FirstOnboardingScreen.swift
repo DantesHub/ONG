@@ -44,53 +44,13 @@ struct OnboardingScreen: View {
                     .padding()
                     .padding(.top)
                 Spacer()
-//                SharedComponents.PrimaryButton(title: "share") {
-//                    createDynamicLink(username: "Test_user1") { url in
-//                        guard let url = url else { return }
-//                        let image = UIImage(named: "AppIcon")
-//                        let content = "I'm inviting you to download and install the ong app"
-//                        shareToFacebook(quote: content, url: url)
-//                       
-//                        //
-//                        //
-//                        //
-//                    }
-//                    
-//                    
-////                    createDynamicLink(username: "Test_user1") { url in
-////                        guard let url = url else { return }
-////                        let image = UIImage(named: "AppIcon")
-////                        let content = "I'm inviting you to download and install the ong app"
-////                        
-////                        let activityVC = UIActivityViewController(activityItems: [ url, image, content], applicationActivities: nil)
-////                        
-////                        activityVC.setValue("ONG", forKey: "subject")
-////                        
-////                        UIApplication.shared.windows.first?.rootViewController?.present(activityVC, animated: true, completion: nil)
-////                    //
-////                    //
-////                    //       
-////                    }
-//                }.padding(EdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 12))
+                
                 
                 SharedComponents.PrimaryButton(title: "continue") {
                     mainVM.currUser = User.exUser
                     mainVM.onboardingScreen = .birthday
                     
                     
-//                    createDynamicLink(username: "1") { url in
-//                        guard let url = url else { return }
-//                        let image = UIImage(named: "AppIcon")
-//                        let content = "I'm inviting you to download and install the ong app"
-//
-//                        let activityVC = UIActivityViewController(activityItems: [ url, image, content], applicationActivities: nil)
-//                        
-//                        activityVC.setValue("ONG", forKey: "subject")
-//                        
-//                        UIApplication.shared.windows.first?.rootViewController?.present(activityVC, animated: true, completion: nil)
-//                        
-//                        
-//                    }
                 }
                 .padding(.vertical, 48)
                 .padding(.horizontal, 24)
@@ -98,25 +58,96 @@ struct OnboardingScreen: View {
         }.frame(maxWidth: .infinity, alignment: .center)
        
     }
-    func shareToInstagramStories() {
-        guard let image = UIImage(named: "AppIcon"), // Replace with your image
-              let imageData = image.pngData() else { return }
+    
+//    func shareToInstagramStories(_ image: UIImage, link: String) {
+//        // Instagram URL scheme for sharing stories
+//        guard let instagramStoriesUrl = URL(string: "instagram-stories://share") else { return }
+//        
+//        // Convert the image to JPEG data
+//        guard let imageData = image.jpegData(compressionQuality: 0.8) else { return }
+//        
+//        // Save image to a temporary file
+//        let tempDirectory = FileManager.default.temporaryDirectory
+//        let fileURL = tempDirectory.appendingPathComponent("storyImage.jpg")
+//        
+//        do {
+//            try imageData.write(to: fileURL, options: .atomic)
+//        } catch {
+//            print("Error saving image to temporary file: \(error)")
+//            return
+//        }
+//        
+//        // Create the pasteboard items
+//        let pasteboardItems: [String: Any] = [
+//            "com.instagram.sharedSticker.backgroundImage": fileURL,
+//            "com.instagram.sharedSticker.stickerImage": fileURL,
+//            "com.instagram.sharedSticker.link": link
+//        ]
+//        
+//        // Set the items to the pasteboard
+//        UIPasteboard.general.setItems([pasteboardItems], options: [:])
+//        
+//        // Open Instagram to share the content
+//        if UIApplication.shared.canOpenURL(instagramStoriesUrl) {
+//            UIApplication.shared.open(instagramStoriesUrl, options: [:]) { success in
+//                if !success {
+//                    print("Failed to open Instagram Stories")
+//                }
+//            }
+//        } else {
+//            let alertController = UIAlertController(title: "Instagram Not Installed", message: "Please install Instagram to share content.", preferredStyle: .alert)
+//            let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
+//            alertController.addAction(okAction)
+//            UIApplication.shared.windows.first?.rootViewController?.present(alertController, animated: true, completion: nil)
+//        }
+//    }
+    
+    
+    
+    func shareToFacebook(quote: String, url: URL) {
+           // Create the content to share
+           let content = ShareLinkContent()
+           content.contentURL = url // Replace with your content URL
         
-        // Create the pasteboard item with the image data
-        let pasteboardItems: [String: Any] = [
-            "com.instagram.sharedSticker.backgroundImage": imageData
-        ]
+           content.quote = quote // Optional: Add a quote
         
-        // Set the pasteboard items
-        UIPasteboard.general.setItems([pasteboardItems], options: [:])
-        
-        // Open Instagram Stories
-        if let url = URL(string: "instagram-stories://share"), UIApplication.shared.canOpenURL(url) {
-            UIApplication.shared.open(url, options: [:], completionHandler: nil)
-        } else {
-            print("Instagram Stories is not available.")
-        }
-    }
+           // Configure the share dialog
+           let dialog = ShareDialog(
+            viewController: UIApplication.shared.windows.first?.rootViewController,
+               content: content,
+               delegate: nil
+           )
+
+           // Show the share dialog if possible
+           if dialog.canShow {
+               
+
+               dialog.show()
+           } else {
+               print("Unable to show the Facebook share dialog.")
+           }
+       }
+    
+    
+//    func shareToInstagramStories() {
+//        guard let image = UIImage(named: "AppIcon"), // Replace with your image
+//              let imageData = image.pngData() else { return }
+//        
+//        // Create the pasteboard item with the image data
+//        let pasteboardItems: [String: Any] = [
+//            "com.instagram.sharedSticker.backgroundImage": imageData
+//        ]
+//        
+//        // Set the pasteboard items
+//        UIPasteboard.general.setItems([pasteboardItems], options: [:])
+//        
+//        // Open Instagram Stories
+//        if let url = URL(string: "instagram-stories://share"), UIApplication.shared.canOpenURL(url) {
+//            UIApplication.shared.open(url, options: [:], completionHandler: nil)
+//        } else {
+//            print("Instagram Stories is not available.")
+//        }
+//    }
     
 //    func shareToInstagram() {
 //           // Prepare the image to share
@@ -165,29 +196,7 @@ struct OnboardingScreen: View {
             }
         }
     }
-    func shareToFacebook(quote: String, url: URL) {
-           // Create the content to share
-           let content = ShareLinkContent()
-           content.contentURL = url // Replace with your content URL
-        
-           content.quote = quote // Optional: Add a quote
-        
-           // Configure the share dialog
-           let dialog = ShareDialog(
-            viewController: UIApplication.shared.windows.first?.rootViewController,
-               content: content,
-               delegate: nil
-           )
-
-           // Show the share dialog if possible
-           if dialog.canShow {
-               
-
-               dialog.show()
-           } else {
-               print("Unable to show the Facebook share dialog.")
-           }
-       }
+    
 }
 
 #Preview {

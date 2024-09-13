@@ -356,7 +356,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
             application,
             didFinishLaunchingWithOptions: launchOptions
         )
-
+        
         // Check if the app was launched from a local notification
         //        if let notificationResponse = launchOptions?[.not] as? UNNotificationResponse {
         //                 let userInfo = notificationResponse.notification.request.content.userInfo
@@ -370,10 +370,10 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         application.registerForRemoteNotifications()
         let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
         UNUserNotificationCenter.current().requestAuthorization(
-          options: authOptions,
-          completionHandler: { _, _ in }
+            options: authOptions,
+            completionHandler: { _, _ in }
         )
-
+        
         
         return true
     }
@@ -404,14 +404,14 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
         if ApplicationDelegate.shared.application(
-                    app,
-                    open: url,
-                    sourceApplication: options[UIApplication.OpenURLOptionsKey.sourceApplication] as? String,
-                    annotation: options[UIApplication.OpenURLOptionsKey.annotation]
-                ) {
-                    return true
-                }
-                
+            app,
+            open: url,
+            sourceApplication: options[UIApplication.OpenURLOptionsKey.sourceApplication] as? String,
+            annotation: options[UIApplication.OpenURLOptionsKey.annotation]
+        ) {
+            return true
+        }
+        
         
         if Auth.auth().canHandle(url) {
             true
@@ -428,25 +428,28 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     }
     
     func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
-          if let token = fcmToken {
-              print("FCM Token: \(token)")
-              // Save or use the FCM token as needed
-              UserDefaults.standard.setValue(token, forKey: "fcmToken")
-//              Task {
-//                  var user = User.exUser
-//                  user.number = "2234567890"
-//                  user.firstName = "Epik"
-//                  user.fcmToken = token
-//                  try await FirebaseService.shared.updateDocument(collection: "users", field: "number", isEqualTo: "2234567890", object: user)
-//              }
-          }
-      }
-
-//   
+        if let token = fcmToken {
+            print("FCM Token: \(token)")
+            // Save or use the FCM token as needed
+            UserDefaults.standard.setValue(token, forKey: "fcmToken")
+            //              Task {
+            //                  var user = User.exUser
+            //                  user.number = "2234567890"
+            //                  user.firstName = "Epik"
+            //                  user.fcmToken = token
+            //                  try await FirebaseService.shared.updateDocument(collection: "users", field: "number", isEqualTo: "2234567890", object: user)
+            //              }
+        }
+    }
+    
+    //
     
     
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: () -> Void) {
         print("hello")
+        
+
+
     }
     
 }
