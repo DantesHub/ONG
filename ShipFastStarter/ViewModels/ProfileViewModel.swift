@@ -50,7 +50,6 @@ class ProfileViewModel: ObservableObject, ImageUploadable {
         var newUser = currUser
         // fetch other user
         var selectedFriend = friend
-        
         // determine status of friendship
         // check if it exists inside users friends dictionary
         if newUser.friends.contains(where: { k,v in
@@ -131,8 +130,12 @@ class ProfileViewModel: ObservableObject, ImageUploadable {
                 newPerson.friendsStatus =  "Add +"
             }
             
+       
             if let index = peopleList.firstIndex(where: { $0.id == newPerson.id }) {
                 peopleList[index] = newPerson
+            }
+            peopleList.removeAll { usr in
+                usr.id == user.id
             }
         }
         
@@ -167,28 +170,27 @@ class ProfileViewModel: ObservableObject, ImageUploadable {
     }
     
 
-    func uploadUserProfilePicture(image: UIImage, user: User) -> User {
-  
-        let path = "profileImages/\(user.username)"
+  func uploadUserProfilePicture(image: UIImage, user: User) async throws -> String {
+    let path = "profileImages/\(user.username)"
+    
+    return try await withCheckedThrowingContinuation { continuation in
         FirebaseService.shared.uploadImage(image, path: path) { result in
-            // Handle the result of the upload
-            // If successful, update the profileImage
             switch result {
             case .success(let url):
                 Task {
-                    var newUser = user
-                    newUser.proPic = url
                     do {
-                      try await FirebaseService.shared.updateDocument(collection: "users", object: newUser)
+                        var newUser = user
+                        newUser.proPic = url
+                        try await FirebaseService.shared.updateField(collection: "users", documentId: newUser.id, field: "proPic", value: url)
+                        continuation.resume(returning: url)
                     } catch {
-                        print(error.localizedDescription)
+                        continuation.resume(throwing: error)
                     }
-                    return newUser
                 }
             case .failure(let error):
-                print("Error uploading image: \(error.localizedDescription)")
+                continuation.resume(throwing: error)
             }
         }
-        return user
     }
+}
 }

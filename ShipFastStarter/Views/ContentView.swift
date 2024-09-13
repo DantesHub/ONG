@@ -7,13 +7,14 @@
 
 import SwiftUI
 import SwiftData
+import FirebaseAuth
 
 struct ContentView: View {
     @EnvironmentObject var mainVM: MainViewModel
+    @EnvironmentObject var highschoolVM: HighSchoolViewModel
     @StateObject var authVM = AuthViewModel()
     @StateObject var pollVM = PollViewModel()
     @StateObject var inboxVM = InboxViewModel()
-    @StateObject var highschoolVM = HighSchoolViewModel()
     @StateObject var profileVM = ProfileViewModel()
     
     @Environment(\.modelContext) private var modelContext
@@ -22,10 +23,16 @@ struct ContentView: View {
     @State private var showDevTestingSheet = false
     @State private var tapCount = 0
     @State private var lastTapTime = Date()
+    @State private var offset: CGFloat = 0
+    @State private var swipeDirection: SwipeDirection = .none
+
+    enum SwipeDirection {
+        case left, right, none
+    }
 
     var body: some View {
         NavigationView {
-            GeometryReader { _ in
+            GeometryReader { geometry in
                 ZStack {
 //                    Color(.primaryBackground).edgesIgnoringSafeArea(.all)
                     switch mainVM.currentPage {
@@ -37,10 +44,11 @@ struct ContentView: View {
                             .environmentObject(mainVM)
                             .environmentObject(pollVM)
                             .environmentObject(profileVM)
+                            .environmentObject(highschoolVM)
                     case .home:
                         HomeScreen()
                     case .poll:
-                        PollScreen()
+                        PeopleScreen()
                             .environmentObject(profileVM)
                             .environmentObject(authVM)
                             .environmentObject(mainVM)
@@ -59,9 +67,41 @@ struct ContentView: View {
                             .environmentObject(mainVM)
                             .environmentObject(authVM)
                             .environmentObject(profileVM)
+                    case .friendRequests:
+                        FriendRequests()
+                            .environmentObject(profileVM)
+                            .environmentObject(inboxVM)
 
                     }
                 }
+                .offset(x: offset)
+                .gesture(
+                    DragGesture()
+                        .onChanged { gesture in
+                            if mainVM.currentPage != .onboarding && mainVM.currentPage != .splash {
+                                offset = gesture.translation.width
+                                swipeDirection = offset > 0 ? .right : .left
+                            }
+                        }
+                        .onEnded { _ in
+                            withAnimation {
+                                if abs(offset) > geometry.size.width * 0.25 {
+                                    switch swipeDirection {
+                                    case .left:
+                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                        navigateLeft()
+                                    case .right:
+                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                        navigateRight()
+                                    case .none:
+                                        break
+                                    }
+                                }
+                                offset = 0
+                                swipeDirection = .none
+                            }
+                        }
+                )
                 .onChange(of: mainVM.currUser) { newUser in
                     if let user = newUser, mainVM.currentPage == .inbox {
                         Task {
@@ -71,14 +111,17 @@ struct ContentView: View {
                 }
                 .onAppear {
                     authVM.isUserSignedIn()
+              
+                    
                     if UserDefaults.standard.bool(forKey: "finishedOnboarding") {
                         Task {
                             await mainVM.fetchUser()
                             
                             if let user = mainVM.currUser {
+                                await profileVM.fetchPeopleList(user: user)
                                 await fetchUserData(user)
                                 pollVM.checkCooldown(user: user)
-                                highschoolVM.checkHighSchoolLock(for: user)
+                                await highschoolVM.checkHighSchoolLock(for: user)
                                 
                                 if let endTime = pollVM.cooldownEndTime {
                                     pollVM.completedPoll = false
@@ -103,53 +146,123 @@ struct ContentView: View {
                         .environmentObject(mainVM)
                         .environmentObject(pollVM)
                 }
-          
             }
             .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
                     if mainVM.currentPage != .onboarding && mainVM.currentPage != .splash {
                         ToolbarItem(placement: .principal) {
                             HStack {
-                                Text("inbox") 
-                                    .sfPro(type: .bold, size: .h3p1)
-                                    .onTapGesture {
-                                        withAnimation {
-                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                            Analytics.shared.log(event: "Tabbar: Tapped Inbox")
-                                            mainVM.currentPage = .inbox
-                                        }
-                                    }.opacity(mainVM.currentPage == .inbox ? 1 : 0.3)
-                                Spacer()
-                                Text("play")
-                                    .sfPro(type: .bold, size: .h3p1)
-                                    .onTapGesture {
-                                        withAnimation {
-                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                            Analytics.shared.log(event: "Tabbar: Tapped Polls")
-                                            if let endTime = pollVM.cooldownEndTime {
-                                                pollVM.completedPoll = false
-                                                mainVM.currentPage = .cooldown
-                                            } else {
-                                                mainVM.currentPage = .poll
+                                if mainVM.currentPage == .friendRequests {
+                                    Spacer()
+                                }
+                                if mainVM.currentPage == .inbox || mainVM.currentPage == .friendRequests {
+                                    Text("add +")
+                                        .sfPro(type: .bold, size: .h3p1)
+                                        .onTapGesture {
+                                            withAnimation {
+                                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                                Analytics.shared.log(event: "Tabbar: Tapped Inbox")
+                                                mainVM.currentPage = .friendRequests
+                                            }
+                                        }.opacity(mainVM.currentPage == .friendRequests ? 1 : 0.3)
+                                    Spacer()
+                                }
+                                if mainVM.currentPage != .profile {
+                                    Text("inbox")
+                                        .sfPro(type: .bold, size: .h3p1)
+                                        .onTapGesture {
+                                            withAnimation {
+                                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                                Analytics.shared.log(event: "Tabbar: Tapped Inbox")
+                                                mainVM.currentPage = .inbox
+                                            }
+                                        }.opacity(mainVM.currentPage == .inbox ? 1 : 0.3)
+                                }
+                                
+                                if mainVM.currentPage != .friendRequests {
+                                    if mainVM.currentPage != .profile {
+                                        Spacer()
+                                    }
+                                    Text("play")
+                                        .sfPro(type: .bold, size: .h3p1)
+                                        .onTapGesture {
+                                            withAnimation {
+                                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                                Analytics.shared.log(event: "Tabbar: Tapped Polls")
+                                                if let endTime = pollVM.cooldownEndTime {
+                                                    pollVM.completedPoll = false
+                                                    mainVM.currentPage = .cooldown
+                                                } else {
+                                                    mainVM.currentPage = .poll
+                                                }
+                                            }
+                                        }.opacity(mainVM.currentPage == .poll || mainVM.currentPage == .cooldown ? 1 : 0.3)
+                                }
+                     
+                                if mainVM.currentPage != .inbox && mainVM.currentPage != .friendRequests {
+                                    Spacer()
+                                    Text("profile")
+                                        .sfPro(type: .bold, size: .h3p1)
+                                        .onTapGesture {
+                                            withAnimation {
+                                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                                Analytics.shared.log(event: "Tabbar: Tapped Profile")
+                                                mainVM.currentPage = .profile
                                             }
                                         }
-                                    }.opacity(mainVM.currentPage == .poll || mainVM.currentPage == .cooldown ? 1 : 0.3)
-                                Spacer()
-                                Text("profile")
-                                    .sfPro(type: .bold, size: .h3p1)
-                                    .onTapGesture {
-                                        withAnimation {
-                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                            Analytics.shared.log(event: "Tabbar: Tapped Profile")
-                                            mainVM.currentPage = .profile
-                                        }
+                                        .opacity(mainVM.currentPage == .profile ? 1 : 0.3)
+                                    if mainVM.currentPage == .profile {
+                                        Spacer()
                                     }
-                                    .opacity(mainVM.currentPage == .profile ? 1 : 0.3)
+                                }
+                              
                             }
                             .foregroundColor(.black)
                         }
                     }
                 }
+        }
+    }
+    
+    private func navigateLeft() {
+        switch mainVM.currentPage {
+        case .inbox:
+            if let endTime = pollVM.cooldownEndTime {
+                pollVM.completedPoll = false
+                mainVM.currentPage = .cooldown
+            } else {
+                mainVM.currentPage = .poll
+            }
+        case .poll:
+            mainVM.currentPage = .profile
+        case .cooldown:
+            mainVM.currentPage = .profile
+        case .profile:
+            break
+        case .friendRequests:
+            mainVM.currentPage = .inbox
+        default:
+            break
+        }
+    }
+    
+    private func navigateRight() {
+        switch mainVM.currentPage {
+        case .inbox:
+            mainVM.currentPage = .friendRequests
+        case .poll:
+            mainVM.currentPage = .inbox
+        case .profile:
+            if let endTime = pollVM.cooldownEndTime {
+                pollVM.completedPoll = false
+                mainVM.currentPage = .cooldown
+            } else {
+                mainVM.currentPage = .poll
+            }
+        case .cooldown:
+            mainVM.currentPage = .inbox
+        default:
+            break
         }
     }
     
@@ -199,20 +312,20 @@ struct DevTestingView: View {
         NavigationView {
             List {
                 Button("Reset Cooldown") {
-                    // Implement test feature 1
-                    let twelveHoursAgo = Date().addingTimeInterval(-12 * 60 * 60) // 12 hours before now
-                    mainVM.currUser?.lastPollFinished = twelveHoursAgo
+                    let sixHoursAgo = Date().addingTimeInterval(-6 * 60 * 60)
+                    mainVM.currUser?.lastPollFinished = sixHoursAgo
                     if let user = mainVM.currUser {
                         pollVM.resetCooldown(user: user)
+                        mainVM.currentPage = .poll
                     }
                 }
-                Button("finish onboarding") {
-                    // Implement test feature 2
+                Button("switch highschool") {
                     UserDefaults.standard.setValue(true, forKey: "finishedOnboarding")
-                    mainVM.currentPage = .poll
+                    mainVM.onboardingScreen = .highschool
+                    mainVM.currentPage = .onboarding
                 }
                 Button("Reset App State") {
-                    // Implement app state reset
+                    resetAppState()
                 }
                 // Add more testing options as needed
             }
@@ -221,6 +334,33 @@ struct DevTestingView: View {
                 presentationMode.wrappedValue.dismiss()
             })
         }
+    }
+    
+    private func resetAppState() {
+        // Reset all UserDefaults
+        if let bundleID = Bundle.main.bundleIdentifier {
+            UserDefaults.standard.removePersistentDomain(forName: bundleID)
+        }
+        
+        // Sign out of Firebase
+        do {
+            try Auth.auth().signOut()
+            print("Successfully signed out of Firebase")
+        } catch let signOutError as NSError {
+            print("Error signing out: %@", signOutError)
+        }
+        
+        // Reset MainViewModel state
+        mainVM.currUser = nil
+        mainVM.currentPage = .onboarding
+        mainVM.onboardingScreen = .first
+        
+        // Reset PollViewModel state
+        pollVM.resetState()
+        
+        // You might want to reset other ViewModels as well
+        
+        print("App state has been reset")
     }
 }
 

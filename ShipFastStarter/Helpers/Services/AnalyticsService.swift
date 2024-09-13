@@ -63,6 +63,43 @@ final class Analytics: ObservableObject {
             .store(in: &cancellables)
     }
     
+    func identifyUser(user: User) {
+        Mixpanel.mainInstance().identify(distinctId: user.id)
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        
+        let properties: [String: MixpanelType] = [
+            "id": user.id,
+            "firstName": user.firstName,
+            "lastName": user.lastName,
+            "username": user.username,
+            "schoolId": user.schoolId,
+            "color": user.color,
+            "aura": user.aura,
+            "godMode": user.godMode,
+            "birthday": dateFormatter.date(from: user.birthday) ?? Date(),
+            "grade": user.grade,
+            "number": user.number,
+            "votedPolls": user.votedPolls,
+            "lastPollFinished": user.lastPollFinished ?? Date(),
+            "friends": user.friends,
+            "invitedFriends": user.invitedFriends,
+            "ogBadge": user.ogBadge,
+            "gender": user.gender,
+            "fcmToken": user.fcmToken,
+            "proPic": user.proPic,
+            "referral": user.referral,
+            "crushId": user.crushId,
+            "friendsStatus": user.friendsStatus,
+            "friendRequests": user.friendRequests,
+            "dateJoined": dateFormatter.date(from: user.dateJoined) ?? Date()
+        ]
+        
+        Mixpanel.mainInstance().people.set(properties: properties)
+        Mixpanel.mainInstance().track(event: "User Identified", properties: properties)
+    }
+    
     func convertToMixpanelType(_ value: Any) -> MixpanelType? {
         if let value = value as? MixpanelType {
             return value

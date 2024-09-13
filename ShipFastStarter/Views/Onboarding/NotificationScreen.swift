@@ -101,10 +101,12 @@ struct NotificationScreen: View {
                     Analytics.shared.log(event: "Notifications: Denied Permission")
                 }
                 
-                // Move to the next screen regardless of the permission result
-                withAnimation {
-                    mainVM.onboardingScreen = .addFriends
-                }
+            
+                    // Move to the next screen only if the app is in the foreground
+                    withAnimation {
+                        mainVM.onboardingScreen = .addFriends
+                    }
+               
             }
         }
     }

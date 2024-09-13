@@ -28,7 +28,7 @@ class InboxViewModel: ObservableObject {
     @Published var oldUsersWhoVoted: [InboxItem] = []
     @Published var newUsersWhoVoted: [InboxItem] = []
     @Published var currentFourOptions: [PollOption] = []
-    @Published var friendRequests: [FriendRequest] = [FriendRequest.exRequest]
+    @Published var friendRequests: [FriendRequest] = []
 
     func tappedNotificationRow() {
         if let option = selectedPollOption, let poll = selectedPoll {
@@ -53,6 +53,7 @@ class InboxViewModel: ObservableObject {
     }
     
     func fetchFriendRequests(for user: User) async {
+        friendRequests = []
         do {
             for friendRequest in user.friendRequests {
                 // fetch friend

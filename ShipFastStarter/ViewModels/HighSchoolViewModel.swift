@@ -20,6 +20,7 @@ class HighSchoolViewModel: ObservableObject {
     @Published var schools: [School] = []
     @Published var searchQuery = ""
     @Published var isHighSchoolLocked = false
+    @Published var totalKids = 0
     private var cancellables = Set<AnyCancellable>()
     
     init() {
@@ -32,7 +33,7 @@ class HighSchoolViewModel: ObservableObject {
             .store(in: &cancellables)        
     }
     
-    func checkHighSchoolLock(for user: User) {
+    func checkHighSchoolLock(for user: User) async {
         Task {
             do {
                 let users: [User] = try await FirebaseService.shared.fetchDocuments(
@@ -42,10 +43,11 @@ class HighSchoolViewModel: ObservableObject {
                 )
                 
                 let userCount = users.count
-                
-                DispatchQueue.main.async {
+                totalKids = userCount
                     // Adjust this threshold as needed
-                    self.isHighSchoolLocked = userCount >= 50
+                self.isHighSchoolLocked = userCount <= 16
+                DispatchQueue.main.async {
+                    self.objectWillChange.send()
                 }
             } catch {
                 print("Error checking high school lock: \(error.localizedDescription)")

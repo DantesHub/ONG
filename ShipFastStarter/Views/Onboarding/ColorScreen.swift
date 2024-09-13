@@ -20,6 +20,7 @@ struct ColorScreen: View {
         VStack {
             Text("finally, pick a color")
                 .sfPro(type: .bold, size: .h1)
+            .foregroundColor(.black)
             Text("keep this a secret 🤫")
                 .sfPro(type: .medium, size: .h2)
                 .foregroundColor(.gray)
@@ -39,9 +40,9 @@ struct ColorScreen: View {
                                         if let currUser = mainVM.currUser {
                                             Task {
                                                 try await FirebaseService.shared.updateDocument(collection: "users", object: currUser)
-                                            }                                  
+                                                Analytics.shared.identifyUser(user: currUser)
+                                            }
                                         }
-                                        
                                         mainVM.currentPage = .poll
                                     }
                                 }

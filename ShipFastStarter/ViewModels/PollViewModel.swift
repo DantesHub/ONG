@@ -132,8 +132,8 @@ class PollViewModel: ObservableObject {
                 updatedPoll.pollOptions[optionIndex].votes = [:]
             }
             if var voteObj = updatedPoll.pollOptions[optionIndex].votes?[user.id] {
-                var currentVotes = Int(voteObj["numVotes"] ?? "1") ?? 1
-                currentVotes += 1
+                var currentVotes = Int(voteObj["numVotes"] ?? "100") ?? 100
+                currentVotes += 100
                 updatedPoll.pollOptions[optionIndex].votes?[user.id] = [
                     "date": dateString,
                     "numVotes": String(currentVotes),
@@ -142,7 +142,7 @@ class PollViewModel: ObservableObject {
             } else {
                 updatedPoll.pollOptions[optionIndex].votes?[user.id] = [
                     "date": dateString,
-                    "numVotes": "1",
+                    "numVotes": "100",
                     "viewedNotification": "false"
                 ]
             }
@@ -173,6 +173,8 @@ class PollViewModel: ObservableObject {
                 
                 var updatedUser = user
                 updatedUser.votedPolls.append(updatedPoll.id)
+                updatedUser.aura += 100
+                
                 try await FirebaseService.shared.updateDocument(
                     collection: "users",
                     object: updatedUser
@@ -187,7 +189,7 @@ class PollViewModel: ObservableObject {
     }
 
     func createPoll(user: User) async {
-        var potentialQuestions = Question.allQuestions.filter { question in
+        var potentialQuestions = Question.bsQuestions.filter { question in
             !allPolls.contains { $0.title == question.question }
         }
 
@@ -400,7 +402,7 @@ class PollViewModel: ObservableObject {
     }
 
     func updateQuestionEmoji() {
-        if let matchingQuestion = Question.allQuestions.first(where: { $0.question == selectedPoll.title }) {
+        if let matchingQuestion = Question.bsQuestions.first(where: { $0.question == selectedPoll.title }) {
             self.questionEmoji = matchingQuestion.emoji
         } else {
             self.questionEmoji = "❓"
@@ -422,14 +424,23 @@ class PollViewModel: ObservableObject {
     }
 
     func finishPoll(user: User) {
-        let cooldownDuration: TimeInterval = 12 * 60 * 60
+        let cooldownDuration: TimeInterval = 6 * 60 * 60
         cooldownEndTime = Date().addingTimeInterval(cooldownDuration)
         startCooldownTimer()
+        
+        // Schedule notification for 6 hours from now
+        let notificationDate = Date().addingTimeInterval(cooldownDuration)
+        NotificationManager.scheduleNotification(
+            title: "New polls are open!",
+            body: "Collect bread, and get ur aura up",
+            date: notificationDate
+        )
         
         Task {
             do {
                 var updatedUser = user
                 updatedUser.lastPollFinished = Date()
+                updatedUser.aura += 300
                 try await FirebaseService.shared.updateDocument(
                     collection: "users",
                     object: updatedUser
@@ -442,7 +453,7 @@ class PollViewModel: ObservableObject {
 
     func checkCooldown(user: User) {
         if let lastPollFinished = user.lastPollFinished {
-            let cooldownDuration: TimeInterval = 12 * 60 * 60
+            let cooldownDuration: TimeInterval = 6 * 60 * 60
             let cooldownEndTime = lastPollFinished.addingTimeInterval(cooldownDuration)
             if Date() < cooldownEndTime {
                 self.cooldownEndTime = cooldownEndTime
@@ -458,7 +469,7 @@ class PollViewModel: ObservableObject {
     }
 
     func resetCooldown(user: User) {
-        let twelveHoursAgo = Date().addingTimeInterval(-12 * 60 * 60)
+        let twelveHoursAgo = Date().addingTimeInterval(-6 * 60 * 60)
         cooldownEndTime = nil
         timeRemaining = 0
         stopCooldownTimer()
@@ -511,5 +522,12 @@ class PollViewModel: ObservableObject {
         Task { @MainActor in
             self.stopCooldownTimer()
         }
+    }
+
+    func resetState() {
+        // Reset all relevant properties
+        self.completedPoll = false
+        self.cooldownEndTime = nil
+        // Reset any other properties as needed
     }
 }

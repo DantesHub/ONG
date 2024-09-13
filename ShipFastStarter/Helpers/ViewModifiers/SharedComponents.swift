@@ -84,7 +84,7 @@ struct SharedComponents {
         var title: String
         var isDisabled: Bool
         var isOption: Bool
-        @State private var opacity: Double = 1
+        @State private var isPressed: Bool = false
         var action: () -> Void
         
         init(img: Image? = nil, title: String = "Continue", isOption: Bool = false, action: @escaping () -> Void, isDisabled: Bool = false) {
@@ -96,16 +96,7 @@ struct SharedComponents {
          }
         
         var body: some View {
-            Button(action: {
-                UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                self.opacity = 0.7
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                    withAnimation(.spring()) {
-                        self.opacity = 1
-                        self.action()
-                    }
-                }
-            }) {
+      
                 ZStack {
                     RoundedRectangle(cornerRadius: 16)
                         .fill(Color.white)
@@ -130,16 +121,30 @@ struct SharedComponents {
                         }
                     }.padding(.horizontal, 32)
                 }
+                .onTapGesture {
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        withAnimation(.spring()) {
+                            self.isPressed = true
+                            isPressed = true
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                                isPressed = false
+                            }
+                            self.action()
+                        }
+                    }
+                }
                 .frame(height: isOption ? 104 : 72)
-                .scaleEffect(opacity == 1 ? 1 : 0.95)
-                .opacity(opacity)
-            }
-            .disabled(isDisabled)
-            .opacity(isDisabled ? 0.5 : 1)
-            .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 4)
-            .primaryShadow()
+                .opacity(1)
+                .disabled(isDisabled)
+                .opacity(isDisabled ? 0.5 : 1)
+                .drawingGroup()
+                .shadow(color: Color.black, radius: 0, x: 0, y: isPressed ? 2 : 6)
+                .offset(y: isPressed ? 2 : 0)
+                .animation(.easeOut(duration: 0.2), value: isPressed)
         }
     }
+
 
     
     struct SecondaryButton: View {
@@ -214,10 +219,18 @@ struct SharedComponents {
     struct Divider: View {
         var body: some View {
             Rectangle()
+                .foregroundColor(.black)
                 .frame(width: UIScreen.size.width, height: 2)
                 .opacity(0.2)
                 .padding(.vertical)
         }
     }
 
+}
+
+
+#Preview {
+    SharedComponents.PrimaryButton(title: "gang") {
+        
+    }
 }

@@ -23,6 +23,7 @@ struct ShipFastStarterApp: App {
     @Environment(\.scenePhase) private var scenePhase
     @StateObject var mainVM: MainViewModel = MainViewModel()
     @StateObject var pollVM: PollViewModel = PollViewModel()
+    @StateObject var highschoolVM: HighSchoolViewModel = HighSchoolViewModel()
     @State private var showSplash = true
 
     init() {
@@ -51,13 +52,37 @@ struct ShipFastStarterApp: App {
                 ContentView()
                     .environmentObject(mainVM)
                     .environmentObject(pollVM)
-                
+                    .environmentObject(highschoolVM)
+
                 if showSplash {
                     SplashScreen()
                         .transition(.opacity)
                         .zIndex(1)
                 }
             }
+            .colorScheme(.dark)
+            .onChange(of: scenePhase) { oldPhase, newPhase in
+                    switch newPhase {
+                    case .active:
+                        if mainVM.onboardingScreen == .lockedHighschool, let currUser = mainVM.currUser {
+                            if !UserDefaults.standard.bool(forKey: "finishedOnboarding") {
+                                Task {
+                                    await highschoolVM.checkHighSchoolLock(for: currUser)
+                                    if !highschoolVM.isHighSchoolLocked {
+                                        mainVM.onboardingScreen = .addFriends
+                                    }
+                                }
+                            }
+                          
+                        }
+                    case .background:
+                        break
+                    case .inactive:
+                        break
+                    @unknown default:
+                        break
+                    }
+             }
             .onAppear {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                     withAnimation {
@@ -97,11 +122,11 @@ private extension ShipFastStarterApp {
 //        AppsFlyerLib.shared().isDebug = false
 //        AppsFlyerLib.shared().
         
-        Mixpanel.initialize(token: "", trackAutomaticEvents: false)
+        Mixpanel.initialize(token: "0db0afbd0e56adaa92a546dffc39b398", trackAutomaticEvents: false)
         Mixpanel.mainInstance().track(event: "App Start")
         Mixpanel.mainInstance().identify(distinctId: userId)
 //        UserDefaults.standard.setValue(true, forKey: "finishedOnboarding")
-        UserDefaults.standard.setValue("+12012222222", forKey: "userNumber")
+//        UserDefaults.standard.setValue("+12012222222", forKey: "userNumber")
     }
 }
 
@@ -186,7 +211,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         print("token",deviceToken.toJsonString())
         Messaging.messaging().apnsToken = deviceToken
-        Auth.auth().setAPNSToken(deviceToken, type: .sandbox)
+        Auth.auth().setAPNSToken(deviceToken, type: .prod)
     }
     
     func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {

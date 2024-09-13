@@ -1,21 +1,28 @@
 import SwiftUI
 
 struct InviteFriendsModal: View {
+    @EnvironmentObject var mainVM: MainViewModel
     @State private var isShareSheetPresented = false
 
     var body: some View {
         ZStack {
-            Color.black.edgesIgnoringSafeArea(.all)
+          
+                Color.black.edgesIgnoringSafeArea(.all)
+            
             VStack(spacing: 12) {
                 // Title
                 Text("invite friends from buildspace")
                     .sfPro(type: .bold, size: .h3)
-                    .foregroundColor(.white)
-                
-                // Subtitle
-                Text("5 more needed to unlock")
-                    .sfPro(type: .medium, size: .p2)
-                    .foregroundColor(.white.opacity(0.9))
+                    .foregroundColor(.white) 
+                if mainVM.currentPage == .friendRequests {
+//                    Color.white.edgesIgnoringSafeArea(.all)
+                } else {
+                    // Subtitle
+                    Text("5 more needed to unlock")
+                        .sfPro(type: .medium, size: .p2)
+                        .foregroundColor(.white.opacity(0.9))
+                }
+           
                 
                 // Buttons
                 HStack(spacing: 16) {
@@ -77,7 +84,7 @@ struct InviteFriendsModal: View {
                             .cornerRadius(17)
                             .padding(.horizontal)
                     }.simultaneousGesture(TapGesture().onEnded() {
-                        print("clicked")
+                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
                         Analytics.shared.log(event: "InviteModal: Tapped Share")
                     })
                 }
@@ -107,5 +114,6 @@ struct ShareSheet: UIViewControllerRepresentable {
 struct InviteFriendsModal_Previews: PreviewProvider {
     static var previews: some View {
         InviteFriendsModal()
+            .environmentObject(MainViewModel())
     }
 }

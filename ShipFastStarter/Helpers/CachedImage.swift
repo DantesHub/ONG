@@ -17,34 +17,40 @@ class ImageCache {
     
     func set(_ image: UIImage, forKey key: String) {
         cache.setObject(image, forKey: NSString(string: key))
+        print("Cached image for key: \(key)")
+    }
+    
+    func remove(forKey key: String) {
+        cache.removeObject(forKey: NSString(string: key))
+        print("Removed cached image for key: \(key)")
     }
     
     func preloadImages(urls: [URL]) async {
-         await withTaskGroup(of: Void.self) { group in
-             for url in urls {
-                 group.addTask {
-                     await self.preloadImage(url: url)
-                 }
-             }
-         }
-     }
-     
-     private func preloadImage(url: URL) async {
-         // If the image is already cached, skip downloading
-         if self.get(forKey: url.absoluteString) != nil {
-             return
-         }
-         
-         do {
-             let (data, _) = try await URLSession.shared.data(from: url)
-             if let uiImage = UIImage(data: data) {
-                 self.set(uiImage, forKey: url.absoluteString)
-                 print("Preloaded image: \(url.absoluteString)")
-             }
-         } catch {
-             print("Failed to preload image: \(url.absoluteString), error: \(error.localizedDescription)")
-         }
-     }
+        await withTaskGroup(of: Void.self) { group in
+            for url in urls {
+                group.addTask {
+                    await self.preloadImage(url: url)
+                }
+            }
+        }
+    }
+    
+    private func preloadImage(url: URL) async {
+        if self.get(forKey: url.absoluteString) != nil {
+            print("Image already cached for URL: \(url.absoluteString)")
+            return
+        }
+        
+        do {
+            let (data, _) = try await URLSession.shared.data(from: url)
+            if let uiImage = UIImage(data: data) {
+                self.set(uiImage, forKey: url.absoluteString)
+                print("Preloaded image: \(url.absoluteString)")
+            }
+        } catch {
+            print("Failed to preload image: \(url.absoluteString), error: \(error.localizedDescription)")
+        }
+    }
 }
 
 struct CachedAsyncImage<Content: View>: View {
@@ -64,40 +70,51 @@ struct CachedAsyncImage<Content: View>: View {
         self.transaction = transaction
         self.content = content
         
-        if let url = url,
-           let cachedImage = ImageCache.shared.get(forKey: url.absoluteString) {
-            _phase = State(initialValue: .success(Image(uiImage: cachedImage)))
-        } else {
-            _phase = State(initialValue: .empty)
-        }
+        _phase = State(initialValue: .empty)
     }
     
     var body: some View {
-        if let url = url {
-            content(phase)
-                .task {
-                    if case .empty = phase {
-                        await load(url: url)
-                    }
+        content(phase)
+            .onAppear {
+                if let url = url {
+                    loadImage(url: url)
                 }
-        } else {
-            content(.empty)
-        }
+            }
+            .onChange(of: url) { newURL in
+                if let newURL = newURL {
+                    loadImage(url: newURL)
+                } else {
+                    phase = .empty
+                }
+            }
     }
     
-    private func load(url: URL) async {
-        do {
-            let (data, _) = try await URLSession.shared.data(from: url)
-            if let uiImage = UIImage(data: data) {
-                ImageCache.shared.set(uiImage, forKey: url.absoluteString)
-                withAnimation(transaction.animation) {
-                    phase = .success(Image(uiImage: uiImage))
+    private func loadImage(url: URL) {
+        if let cachedImage = ImageCache.shared.get(forKey: url.absoluteString) {
+            print("Using cached image for URL: \(url.absoluteString)")
+            phase = .success(Image(uiImage: cachedImage))
+        } else {
+            print("Loading image for URL: \(url.absoluteString)")
+            phase = .empty
+            
+            Task {
+                do {
+                    let (data, _) = try await URLSession.shared.data(from: url)
+                    if let uiImage = UIImage(data: data) {
+                        ImageCache.shared.set(uiImage, forKey: url.absoluteString)
+                        withAnimation(transaction.animation) {
+                            phase = .success(Image(uiImage: uiImage))
+                        }
+                        print("Successfully loaded and cached image for URL: \(url.absoluteString)")
+                    } else {
+                        print("Failed to create UIImage from data for URL: \(url.absoluteString)")
+                        phase = .failure(URLError(.cannotDecodeContentData))
+                    }
+                } catch {
+                    print("Error loading image for URL: \(url.absoluteString), error: \(error.localizedDescription)")
+                    phase = .failure(error)
                 }
-            } else {
-                phase = .failure(URLError(.cannotDecodeContentData))
             }
-        } catch {
-            phase = .failure(error)
         }
     }
 }

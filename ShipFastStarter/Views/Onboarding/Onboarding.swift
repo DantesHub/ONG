@@ -14,6 +14,7 @@ struct OnboardingView: View {
     @EnvironmentObject var authVM: AuthViewModel
     @EnvironmentObject var pollVM: AuthViewModel
     @EnvironmentObject var profileVM: ProfileViewModel
+    @EnvironmentObject var highschoolVM: HighSchoolViewModel
     @State private var currentProgressIndex: Int = 0
     
     let totalSteps = 10
@@ -62,10 +63,7 @@ struct OnboardingView: View {
                     case .gender: GenderScreen()
                     case .birthday: BirthdayScreen()
                     case .name: NameScreen()
-                    case .number: 
-                        NumberScreen()
-                        .environmentObject(authVM)
-                        .environmentObject(mainVM)
+                    case .number: NumberScreen()
                     case .contacts: ContactsScreen()
                     case .location: LocationScreen()
                     case .highschool: HighSchoolScreen()
@@ -76,6 +74,7 @@ struct OnboardingView: View {
                     case .uploadProfile: UploadProfileScreen()
                     case .notification: NotificationScreen() 
                     case .addFriends: PeopleScreen()
+                    case .lockedHighschool: LockedHighschoolScreen()
                 }
             }
        }.onChange(of: mainVM.onboardingScreen) { newValue in
@@ -90,7 +89,7 @@ struct OnboardingView: View {
             case .age:
                 mainVM.onboardingScreen = .first
             case .gender:
-                mainVM.onboardingScreen = .gender
+                mainVM.onboardingScreen = .grade
             case .birthday:
                 mainVM.onboardingScreen = .gender
             case .name:
@@ -102,9 +101,9 @@ struct OnboardingView: View {
             case .location:
                 mainVM.onboardingScreen = .birthday
             case .grade:
-                mainVM.onboardingScreen = .highschool
+                mainVM.onboardingScreen = .birthday
             case .lastName:
-                mainVM.onboardingScreen = .first
+                mainVM.onboardingScreen = .name
             case .highschool:
                 mainVM.onboardingScreen = .location
             case .username:
@@ -117,13 +116,15 @@ struct OnboardingView: View {
                 mainVM.onboardingScreen = .addFriends
             case .addFriends:
                 mainVM.onboardingScreen = .uploadProfile
+            case .lockedHighschool:
+                mainVM.onboardingScreen = .highschool
         }
     }
 
     func updateProgressIndex(for screen: OnboardingScreenType) {
 //        let screenOrder: [OnboardingScreenType] = [.first, .birthday, .location, .grade, .name, .lastName, .username]
 
-        let screenOrder: [OnboardingScreenType] = [.first, .birthday, .grade, .gender, .name, .lastName, .username, .number, .uploadProfile, .addFriends, .notification, .color]
+        let screenOrder: [OnboardingScreenType] = [.first, .birthday, .grade, .gender, .name, .lastName, .username, .number, .uploadProfile, .highschool, .lockedHighschool, .addFriends, .notification, .color]
         if let index = screenOrder.firstIndex(of: screen) {
             currentProgressIndex = min(index, totalSteps)
         }
@@ -147,6 +148,7 @@ enum OnboardingScreenType {
     case uploadProfile
     case notification
     case addFriends
+    case lockedHighschool
 }
 
 struct CustomProgressViewStyle: ProgressViewStyle {

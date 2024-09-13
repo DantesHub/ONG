@@ -37,8 +37,9 @@ struct User: Codable, Equatable, FBObject {
     var crushId: String
     var friendsStatus: String = "Add +"
     var friendRequests: [String: String]  // New property added
+    var dateJoined: String  // New property added
 
-    init(id: String, firstName: String, lastName: String, username: String, schoolId: String, color: String, aura: Int, godMode: Bool, birthday: String, grade: String, number: String, votedPolls: [String], lastPollFinished: Date?, friends: [String: String], invitedFriends: [String], ogBadge: Bool, gender: String, fcmToken: String, proPic: String, referral: Int = 0, crushId: String = "", friendRequests: [String: String]) {
+    init(id: String, firstName: String, lastName: String, username: String, schoolId: String, color: String, aura: Int, godMode: Bool, birthday: String, grade: String, number: String, votedPolls: [String], lastPollFinished: Date?, friends: [String: String], invitedFriends: [String], ogBadge: Bool, gender: String, fcmToken: String, proPic: String, referral: Int = 0, crushId: String = "", friendRequests: [String: String], dateJoined: String) {
         self.id = id
         self.firstName = firstName
         self.lastName = lastName
@@ -60,7 +61,8 @@ struct User: Codable, Equatable, FBObject {
         self.proPic = proPic
         self.referral = referral
         self.crushId = crushId
-        self.friendRequests = friendRequests  // Initialize the new property
+        self.friendRequests = friendRequests
+        self.dateJoined = dateJoined  // Initialize the new property
     }
 
     static var exUser = User(
@@ -74,7 +76,7 @@ struct User: Codable, Equatable, FBObject {
         godMode: false,
         birthday: "2000-01-01",
         grade: "11",
-        number: "1234567890",
+        number: "+12013333333",
         votedPolls: [],
         lastPollFinished: nil,
         friends: [:],
@@ -85,7 +87,8 @@ struct User: Codable, Equatable, FBObject {
         proPic: "https://firebasestorage.googleapis.com/v0/b/ongod-fce40.appspot.com/o/profileImages%2FOkl?alt=media&token=000ea88e-bce7-4167-b332-5df492744d68",
         referral: 0,
         crushId: "",
-        friendRequests: [:]
+        friendRequests: [:],
+        dateJoined: "2024-09-15"  // Example date, you can adjust as needed
     )
 
     
@@ -97,7 +100,7 @@ struct User: Codable, Equatable, FBObject {
     }
 
     enum CodingKeys: String, CodingKey {
-        case id, firstName, lastName, username, schoolId, color, aura, godMode, birthday, grade, number, votedPolls, lastPollFinished, friends, invitedFriends, ogBadge, gender, fcmToken, proPic, referral, crushId, friendRequests
+        case id, firstName, lastName, username, schoolId, color, aura, godMode, birthday, grade, number, votedPolls, lastPollFinished, friends, invitedFriends, ogBadge, gender, fcmToken, proPic, referral, crushId, friendRequests, dateJoined
     }
 
     init(from decoder: Decoder) throws {
@@ -124,6 +127,7 @@ struct User: Codable, Equatable, FBObject {
         referral = try container.decodeIfPresent(Int.self, forKey: .referral) ?? 0
         crushId = try container.decodeIfPresent(String.self, forKey: .crushId) ?? ""
         friendRequests = try container.decodeIfPresent([String: String].self, forKey: .friendRequests) ?? ["shiva":"shiva2"]  // Changed to dictionary
+        dateJoined = try container.decodeIfPresent(String.self, forKey: .dateJoined) ?? Date().toString(format: "yyyy-MM-dd")
         // Custom decoding for lastPollFinished
         if let lastPollFinishedTimestamp = try? container.decode(Double.self, forKey: .lastPollFinished) {
             lastPollFinished = Date(timeIntervalSince1970: lastPollFinishedTimestamp)

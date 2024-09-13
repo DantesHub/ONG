@@ -75,8 +75,16 @@ struct UploadProfileScreen: View {
                     .padding(.top)
                     SharedComponents.PrimaryButton(title: "next") {
                         if let user = mainVM.currUser {
-                            mainVM.currUser = profileVM.uploadUserProfilePicture(image: profileImage, user: user)
-                            mainVM.onboardingScreen = .notification
+                            Task {
+                                do {
+                                    mainVM.currUser?.proPic = try await profileVM.uploadUserProfilePicture(image: profileVM.profileImage!, user: user)
+                                } catch {
+                                    print(error.localizedDescription)
+                                }
+                                
+                                print(mainVM.currUser?.proPic, "like wdym bro?")
+                            }
+                            mainVM.onboardingScreen = .highschool
                         }
                        
                     }.padding(.horizontal, 32)
@@ -97,12 +105,6 @@ struct UploadProfileScreen: View {
             }
             .sheet(isPresented: $profileVM.showingImagePicker) {
                 ImagePicker(sourceType: profileVM.sourceType, selectedImage: $profileVM.profileImage)
-            }
-            .onChange(of: profileVM.profileImage) {
-                if let user = mainVM.currUser {
-                    UserDefaults.standard.setValue(true, forKey: "uploadedProPic")
-                    mainVM.currUser = profileVM.uploadUserProfilePicture(image: profileVM.profileImage!, user: user)
-                }
             }
         }
     }

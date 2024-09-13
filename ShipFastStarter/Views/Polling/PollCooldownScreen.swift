@@ -12,7 +12,8 @@ struct PollCooldownScreen: View {
     @EnvironmentObject var pollVM: PollViewModel
     @EnvironmentObject var mainVM: MainViewModel
     @State private var timer: Timer?
-
+    @State private var showShareSheet = false
+    
     var body: some View {
         Group {
             if pollVM.completedPoll {
@@ -22,6 +23,7 @@ struct PollCooldownScreen: View {
                 ZStack {
                     Color.primaryBackground.ignoresSafeArea()
                     VStack(spacing: 0) {
+                        Spacer()
                         Text("new polls in")
                             .sfPro(type: .bold, size: .h1)
                             .foregroundColor(.white)
@@ -43,7 +45,10 @@ struct PollCooldownScreen: View {
                             SharedComponents.PrimaryButton(
                                 title: "Invite a friend",
                                 action: {
-                                    // Implement skip the wait functionality
+                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                    withAnimation {
+                                        showShareSheet = true
+                                    }
                                 }
                             )
                         }
@@ -56,8 +61,14 @@ struct PollCooldownScreen: View {
                         //     }
                         // }
                         // .padding(.bottom, 32)
+                        Spacer()
+                        Spacer()
                     }
-                    .padding(.top, 64)
+                    .padding(.top, 42)
+                }  .sheet(isPresented: $showShareSheet) {
+                    InviteFriendsModal()
+                        .presentationDetents([.height(300)])
+                        .presentationDragIndicator(.visible)
                 }
             }
        

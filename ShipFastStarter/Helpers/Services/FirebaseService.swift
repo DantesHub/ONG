@@ -345,45 +345,46 @@ class FirebaseService {
 
   func uploadImage(_ image: UIImage, path: String, completion: @escaping (Result<String, Error>) -> Void) {
     print("Starting image upload process for path: \(path)")
-    
-    guard let imageData = image.jpegData(compressionQuality: 0.5) else {
-        print("Failed to convert image to JPEG data")
-        completion(.failure(NSError(domain: "FirebaseService", code: 0, userInfo: [NSLocalizedDescriptionKey: "Failed to convert image to data"])))
-        return
-    }
-    
-    print("Image converted to JPEG data. Size: \(imageData.count) bytes")
-
-    let imageRef = storage.child(path)
-    print("Uploading image to Firebase Storage at path: \(path)")
-    
-    imageRef.putData(imageData, metadata: nil) { metadata, error in
-        if let error = error {
-            print("Error uploading image: \(error.localizedDescription)")
-            completion(.failure(error))
-            return
-        }
-        
-        print("Image uploaded successfully. Metadata: \(String(describing: metadata))")
-        
-        // Fetch the download URL
-        imageRef.downloadURL { url, error in
-            if let error = error {
-                print("Error getting download URL: \(error.localizedDescription)")
-                completion(.failure(error))
-                return
-            }
-            
-            guard let downloadURL = url else {
-                print("Download URL is nil")
-                completion(.failure(NSError(domain: "FirebaseService", code: 0, userInfo: [NSLocalizedDescriptionKey: "Failed to get download URL"])))
-                return
-            }
-            
-            print("Download URL obtained successfully: \(downloadURL.absoluteString)")
-            completion(.success(downloadURL.absoluteString))
-        }
-    }
+      if  let newImage = image.resized(to: CGSize(width: 256, height: 256)) {
+          guard let imageData = newImage.jpegData(compressionQuality: 0.5) else {
+              print("Failed to convert image to JPEG data")
+              completion(.failure(NSError(domain: "FirebaseService", code: 0, userInfo: [NSLocalizedDescriptionKey: "Failed to convert image to data"])))
+              return
+          }
+          
+          print("Image converted to JPEG data. Size: \(imageData.count) bytes")
+          
+          let imageRef = storage.child(path)
+          print("Uploading image to Firebase Storage at path: \(path)")
+          
+          imageRef.putData(imageData, metadata: nil) { metadata, error in
+              if let error = error {
+                  print("Error uploading image: \(error.localizedDescription)")
+                  completion(.failure(error))
+                  return
+              }
+              
+              print("Image uploaded successfully. Metadata: \(String(describing: metadata))")
+              
+              // Fetch the download URL
+              imageRef.downloadURL { url, error in
+                  if let error = error {
+                      print("Error getting download URL: \(error.localizedDescription)")
+                      completion(.failure(error))
+                      return
+                  }
+                  
+                  guard let downloadURL = url else {
+                      print("Download URL is nil")
+                      completion(.failure(NSError(domain: "FirebaseService", code: 0, userInfo: [NSLocalizedDescriptionKey: "Failed to get download URL"])))
+                      return
+                  }
+                  
+                  print("Download URL obtained successfully: \(downloadURL.absoluteString)")
+                  completion(.success(downloadURL.absoluteString))
+              }
+          }
+      }
 }
 
     func fetchImage(path: String, completion: @escaping (Result<UIImage, Error>) -> Void) {
@@ -429,4 +430,24 @@ class PhoneAuthUIDelegate: NSObject, AuthUIDelegate {
             topController.dismiss(animated: flag, completion: completion)
         }
     }
+}
+
+import UIKit
+extension UIImage {
+    func resized(to size: CGSize) -> UIImage? {
+      let aspectWidth = size.width / self.size.width
+      let aspectHeight = size.height / self.size.height
+      let aspectRatio = min(aspectWidth, aspectHeight)
+      
+      let newSize = CGSize(width: self.size.width * aspectRatio, height: self.size.height * aspectRatio)
+      
+      UIGraphicsBeginImageContextWithOptions(newSize, false, 1.0)
+      let context = UIGraphicsGetCurrentContext()
+      context?.interpolationQuality = .high
+      self.draw(in: CGRect(origin: CGPoint(x: 0, y: 0), size: newSize))
+      let resizedImage = UIGraphicsGetImageFromCurrentImageContext()
+      UIGraphicsEndImageContext()
+      return resizedImage
+    }
+    
 }

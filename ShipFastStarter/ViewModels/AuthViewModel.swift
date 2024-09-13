@@ -75,6 +75,7 @@ class AuthViewModel: ObservableObject {
 
                 completion(.success(authResult))
             }
+                                    
         }
     }
     

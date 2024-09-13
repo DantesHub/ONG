@@ -9,7 +9,11 @@ import SwiftUI
 
 struct LockedHighschoolScreen: View {
     @EnvironmentObject var mainVM: MainViewModel
+    @EnvironmentObject var highschoolVM: HighSchoolViewModel
+    @EnvironmentObject var profileVM: ProfileViewModel
     @State private var showShareSheet = false
+    @State private var showPeopleSheet = false
+
     
     var body: some View {
         ZStack {
@@ -57,7 +61,7 @@ struct LockedHighschoolScreen: View {
                         .offset(x: -80, y: -80)
                         .rotationEffect(.degrees(-12))
                     VStack(spacing: -12) {
-                        Text("5")
+                        Text("\(20 - highschoolVM.totalKids) more")
                         Text("needed")
                         Text("to unlock")
                     }
@@ -70,17 +74,20 @@ struct LockedHighschoolScreen: View {
                         .stroke(color: .black, width: 2)
                         .offset(x: 60, y: -90)
                         .rotationEffect(.degrees(9))
-                }.padding(.bottom, 32)
-                Text("hey! your school is still locked.")
-                    .sfPro(type: .bold, size: .h1)
-                    .multilineTextAlignment(.center)
-                    .foregroundColor(Color.white)
-                    .padding(.horizontal)
-                Text("you can earn bread, limited profile badges, aura for inviting ur friends to ong.")
-                    .sfPro(type: .semibold, size: .h3p1)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 48)
-                    .foregroundColor(Color.white)
+                }.padding(.bottom, 24)
+                VStack(spacing: 8) {
+                    Text("hey! your school is still locked.")
+                        .sfPro(type: .bold, size: .h1)
+                        .multilineTextAlignment(.center)
+                        .foregroundColor(Color.white)
+                        .padding(.horizontal)
+                    Text("earn bread, limited profile badges, aura for inviting ur friends to ong.")
+                        .sfPro(type: .semibold, size: .h3p1)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 32)
+                        .foregroundColor(Color.white)
+                }
+                .frame(height: 140)
                 VStack(spacing: -32) {
                     HStack(spacing: 0) {
                         StickerView(text: "🚀", rotation: 6)
@@ -143,9 +150,22 @@ struct LockedHighschoolScreen: View {
                     showShareSheet.toggle()
                 }
                 .padding(.horizontal, 24)
-                .padding(.bottom, 24)
+                
+                Text("check who's already on")
+                    .sfPro(type: .bold, size: .h3p1)
+                    .foregroundColor(.white)
+                    .underline()
+                    .padding(.top)
+                    .padding(.bottom, 24)
+                    .onTapGesture {
+                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                        withAnimation {
+                            showPeopleSheet.toggle()
+                        }
+                    }
          
             }
+            
             if showShareSheet {
                 Color.black.edgesIgnoringSafeArea(.all).opacity(0.5)
                     .onTapGesture {
@@ -154,13 +174,29 @@ struct LockedHighschoolScreen: View {
                         }
                     }
             }
+            
         }
         .navigationBarBackButtonHidden(true)
         .onAppearAnalytics(event: "LockedHighschoolScreen: Screenload")
         .sheet(isPresented: $showShareSheet) {
             InviteFriendsModal()
+                .environmentObject(mainVM)
                 .presentationDetents([.height(350)])
                 .presentationDragIndicator(.visible)
+        }.sheet(isPresented: $showPeopleSheet) {
+            PeopleScreen()
+                .environmentObject(profileVM)
+                .environmentObject(mainVM)
+        }.onAppear {
+            if let user = mainVM.currUser {
+                Task {
+                    await highschoolVM.checkHighSchoolLock(for: user)
+                }
+                
+                if !highschoolVM.isHighSchoolLocked {
+                    mainVM.onboardingScreen = .addFriends
+                }
+            }
         }
     }
 }
@@ -169,6 +205,8 @@ struct LockedHighschoolScreen_Previews: PreviewProvider {
     static var previews: some View {
         LockedHighschoolScreen()
             .environmentObject(MainViewModel())
+            .environmentObject(ProfileViewModel())
+            .environmentObject(HighSchoolViewModel())
     }
 }
 

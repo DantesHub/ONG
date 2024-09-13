@@ -51,6 +51,7 @@ enum SFProType {
 enum FontSize: CGFloat {
     case h1Big = 42
     case h1 = 34
+    case h1Small = 32
     case h2 = 24
     case h3 = 22
     case h3p1 = 20

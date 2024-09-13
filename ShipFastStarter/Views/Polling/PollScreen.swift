@@ -42,10 +42,11 @@ struct PollScreen: View {
                                 Text(pollVM.questionEmoji)
                                     .font(.system(size: 64))
                                 Text(pollVM.selectedPoll.title)
-                                    .sfPro(type: .bold, size: .h1)
+                                    .sfPro(type: .bold, size: .h1Small)
                                     .frame(height: 124, alignment: .top)
                                     .padding(.horizontal, 24)
                                     .multilineTextAlignment(.center)
+                                    .foregroundColor(.black)
                             }
                             
                             if showError {
@@ -164,8 +165,6 @@ struct PollScreen: View {
                                        
                                     }.frame(width: 48, height: 48)
                                     .primaryShadow()
-                                    
-                                 
                                 }
                                 .frame(height: 64)
                                 .padding(.horizontal)
@@ -180,6 +179,7 @@ struct PollScreen: View {
                     }
                 }.onTapGesture {
                     if pollVM.showProgress {
+                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
                         shuffleCounter = 0
                         animateTransition()
                     }
@@ -211,6 +211,7 @@ struct PollScreen: View {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             if let user = mainVM.currUser {
                 moveToNextPoll(user: user)
+                pollVM.updateQuestionEmoji()
             }
             
             withAnimation(.easeInOut(duration: 0.3)) {
@@ -239,6 +240,7 @@ struct PollScreen: View {
             mainVM.currentPage = .cooldown
             if let user = mainVM.currUser {
                 UserDefaults.standard.setValue(0, forKey: Constants.currentIndex)
+                mainVM.currUser?.aura += 300
                 pollVM.finishPoll(user: user)
             }
         }
@@ -293,12 +295,12 @@ struct PollOptionView: View {
                             .foregroundColor(.black)
                             .sfPro(type: .semibold, size: .h3p1)
                         
-                        if pollVM.showProgress {
-                            Spacer()
-                            Text("\(Int(progress * 100))%")
-                                .foregroundColor(.black)
-                                .sfPro(type: .semibold, size: .h3p1)
-                        }
+//                        if pollVM.showProgress {
+//                            Spacer()
+//                            Text("\(Int(progress * 100))%")
+//                                .foregroundColor(.black)
+//                                .sfPro(type: .semibold, size: .h3p1)
+//                        }
                     }
                     .padding(.horizontal, 32)
                     .frame(maxWidth: .infinity, alignment: pollVM.showProgress ? .leading : .center)
