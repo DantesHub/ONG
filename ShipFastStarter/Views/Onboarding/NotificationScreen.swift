@@ -80,7 +80,7 @@ struct NotificationScreen: View {
                     .padding(.top, 4)
                 }
                 .frame(height: 200)
-                .background(Color(UIColor.white).opacity(0.85))
+                .background(Color(UIColor.black).opacity(0.75))
                 .cornerRadius(16)
                 .shadow(radius: 10)
                 .padding(.horizontal,  52)

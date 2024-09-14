@@ -15,7 +15,7 @@ struct InboxScreen: View {
                             Spacer()
                             Text("No one has voted for you yet!\n\nTip: Answer more questions to show up in more polls")
                                 .foregroundColor(Color.black.opacity(0.7))
-                                .font(.system(size: 22, weight: .bold))
+                                    .font(.system(size: 22, weight: .bold))
                                 .multilineTextAlignment(.center)
                                 .padding(.horizontal, 48)
                                 .opacity(0.3)

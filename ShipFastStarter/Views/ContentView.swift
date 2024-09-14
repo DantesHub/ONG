@@ -22,6 +22,7 @@ struct ContentView: View {
     
     @State private var showDevTestingSheet = false
     @State private var offset: CGFloat = 0
+    @State private var showSplash = true
     
     var body: some View {
         NavigationView {
@@ -29,49 +30,58 @@ struct ContentView: View {
                 ZStack {
                     Color.white.edgesIgnoringSafeArea(.all)
                     
-                    HStack(spacing: 0) {
-                        ForEach([Page.friendRequests, Page.inbox, Page.poll, Page.profile], id: \.self) { page in
-                            pageView(for: page)
+                    if showSplash {
+                        SplashScreen()
+                    } else if mainVM.currentPage == .onboarding {
+                        if mainVM.currentPage == .onboarding {
+                            OnboardingView()
+                                .environmentObject(authVM)
+                                .environmentObject(mainVM)
+                                .environmentObject(pollVM)
+                                .environmentObject(profileVM)
+                                .environmentObject(highschoolVM)
                                 .frame(width: geometry.size.width, height: geometry.size.height)
                         }
-                    }
-                    .offset(x: -CGFloat(pageIndex(for: mainVM.currentPage)) * geometry.size.width + offset)
-                    .gesture(
-                        DragGesture()
-                            .onChanged { gesture in
-                                if mainVM.currentPage != .onboarding && mainVM.currentPage != .splash {
-                                    offset = gesture.translation.width
-                                }
+                    } else {
+                        HStack(spacing: 0) {
+                            ForEach([Page.friendRequests, Page.inbox, Page.poll, Page.profile], id: \.self) { page in
+                                pageView(for: page)
+                                    .frame(width: geometry.size.width, height: geometry.size.height)
                             }
-                            .onEnded { gesture in
-                                let pageWidth = geometry.size.width
-                                let dragThreshold: CGFloat = 0.25
-                                let draggedRatio = gesture.predictedEndTranslation.width / pageWidth
-                                
-                                if abs(draggedRatio) > dragThreshold {
-                                    if draggedRatio > 0 {
-                                        navigateRight()
-                                    } else {
-                                        navigateLeft()
+                        }
+                        .offset(x: -CGFloat(pageIndex(for: mainVM.currentPage)) * geometry.size.width + offset)
+                        .gesture(
+                            DragGesture()
+                                .onChanged { gesture in
+                                    if mainVM.currentPage != .onboarding && mainVM.currentPage != .splash {
+                                        offset = gesture.translation.width
                                     }
                                 }
-                                
-                                
-                                withAnimation(.easeOut(duration: 0.2)) {
-                                    offset = 0
+                                .onEnded { gesture in
+                                    let pageWidth = geometry.size.width
+                                    let dragThreshold: CGFloat = 0.25
+                                    let draggedRatio = gesture.predictedEndTranslation.width / pageWidth
+                                    
+                                    if abs(draggedRatio) > dragThreshold {
+                                        if draggedRatio > 0 {
+                                            navigateRight()
+                                        } else {
+                                            navigateLeft()
+                                        }
+                                    }
+                                    
+                                    withAnimation(.easeOut(duration: 0.2)) {
+                                        offset = 0
+                                    }
                                 }
-                                
-                            }
-                    )
+                        )
                     
-                    if mainVM.currentPage == .onboarding || mainVM.currentPage == .splash {
-                        pageView(for: mainVM.currentPage)
-                            .frame(width: geometry.size.width, height: geometry.size.height)
                     }
                 }
             }
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                if mainVM.currentPage != .onboarding && mainVM.currentPage != .splash {
+                if !showSplash && mainVM.currentPage != .onboarding {
                     ToolbarItem(placement: .principal) {
                         HStack {
                             if mainVM.currentPage == .inbox || mainVM.currentPage == .friendRequests {
@@ -91,6 +101,11 @@ struct ContentView: View {
         }
         .onAppear {
             setupInitialState()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+                withAnimation {
+                    showSplash = false
+                }
+            }
         }
         .gesture(
             TapGesture(count: 3)
@@ -120,7 +135,7 @@ struct ContentView: View {
         case .home:
             HomeScreen()
         case .poll, .cooldown:
-            PollScreen()
+            PeopleScreen()
                 .environmentObject(profileVM)
                 .environmentObject(authVM)
                 .environmentObject(mainVM)
@@ -230,10 +245,13 @@ struct ContentView: View {
     }
     
     private func fetchPolls(user: User) async {
-        await pollVM.fetchPolls(for: user)
-        withAnimation {
-            mainVM.currentPage = .poll
+        Task {
+            await pollVM.fetchPolls(for: user)
+            withAnimation {
+                mainVM.currentPage = .poll
+            }
         }
+       
     }
 }
 

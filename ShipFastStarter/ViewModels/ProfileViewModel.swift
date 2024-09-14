@@ -31,6 +31,13 @@ class ProfileViewModel: ObservableObject, ImageUploadable {
             var newFriend = friend
             newUser.friends[friend.id] = Date().toString(format: "yyyy-MM-dd HH:mm:ss")
             newFriend.friendRequests[newUser.id] = Date().toString(format: "yyyy-MM-dd HH:mm:ss")
+            
+            do {
+                try await FirebaseService.shared.updateField(collection: "users", documentId: newFriend.id, field: "friendRequests", value: newFriend.friendRequests)
+            } catch {
+                print(error.localizedDescription)
+            }
+            
             newFriends.append(newFriend)
         }
         newFriends.append(newUser)

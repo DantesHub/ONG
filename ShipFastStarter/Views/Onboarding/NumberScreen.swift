@@ -112,7 +112,7 @@ struct NumberScreen: View {
                     action: {
                         if !authVM.isVerificationCodeSent {
 //                            let formattedNumber = "+1\(phoneNumber)"
-//                            verificationCode = "222222"
+//                            verificationCode = "333333"
 //                            verifyCode()
 //                            mainVM.currUser?.fcmToken = UserDefaults.standard.string(forKey: "fcmToken") ?? ""
 //                            if var user = mainVM.currUser {
