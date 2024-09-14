@@ -44,12 +44,16 @@ struct HighSchoolScreen: View {
                         if let currUser = mainVM.currUser {
                             Task {
                                 await viewModel.checkHighSchoolLock(for: currUser)
+                                if viewModel.isHighSchoolLocked {
+                                    withAnimation {
+                                        mainVM.onboardingScreen = .lockedHighschool
+                                    }
+                                } else {
+                                    withAnimation {
+                                        mainVM.onboardingScreen = .addFriends
+                                    }
+                                }
                             }
-                        }
-                        if viewModel.isHighSchoolLocked {
-                            mainVM.onboardingScreen = .lockedHighschool
-                        } else {
-                            mainVM.onboardingScreen = .addFriends
                         }
                     }
                 }
@@ -58,7 +62,6 @@ struct HighSchoolScreen: View {
                     withAnimation {
                         mainVM.currUser?.schoolId = "123e4567-e89b-12d3-a456-426614174000"
                         mainVM.onboardingScreen = .addFriends
-                        
                     }
                 }
                 .environmentObject(mainVM)
@@ -101,9 +104,9 @@ struct HighschoolButton: View {
                               Text(title)
                                   .foregroundColor(.black)
                                   .sfPro(type: .bold, size: .h2)
-                              Text("\(totalNum) students")
-                                  .foregroundColor(.black.opacity(0.5))
-                                  .sfPro(type: .bold, size: .h3p1)
+//                              Text("\(totalNum) students")
+//                                  .foregroundColor(.black.opacity(0.5))
+//                                  .sfPro(type: .bold, size: .h3p1)
                           }
                        
                           Spacer()

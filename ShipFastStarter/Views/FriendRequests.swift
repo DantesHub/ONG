@@ -65,7 +65,6 @@ struct FriendRequests: View {
                 }
             }
         }
-        .navigationTitle("Friend Requests")
     }
 }
 

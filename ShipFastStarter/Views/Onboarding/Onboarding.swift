@@ -95,7 +95,7 @@ struct OnboardingView: View {
             case .name:
                 mainVM.onboardingScreen = .birthday
             case .number:
-                mainVM.onboardingScreen = .name
+                mainVM.onboardingScreen = .username
             case .contacts:
                 mainVM.onboardingScreen = .number
             case .location:
@@ -115,7 +115,7 @@ struct OnboardingView: View {
             case .notification:
                 mainVM.onboardingScreen = .addFriends
             case .addFriends:
-                mainVM.onboardingScreen = .uploadProfile
+                mainVM.onboardingScreen = .highschool
             case .lockedHighschool:
                 mainVM.onboardingScreen = .highschool
         }

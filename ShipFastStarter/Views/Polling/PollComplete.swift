@@ -60,11 +60,20 @@ struct PollComplete: View {
                 }
     
                 Spacer()
-                VStack(spacing: 16) {
-                    SharedComponents.PrimaryButton(title: "continue") {
-                        Analytics.shared.log(event: "PollCompleted: Tapped Continue")
-                        pollVM.completedPoll = false
-                    }
+                if showAuraPopup {
+                    
+                    VStack(spacing: 16) {
+                        SharedComponents.PrimaryButton(title: "continue") {
+                            Analytics.shared.log(event: "PollCompleted: Tapped Continue")
+                            pollVM.completedPoll = false
+                        }
+                        .scaleEffect(auraScale)
+                        .opacity(auraOpacity)
+                        .animation(.spring(response: 0.5, dampingFraction: 0.6, blendDuration: 0.5), value: auraScale)
+                        .animation(.easeInOut(duration: 0.5), value: auraOpacity)
+                    }        .padding(.vertical, 48)
+                        .padding(.horizontal, 24)
+                }
 //                    SharedComponents.PrimaryButton(title: "Skip the wait!") {
 //                        Analytics.shared.log(event: "PollCompleted: Skipped Wait")
 ////                        if let user = mainVM.currUser {
@@ -73,19 +82,18 @@ struct PollComplete: View {
 //                        presentationMode.wrappedValue.dismiss()
 //                    }
                 }
-                .padding(.vertical, 48)
-                .padding(.horizontal, 24)
-            }
+        
+            
             
         }
         .frame(maxWidth: .infinity, alignment: .center)
         .onAppear {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            DispatchQueue.main.asyncAfter(deadline: .now()) {
                 self.showAuraPopup = true
                 self.auraScale = 0.01
                 self.auraOpacity = 1
                 
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                     withAnimation {
                         self.auraScale = 1.25
                     }

@@ -26,15 +26,12 @@ struct BirthdayScreen: View {
                     .multilineTextAlignment(.center)
                 Spacer()
                 
-                DatePickerWrapper(date: $birthdate)
-                    .frame(height: 220)
-                    .background(Color.white)
-                    .cornerRadius(16)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 16)
-                            .stroke(Color.black, lineWidth: 3)
-                    )
-                    .padding(.horizontal)
+                CustomDatePicker(date: $birthdate)
+                         .frame(height: 200)  // Adjust the height as needed
+                         .background(Color.white)
+//                   .cornerRadius(16)
+//                   .stroke(color: .black, width: 3)
+//                   .padding(.horizontal)
                 
                 Spacer()
 
@@ -55,6 +52,12 @@ struct BirthdayScreen: View {
                 .padding(.horizontal, 24)
                 .padding(.bottom, 32)
             }
+        }.onAppear {
+//            if let transparentView = datePicker.subviews.first {
+//                for subview in transparentView.subviews {
+//                    print(String(describing: subview)) // Log subview hierarchy
+//                }
+//            }
         }
     }
     
@@ -71,41 +74,48 @@ struct BirthdayScreen: View {
     }
 }
 
-struct DatePickerWrapper: UIViewRepresentable {
-    @Binding var date: Date
-    
-    func makeUIView(context: Context) -> UIDatePicker {
-        let picker = UIDatePicker()
-        picker.datePickerMode = .date
-        picker.preferredDatePickerStyle = .wheels
-        picker.backgroundColor = .clear
-        picker.setValue(UIColor.black, forKeyPath: "textColor")
-        picker.addTarget(context.coordinator, action: #selector(Coordinator.dateChanged(_:)), for: .valueChanged)
-        return picker
-    }
-    
-    func updateUIView(_ uiView: UIDatePicker, context: Context) {
-        uiView.date = date
-    }
-    
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
-    }
-    
-    class Coordinator: NSObject {
-        var parent: DatePickerWrapper
-        
-        init(_ parent: DatePickerWrapper) {
-            self.parent = parent
-        }
-        
-        @objc func dateChanged(_ sender: UIDatePicker) {
-            parent.date = sender.date
-        }
-    }
-}
+
 
 #Preview {
     BirthdayScreen()
         .environmentObject(MainViewModel())
+}
+import SwiftUI
+
+
+struct CustomDatePicker: UIViewRepresentable {
+    @Binding var date: Date
+
+    func makeUIView(context: Context) -> UIDatePicker {
+        let datePicker = UIDatePicker()
+        datePicker.datePickerMode = .date
+        datePicker.preferredDatePickerStyle = .wheels
+        datePicker.addTarget(context.coordinator, action: #selector(Coordinator.dateChanged(_:)), for: .valueChanged)
+        return datePicker
+    }
+
+    func updateUIView(_ uiView: UIDatePicker, context: Context) {
+        uiView.date = date
+
+        // Customize appearance
+        if let subview = uiView.subviews.first?.subviews.first?.subviews.first {
+            subview.alpha = 0.0
+        }
+    }
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+
+    class Coordinator: NSObject {
+        var parent: CustomDatePicker
+
+        init(_ parent: CustomDatePicker) {
+            self.parent = parent
+        }
+
+        @objc func dateChanged(_ sender: UIDatePicker) {
+            parent.date = sender.date
+        }
+    }
 }

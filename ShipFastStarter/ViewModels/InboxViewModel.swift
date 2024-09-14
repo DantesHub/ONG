@@ -102,7 +102,7 @@ class InboxViewModel: ObservableObject {
                                             time: date,
                                             gender: usr.gender,
                                             grade: usr.grade,
-                                            backgroundColor: Color(hex: usr.color),
+                                            backgroundColor: Color(usr.color),
                                             accompanyingPoll: poll,
                                             pollOption: option,
                                             isNew: voteInfo["viewedNotification"] == "false"

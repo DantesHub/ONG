@@ -26,11 +26,7 @@ struct NumberScreen: View {
             
             VStack(spacing: 24) {
                 Spacer()
-                if !authVM.errorString.isEmpty {
-                    Text(authVM.errorString)
-                        .sfPro(type: .bold, size: .h1)
-                        .foregroundColor(.red)
-                }
+        
                 Text(authVM.isVerificationCodeSent ? "Enter verification\ncode" : "What's your phone\nnumber?")
                     .sfPro(type: .bold, size: .h1)
                     .foregroundColor(.white)
@@ -85,6 +81,7 @@ struct NumberScreen: View {
                         Text(authVM.errorString)
                             .sfPro(type: .semibold, size: .p2)
                             .foregroundColor(.red)
+                            .multilineTextAlignment(.center)
                     }
                     
                     HStack(spacing: 4) {
@@ -114,16 +111,16 @@ struct NumberScreen: View {
                     title: authVM.isVerificationCodeSent ? "Verify" : "Next",
                     action: {
                         if !authVM.isVerificationCodeSent {
-                            let formattedNumber = "+1\(phoneNumber)"
-                            verificationCode = "222222"
-                            verifyCode()
-                            mainVM.currUser?.fcmToken = UserDefaults.standard.string(forKey: "fcmToken") ?? ""
-                            if var user = mainVM.currUser {
-                                mainVM.currUser?.number = formattedNumber
-                                user.number = formattedNumber
-                            }
-                            UserDefaults.standard.setValue(formattedNumber, forKey: "userNumber")
-//                            sendVerificationCode()
+//                            let formattedNumber = "+1\(phoneNumber)"
+//                            verificationCode = "222222"
+//                            verifyCode()
+//                            mainVM.currUser?.fcmToken = UserDefaults.standard.string(forKey: "fcmToken") ?? ""
+//                            if var user = mainVM.currUser {
+//                                mainVM.currUser?.number = formattedNumber
+//                                user.number = formattedNumber
+//                            }
+//                            UserDefaults.standard.setValue(formattedNumber, forKey: "userNumber")
+                            sendVerificationCode()
                         } else {
                             verifyCode()
                         }
@@ -132,7 +129,7 @@ struct NumberScreen: View {
                 .padding(.horizontal, 24)
                 .padding(.bottom, 32)
                 .disabled(authVM.isVerificationCodeSent ? verificationCode.count != 6 : phoneNumber.count != 10)
-                .opacity(!authVM.isVerificationCodeSent && phoneNumber.count != 10 ? 0.5 : 1)
+                .opacity((!authVM.isVerificationCodeSent && phoneNumber.count != 10) || (authVM.isVerificationCodeSent && verificationCode.count != 6) ? 0.5 : 1)
             }
             .overlay(
                 Group {
@@ -165,6 +162,9 @@ struct NumberScreen: View {
         }
         .onAppear {
             isPhoneNumberFocused = true
+        }
+        .onDisappear {
+            authVM.isVerificationCodeSent = false
         }
     }
     

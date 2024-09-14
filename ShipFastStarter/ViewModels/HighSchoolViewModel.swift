@@ -33,8 +33,8 @@ class HighSchoolViewModel: ObservableObject {
             .store(in: &cancellables)        
     }
     
+    @MainActor
     func checkHighSchoolLock(for user: User) async {
-        Task {
             do {
                 let users: [User] = try await FirebaseService.shared.fetchDocuments(
                     collection: "users",
@@ -52,7 +52,6 @@ class HighSchoolViewModel: ObservableObject {
             } catch {
                 print("Error checking high school lock: \(error.localizedDescription)")
             }
-        }
     }
     
     func searchSchools(query: String) {                

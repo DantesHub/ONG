@@ -158,7 +158,7 @@ struct PeopleScreen: View {
                     SharedComponents.PrimaryButton(title: "next") {
                         if let user = mainVM.currUser {
                             withAnimation {
-                                mainVM.onboardingScreen = .color
+                            mainVM.onboardingScreen = .notification
                             }
                             Task {
                                 let selectedUsers = profileVM.peopleList.filter { selectedFriends.contains($0.id) }

@@ -110,7 +110,7 @@ struct ProfileScreen: View {
                         Text("\(mainVM.currUser?.aura ?? 0)")
                             .sfPro(type: .bold, size: .h1Big)
                             .stroke(color: .primaryBackground, width: 3)
-                        Text("aura")
+                        Text("aura") 
                             .sfPro(type: .bold, size: .h1Big)
                             .stroke(color: .primaryBackground, width: 3)
                     }.foregroundColor(.white)
@@ -154,6 +154,11 @@ struct ProfileScreen: View {
             // show highschool.
         }
         .onAppear {
+            if let user = mainVM.currUser {
+                self.user = user
+            }
+        }
+        .onChange(of: mainVM.currUser) {
             if let user = mainVM.currUser {
                 self.user = user
             }

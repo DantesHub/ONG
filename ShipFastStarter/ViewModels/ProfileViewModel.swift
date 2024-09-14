@@ -8,6 +8,7 @@
 import Foundation
 import UIKit
 import FirebaseAuth
+
 class ProfileViewModel: ObservableObject, ImageUploadable {
     @Published var profileImage: UIImage?
     @Published var peopleList: [User] = []
@@ -21,9 +22,6 @@ class ProfileViewModel: ObservableObject, ImageUploadable {
     init() {
         
     }
-    
-    
-    
 
     func addFriends(currUser: User, users: [User]) async  -> User{
         // we have to update each document sepeartely
@@ -31,7 +29,7 @@ class ProfileViewModel: ObservableObject, ImageUploadable {
         var newFriends: [User] = []
         for friend in users {
             var newFriend = friend
-            newUser.friends[friend.id] = Date().toString()
+            newUser.friends[friend.id] = Date().toString(format: "yyyy-MM-dd HH:mm:ss")
             newFriend.friendRequests[newUser.id] = Date().toString(format: "yyyy-MM-dd HH:mm:ss")
             newFriends.append(newFriend)
         }

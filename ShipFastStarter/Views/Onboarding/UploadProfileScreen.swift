@@ -81,12 +81,9 @@ struct UploadProfileScreen: View {
                                 } catch {
                                     print(error.localizedDescription)
                                 }
-                                
-                                print(mainVM.currUser?.proPic, "like wdym bro?")
                             }
                             mainVM.onboardingScreen = .highschool
                         }
-                       
                     }.padding(.horizontal, 32)
                     .padding(.bottom)
                 } else {

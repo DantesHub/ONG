@@ -20,16 +20,16 @@ struct LockedHighschoolScreen: View {
             Color.primaryBackground.edgesIgnoringSafeArea(.all)
             
             VStack(spacing: 12) {
-                HStack {
-                    Image(systemName: "arrow.left")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 28)
-                        .foregroundColor(.white)
-                        .bold()
-                    Spacer()
-                }
-                .padding(.horizontal, 32)
+//                HStack {
+//                    Image(systemName: "arrow.left")
+//                        .resizable()
+//                        .aspectRatio(contentMode: .fit)
+//                        .frame(width: 28)
+//                        .foregroundColor(.white)
+//                        .bold()
+//                    Spacer()
+//                }
+//                .padding(.horizontal, 32)
                 ZStack {
             
                     ZStack {
@@ -160,6 +160,11 @@ struct LockedHighschoolScreen: View {
                     .onTapGesture {
                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                         withAnimation {
+                            Task {
+                                if let user = mainVM.currUser {
+                                    try await profileVM.fetchPeopleList(user: user)
+                                }
+                            }
                             showPeopleSheet.toggle()
                         }
                     }
@@ -193,9 +198,9 @@ struct LockedHighschoolScreen: View {
                     await highschoolVM.checkHighSchoolLock(for: user)
                 }
                 
-                if !highschoolVM.isHighSchoolLocked {
-                    mainVM.onboardingScreen = .addFriends
-                }
+//                if !highschoolVM.isHighSchoolLocked {
+//                    mainVM.onboardingScreen = .addFriends
+//                }
             }
         }
     }

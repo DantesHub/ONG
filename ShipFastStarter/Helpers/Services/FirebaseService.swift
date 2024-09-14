@@ -416,6 +416,12 @@ class FirebaseService {
             throw error
         }
     }
+
+    func deleteDocument(collection: String, documentId: String) async throws {
+        let documentRef = FirebaseService.db.collection(collection).document(documentId)
+        try await documentRef.delete()
+        print("Document successfully deleted")
+    }
 }
 
 class PhoneAuthUIDelegate: NSObject, AuthUIDelegate {

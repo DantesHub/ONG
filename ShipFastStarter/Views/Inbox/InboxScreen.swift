@@ -26,7 +26,7 @@ struct InboxScreen: View {
                                 Text("New")
                                     .font(.system(size: 22, weight: .bold))
                                     .padding(.leading, 20)
-                                
+                                    .foregroundColor(.black)
                                 ForEach(inboxVM.newUsersWhoVoted) { item in
                                     InboxItemView(item: item)
                                 }
@@ -34,6 +34,7 @@ struct InboxScreen: View {
                             
                             if !inboxVM.oldUsersWhoVoted.isEmpty {
                                 Text("Past")
+                                    .foregroundColor(.black)
                                     .font(.system(size: 22, weight: .bold))
                                     .padding(.leading, 20)
                                     .padding(.top, 10)
@@ -109,6 +110,7 @@ struct InboxItemView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("from \(item.grade)")
                         .sfPro(type: .bold, size: .h3p1)
+                        .foregroundColor(Color.black)
                     Text("aura +\(item.aura)")
                         .sfPro(type: .medium, size: .p2)
                         .foregroundColor(Color.black.opacity(0.5))

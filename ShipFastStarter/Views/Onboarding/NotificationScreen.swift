@@ -80,7 +80,7 @@ struct NotificationScreen: View {
                     .padding(.top, 4)
                 }
                 .frame(height: 200)
-                .background(Color(UIColor.systemBackground).opacity(0.85))
+                .background(Color(UIColor.white).opacity(0.85))
                 .cornerRadius(16)
                 .shadow(radius: 10)
                 .padding(.horizontal,  52)
@@ -102,11 +102,10 @@ struct NotificationScreen: View {
                 }
                 
             
-                    // Move to the next screen only if the app is in the foreground
-                    withAnimation {
-                        mainVM.onboardingScreen = .addFriends
-                    }
-               
+                // Move to the next screen only if the app is in the foreground
+                withAnimation {
+                    mainVM.onboardingScreen = .color
+                }
             }
         }
     }
