@@ -26,40 +26,32 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
 }
 
 struct LocationScreen: View {
+    @EnvironmentObject var mainVM: MainViewModel
     @StateObject private var locationManager = LocationManager()
     
     var body: some View {
         VStack {
-            Spacer()
-            
-            Image(systemName: "map.fill")
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(width: 100, height: 100)
+            Text("how it works")
+                .sfPro(type: .bold, size: .h1)
                 .foregroundColor(.white)
-            
-            Text("Connect your school\nto find friends")
-                .font(.title2)
-                .fontWeight(.bold)
                 .multilineTextAlignment(.center)
-                .foregroundColor(.white)
-                .padding()
-            
-            Button(action: {
-                locationManager.requestLocation()
-            }) {
-                HStack {
-                    Image(systemName: "location.fill")
-                    Text("Find My School")
-                }
-                .padding()
-                .background(Color.white)
-                .foregroundColor(.orange)
-                .cornerRadius(25)
-            }
-            
+                .padding(.top, 56)
             Spacer()
-            
+            VStack(alignment: .leading, spacing: 24){
+                Text("1.  join your school 🏫")
+                    .sfPro(type: .bold, size: .h2)
+                    .foregroundColor(.white)
+                    .multilineTextAlignment(.center)
+                Text("2.  find friends 🫶")
+                    .sfPro(type: .bold, size: .h2)
+                    .foregroundColor(.white)
+                    .multilineTextAlignment(.center)
+                Text("3.  answer questions\nand earn aura ✨")
+                    .sfPro(type: .bold, size: .h2)
+                    .foregroundColor(.white)
+                    .multilineTextAlignment(.center)
+            }
+            Spacer()
             HStack {
                 Image(systemName: "lock.fill")
                 Text("ONG cares intensely about your privacy.\nLocation is only used to find nearby schools.")
@@ -68,12 +60,27 @@ struct LocationScreen: View {
             }
             .foregroundColor(.white)
             .padding()
+            SharedComponents.PrimaryButton(
+                title: "Continue",
+                action: {
+                    locationManager.requestLocation()
+                    Analytics.shared.log(event: "LocationScreen: Tapped Continue")
+                }
+            )
+            .padding(.horizontal, 24)
+            .padding(.bottom, 56)
         }
-        .background(Color.orange)
         .edgesIgnoringSafeArea(.all)
         .onChange(of: locationManager.authorizationStatus) { status in
-            if status == .authorizedWhenInUse {
+            if status == .authorizedWhenInUse || status == .authorizedAlways {
                 handleLocationAuthorization()
+            } else if status == .denied || status == .restricted {
+                // Handle denied or restricted access
+                print("Location access denied or restricted")
+                // You might want to show an alert or navigate to a different screen
+                withAnimation {
+                    mainVM.onboardingScreen = .grade // Navigate to the next screen even if denied
+                }
             }
         }
     }
@@ -81,21 +88,28 @@ struct LocationScreen: View {
     private func handleLocationAuthorization() {
         switch locationManager.accuracyAuthorization {
         case .fullAccuracy:
-            // Use precise location
             print("Full accuracy granted")
+           withAnimation {
+                mainVM.onboardingScreen = .grade // Navigate to the next screen
+            }
         case .reducedAccuracy:
-            // Use approximate location or request temporary full accuracy
             locationManager.requestTemporaryFullAccuracyAuthorization(purposeKey: "FindNearbySchools")
+            // You might want to wait for the result of this request before navigating
+            withAnimation {
+                mainVM.onboardingScreen = .grade // Navigate to the next screen
+            }
         case .none:
-            // Handle unexpected case
             print("Accuracy authorization not determined")
         @unknown default:
-            // Handle future cases
             print("Unknown accuracy authorization")
         }
     }
 }
 
 #Preview {
-    LocationScreen()
+    ZStack {
+        Color.primaryBackground.edgesIgnoringSafeArea(.all)
+        LocationScreen()
+    }
+    .environmentObject(MainViewModel())
 }

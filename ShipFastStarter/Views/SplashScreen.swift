@@ -9,23 +9,13 @@ import SwiftUI
 struct SplashScreen: View {
     var body: some View {
         ZStack {
-            Color.primaryBackground.edgesIgnoringSafeArea(.all)
+            Color.pink.edgesIgnoringSafeArea(.all)
             VStack {
-                ZStack {
-                    Text("ONG")
-                        .sfPro(type: .black, size: .logo)
-                        .frame(maxWidth: .infinity)
-                        .rotationEffect(.degrees(-12))
-                        .foregroundColor(.white)
-                        .stroke(color: .black, width: 11)
-                    Text("ONG")
-                        .sfPro(type: .black, size: .logo)
-                        .frame(maxWidth: .infinity)
-                        .rotationEffect(.degrees(-12))
-                        .foregroundColor(.white)
-                        .stroke(color: .black, width: 11)
-                        .offset(y: -4)
-                }
+                Text("ONG")
+                    .sfPro(type: .black, size: .logo)
+                    .foregroundColor(.white)
+                    .rotationEffect(.degrees(-12))
+                    .stroke(color: .black, width: 11)
                 
                 Text("Get ready to vote!")
                     .sfPro(type: .bold, size: .h1)

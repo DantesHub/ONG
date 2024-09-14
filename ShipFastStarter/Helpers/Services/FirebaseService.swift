@@ -2,10 +2,13 @@ import Firebase
 import FirebaseAuth
 import FirebaseFirestore
 import UIKit
+import FirebaseMessaging
+import FirebaseStorage
 
 class FirebaseService {
     static let shared = FirebaseService()
     static let db = Firestore.firestore()
+    private let storage = Storage.storage().reference()
 
     private init() {}
     
@@ -61,19 +64,6 @@ class FirebaseService {
         try Auth.auth().signOut()
     }
     
-    // MARK: - Database Operations
-    
-    func fetchData(collection: String, document: String, completion: @escaping (Result<[String: Any], Error>) -> Void) {
-        // Implement Firestore data fetching
-    }
-    
-    func saveData(collection: String, document: String, data: [String: Any], completion: @escaping (Result<Void, Error>) -> Void) {
-        // Implement Firestore data saving
-    }
-    
-    // Add more methods as needed for your specific Firebase interactions
-    
-    
     //MARK: - Firestore database
      func batchSave(documents: [(collection: String, data: [String: Any])]) async throws {
         let batch = Firestore.firestore().batch()
@@ -85,6 +75,24 @@ class FirebaseService {
         
         try await batch.commit()
     }
+
+    
+    // Batch update function
+    func batchUpdate<T: FBObject>(collection: String, objects: [T]) async throws {
+        let batch = Firestore.firestore().batch()
+        
+        for object in objects {
+            guard let data = object.encodeToDictionary() else {
+                throw NSError(domain: "FirebaseService", code: 400, userInfo: [NSLocalizedDescriptionKey: "Failed to encode object to dictionary"])
+            }
+            let ref = Firestore.firestore().collection(collection).document(object.id)
+            batch.setData(data, forDocument: ref, merge: true)
+        }
+        
+        try await batch.commit()
+    }
+    
+    
     
     func addDocument(_ object: FBObject, collection: String, completion: @escaping (String?) -> Void) {
         if let dict = object.encodeToDictionary() {
@@ -104,6 +112,34 @@ class FirebaseService {
             print("error here")
             completion(nil)
         }
+    }
+    
+    func updateDocument(collection: String, field: String, isEqualTo: String, object: FBObject) async throws  {
+        let query = FirebaseService.db.collection(collection).whereField(field, isEqualTo: isEqualTo)
+        let querySnapshot = try await query.getDocuments()
+        
+        return try await withCheckedThrowingContinuation { continuation in
+            guard let data = object.encodeToDictionary(), let id = data["id"] as? String else {
+                continuation.resume(throwing: NSError(domain: "FirebaseService", code: 400, userInfo: [NSLocalizedDescriptionKey: "Failed to encode object to dictionary or missing id"]))
+                return
+            }
+          
+                
+                guard let document = querySnapshot.documents.first else {
+                    continuation.resume(throwing: NSError(domain: "FirebaseService", code: 404, userInfo: [NSLocalizedDescriptionKey: "No matching document found"]))
+                    return
+                }
+                
+                document.reference.setData(data, merge: true) { error in
+                    if let error = error {
+                        continuation.resume(throwing: error)
+                    } else {
+                        print("Document successfully updated")
+                        continuation.resume(returning: ())
+                    }
+                }            
+        }
+        
     }
     
      func updateDocument(collection: String, object: FBObject) async throws {
@@ -130,14 +166,13 @@ class FirebaseService {
                     if let error = error {
                         continuation.resume(throwing: error)
                     } else {
-                        print("Document successfully updated")
+                        print(document["friends"], "Document successfully updated")
                         continuation.resume(returning: ())
                     }
                 }
             }
         }
     }
-    
     
     //MARK: - get methods
     static func getUser(completion: @escaping (Result<User, Error>) -> Void) {
@@ -175,8 +210,8 @@ class FirebaseService {
     }
     
     //MARK: - Getter Methods
-    static func getDocument<T: Codable>(collection: String, documentId: String) async throws -> T {
-        let docRef = db.collection(collection).document(documentId)
+    func getDocument<T: Codable>(collection: String, documentId: String) async throws -> T {
+        let docRef = FirebaseService.db.collection(collection).document(documentId)
         let snapshot = try await docRef.getDocument()
         
         guard let data = snapshot.data() else {
@@ -263,11 +298,124 @@ class FirebaseService {
             }
         }
     }
+    
+    //MARK: - revert
+     func updateAllObjects(collection: String) async throws {
+        let db = Firestore.firestore()
+        let documentCollection = db.collection(collection)
+
+        // Start a new write batch
+        let batch = db.batch()
+        
+        do {
+            let querySnapshot = try await documentCollection.getDocuments()
+             let documents = querySnapshot.documents
+
+            for doc in documents {
+                if var user = try? doc.data() {
+                    let documentRef = documentCollection.document(doc.documentID)
+                    user["friendRequests"] = [:]
+                    user["friends"] = [:]
+                    print(doc.documentID, "documentID")
+                    try await documentRef.updateData(user)
+                  }
+              }
+                
+                
+
+            try await batch.commit()
+            print("Batch write succeeded.")
+        } catch {
+            print("Error: \(error)")
+        }
+    }
+
+    func isUsernameTaken(_ username: String) async throws -> Bool {
+        let usersRef = FirebaseService.db.collection("users")
+        let query = usersRef.whereField("username", isEqualTo: username)
+        
+        do {
+            let snapshot = try await query.getDocuments()
+            return !snapshot.isEmpty
+        } catch {
+            print("Error checking username: \(error.localizedDescription)")
+            throw error
+        }
+    }
+
+  func uploadImage(_ image: UIImage, path: String, completion: @escaping (Result<String, Error>) -> Void) {
+    print("Starting image upload process for path: \(path)")
+    
+    guard let imageData = image.jpegData(compressionQuality: 0.5) else {
+        print("Failed to convert image to JPEG data")
+        completion(.failure(NSError(domain: "FirebaseService", code: 0, userInfo: [NSLocalizedDescriptionKey: "Failed to convert image to data"])))
+        return
+    }
+    
+    print("Image converted to JPEG data. Size: \(imageData.count) bytes")
+
+    let imageRef = storage.child(path)
+    print("Uploading image to Firebase Storage at path: \(path)")
+    
+    imageRef.putData(imageData, metadata: nil) { metadata, error in
+        if let error = error {
+            print("Error uploading image: \(error.localizedDescription)")
+            completion(.failure(error))
+            return
+        }
+        
+        print("Image uploaded successfully. Metadata: \(String(describing: metadata))")
+        
+        // Fetch the download URL
+        imageRef.downloadURL { url, error in
+            if let error = error {
+                print("Error getting download URL: \(error.localizedDescription)")
+                completion(.failure(error))
+                return
+            }
+            
+            guard let downloadURL = url else {
+                print("Download URL is nil")
+                completion(.failure(NSError(domain: "FirebaseService", code: 0, userInfo: [NSLocalizedDescriptionKey: "Failed to get download URL"])))
+                return
+            }
+            
+            print("Download URL obtained successfully: \(downloadURL.absoluteString)")
+            completion(.success(downloadURL.absoluteString))
+        }
+    }
 }
 
-// Add this new function to the FirebaseService class
+    func fetchImage(path: String, completion: @escaping (Result<UIImage, Error>) -> Void) {
+        let imageRef = storage.child(path)
+        
+        imageRef.getData(maxSize: 1024 * 1024) { data, error in
+            if let error = error {
+                completion(.failure(error))
+                return
+            }
+            
+            guard let imageData = data, let image = UIImage(data: imageData) else {
+                completion(.failure(NSError(domain: "FirebaseService", code: 0, userInfo: [NSLocalizedDescriptionKey: "Failed to convert data to image"])))
+                return
+            }
+            
+            completion(.success(image))
+        }
+    }
 
-// MARK: - PhoneAuthUIDelegate
+    func updateField(collection: String, documentId: String, field: String, value: Any) async throws {
+        let docRef = FirebaseService.db.collection(collection).document(documentId)
+        
+        do {
+            try await docRef.updateData([field: value])
+            print("Document successfully updated")
+        } catch {
+            print("Error updating document: \(error)")
+            throw error
+        }
+    }
+}
 
 class PhoneAuthUIDelegate: NSObject, AuthUIDelegate {
     func present(_ viewControllerToPresent: UIViewController, animated flag: Bool, completion: (() -> Void)? = nil) {

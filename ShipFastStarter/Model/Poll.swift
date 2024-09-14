@@ -20,22 +20,22 @@ struct Poll: Codable, Equatable, FBObject {
     let category: String
     var usersWhoVoted: [String]
 
-    struct PollOption: Codable, Equatable, Identifiable {
-        let id: String
-        let option: String
-        var votes: [String: Int]
-        let gradeLevel: String
-    }
+//    struct PollOption: Codable, Equatable, Identifiable {
+//        let id: String
+//        let option: String
+//        var votes: [String: String]
+//        let gradeLevel: String
+//    }
 
     static var exPoll = Poll(
         id: "example_poll_id",
         title: "Example Poll",
         createdAt: Date(),
         pollOptions: [
-            PollOption(id: UUID().uuidString, option: "Option 1", votes: [:], gradeLevel: "All"),
-            PollOption(id: UUID().uuidString, option: "Option 2", votes: [:], gradeLevel: "All"),
-            PollOption(id: UUID().uuidString, option: "Option 3", votes: [:], gradeLevel: "All"),
-            PollOption(id: UUID().uuidString, option: "Option 4", votes: [:], gradeLevel: "All")
+            PollOption(id: UUID().uuidString, type: "Poll", option: "Option 1", userId: "user1", votes: [:], gradeLevel: "All"),
+            PollOption(id: UUID().uuidString, type: "Poll", option: "Option 2", userId: "user2", votes: [:], gradeLevel: "All"),
+            PollOption(id: UUID().uuidString, type: "Poll", option: "Option 3", userId: "user3", votes: [:], gradeLevel: "All"),
+            PollOption(id: UUID().uuidString, type: "Poll", option: "Option 4", userId: "user4", votes: [:], gradeLevel: "All")
         ],
         isActive: true,
         schoolId: "example_school_id",

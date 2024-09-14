@@ -11,17 +11,18 @@ import Foundation
 struct PollOption: Codable, Equatable, FBObject {
     var id: String
     let type: String?
-    let pollId: String
     let option: String
-    var votes: [String: Int]?
+    let userId: String
+    var votes: [String: [String: String]]?
+    // id: [date: timeStamp, numVotes: "100", viewedNotification: "true"]
     let gradeLevel: String
     var computedProgress: Double = 0 // Make this mutable
 
-    init(id: String, type: String, pollId: String, option: String, votes: [String: Int], gradeLevel: String) {
+    init(id: String, type: String, option: String, userId: String, votes: [String: [String: String]], gradeLevel: String) {
         self.id = id
         self.type = type
-        self.pollId = pollId
         self.option = option
+        self.userId = userId
         self.votes = votes
         self.gradeLevel = gradeLevel
     }
@@ -31,7 +32,7 @@ struct PollOption: Codable, Equatable, FBObject {
     }
 
     enum CodingKeys: String, CodingKey {
-        case id, type, pollId, option, votes, gradeLevel
+        case id, type, option, votes, gradeLevel, userId
     }
 
     func encodeToDictionary() -> [String: Any]? {
@@ -48,8 +49,8 @@ struct PollOption: Codable, Equatable, FBObject {
     static var exPollOption = PollOption(
         id: "example_option_id",
         type: "Interest Based Question",
-        pollId: "example_poll_id",
         option: "Example Option",
+        userId: "user_id",
         votes: [:],
         gradeLevel: "9" // Example grade level
     )

@@ -15,6 +15,7 @@ import SuperwallKit
 import FirebaseCore
 import FirebaseAuth
 import UserNotifications
+import FirebaseMessaging
 
 @main
 struct ShipFastStarterApp: App {
@@ -25,7 +26,10 @@ struct ShipFastStarterApp: App {
     @State private var showSplash = true
 
     init() {
+
         setup()
+
+        
     }
     
     var sharedModelContainer: ModelContainer = {
@@ -82,29 +86,33 @@ private extension ShipFastStarterApp {
         let userId = UserDefaults.standard.string(forKey: Constants.userId) ?? ""
         
 //        Purchases.configure(withAPIKey: "", appUserID: userId)
-//     
+//
 //        Superwall.configure(apiKey: "pk_88a4283fb120960bd9daaf8180061db015bbeeb303396abb", purchaseController: RCPurchaseController.shared)
 //        Superwall.shared.identify(userId: userId)
-//        
+//
 //        AppsFlyerLib.shared().appsFlyerDevKey = ""
 //        AppsFlyerLib.shared().appleAppID = ""
 //        AppsFlyerLib.shared().customerUserID = userId
 //        AppsFlyerLib.shared().logEvent("App Started", withValues: [:])
 //        AppsFlyerLib.shared().isDebug = false
-//        AppsFlyerLib.shared().start()
-//        
+//        AppsFlyerLib.shared().
         
         Mixpanel.initialize(token: "", trackAutomaticEvents: false)
         Mixpanel.mainInstance().track(event: "App Start")
         Mixpanel.mainInstance().identify(distinctId: userId)
+
         
-        UserDefaults.standard.setValue("0234567890", forKey: "userNumber")
+       UserDefaults.standard.setValue("+12012222222", forKey: "userNumber")
+
+       UserDefaults.standard.setValue(true, forKey: "finishedOnboarding")
+        //UserDefaults.standard.setValue("+12012222222", forKey: "userNumber")
+
     }
 }
 
 //MARK: - AppDelegate
 
-class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
+class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate, MessagingDelegate {
     var mainViewModel: MainViewModel?
     
     func applicationDidEnterBackground(_ application: UIApplication) {
@@ -117,6 +125,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
         FirebaseApp.configure()
+        Messaging.messaging().delegate = self
         UNUserNotificationCenter.current().delegate = self
         //        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
         //             if let error = error {
@@ -137,6 +146,13 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         //             }
         
         application.registerForRemoteNotifications()
+        let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
+//        UNUserNotificationCenter.current().requestAuthorization(
+//          options: authOptions,
+//          completionHandler: { _, _ in }
+//        )
+
+        
         return true
     }
     
@@ -164,16 +180,41 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         print("failed to get remote notification man lets go", error.localizedDescription)
     }
     
-    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        // Convert token to string (if needed) and use it for testing
-        print("APNs token retrieved: \(deviceToken)")
-        let tokenParts = deviceToken.map { data in String(format: "%02.2hhx", data) }
-        let tokenString = tokenParts.joined()
-        
-        print("Device Token: \(tokenString)")
-        
-        // Now use this tokenString with CustomerIO
+    func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
+        if Auth.auth().canHandle(url) {
+            true
+        }else {
+            false
+        }
     }
-}
     
- 
+    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        print("token",deviceToken.toJsonString())
+        Messaging.messaging().apnsToken = deviceToken
+        Auth.auth().setAPNSToken(deviceToken, type: .sandbox)
+    }
+    
+    func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
+          if let token = fcmToken {
+              print("FCM Token: \(token)")
+              // Save or use the FCM token as needed
+              UserDefaults.standard.setValue(token, forKey: "fcmToken")
+//              Task {
+//                  var user = User.exUser
+//                  user.number = "2234567890"
+//                  user.firstName = "Epik"
+//                  user.fcmToken = token
+//                  try await FirebaseService.shared.updateDocument(collection: "users", field: "number", isEqualTo: "2234567890", object: user)
+//              }
+          }
+      }
+
+//   
+    
+    
+    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: () -> Void) {
+        print("hello")
+    }
+
+    
+}

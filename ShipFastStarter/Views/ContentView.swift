@@ -12,7 +12,10 @@ struct ContentView: View {
     @EnvironmentObject var mainVM: MainViewModel
     @StateObject var authVM = AuthViewModel()
     @StateObject var pollVM = PollViewModel()
+    @StateObject var inboxVM = InboxViewModel()
     @StateObject var highschoolVM = HighSchoolViewModel()
+    @StateObject var profileVM = ProfileViewModel()
+    
     @Environment(\.modelContext) private var modelContext
     @Query private var items: [Item]
     
@@ -21,60 +24,153 @@ struct ContentView: View {
     @State private var lastTapTime = Date()
 
     var body: some View {
-        GeometryReader { _ in
-            ZStack {
-                Color(.primaryBackground).edgesIgnoringSafeArea(.all)
-                switch mainVM.currentPage {
-                case .onboarding:
-                    OnboardingView()
-                        .environmentObject(authVM)
-                        .environmentObject(mainVM)
-                case .home:
-                    HomeScreen()
-                case .poll:
-                    PollScreen()
-                        .environmentObject(pollVM)
-                case .cooldown:
-                    PollCooldownScreen()
-                        .environmentObject(pollVM)
-                        .environmentObject(mainVM)
+        NavigationView {
+            GeometryReader { _ in
+                ZStack {
+//                    Color(.primaryBackground).edgesIgnoringSafeArea(.all)
+                    switch mainVM.currentPage {
+                    case .splash:
+                        SplashScreen()
+                    case .onboarding:
+                        OnboardingView()
+                            .environmentObject(authVM)
+                            .environmentObject(mainVM)
+                            .environmentObject(pollVM)
+                            .environmentObject(profileVM)
+                    case .home:
+                        HomeScreen()
+                    case .poll:
+                        PollScreen()
+                            .environmentObject(profileVM)
+                            .environmentObject(authVM)
+                            .environmentObject(mainVM)
+                            .environmentObject(pollVM)
+                    case .cooldown:
+                        PollCooldownScreen()
+                            .environmentObject(pollVM)
+                            .environmentObject(mainVM)
+                    case .inbox:
+                        InboxScreen()
+                            .environmentObject(mainVM)
+                            .environmentObject(inboxVM)
+                            .environmentObject(profileVM)
+                    case .profile:
+                        ProfileScreen()
+                            .environmentObject(mainVM)
+                            .environmentObject(authVM)
+                            .environmentObject(profileVM)
+
+                    }
                 }
-            }
-            .onAppear {
-                if UserDefaults.standard.bool(forKey: "finishedOnboarding") {
-                    Task {
-                        await mainVM.fetchUser()
-                        if let user = mainVM.currUser {
-                            pollVM.checkCooldown(user: user)
-                            highschoolVM.checkHighSchoolLock(for: user)
+                .onChange(of: mainVM.currUser) { newUser in
+                    if let user = newUser, mainVM.currentPage == .inbox {
+                        Task {
+                            await fetchUserData(user)
+                        }
+                    }
+                }
+                .onAppear {
+                    authVM.isUserSignedIn()
+                    if UserDefaults.standard.bool(forKey: "finishedOnboarding") {
+                        Task {
+                            await mainVM.fetchUser()
                             
-                            if let endTime = pollVM.cooldownEndTime {
-                                pollVM.completedPoll = false
-                                mainVM.currentPage = .cooldown
-                            } else {
-                                if !highschoolVM.isHighSchoolLocked {
-                                    await pollVM.fetchPolls(for: user)
-                                    if pollVM.pollSet.count < 8 {
-                                        await pollVM.createPoll(user: user)
-                                    }
+                            if let user = mainVM.currUser {
+                                await fetchUserData(user)
+                                pollVM.checkCooldown(user: user)
+                                highschoolVM.checkHighSchoolLock(for: user)
+                                
+                                if let endTime = pollVM.cooldownEndTime {
+                                    pollVM.completedPoll = false
+                                    mainVM.currentPage = .cooldown
+                                } else {
+                                    await fetchPolls(user: user)
                                 }
                             }
                         }
+                    } else {
+                        mainVM.currentPage = .onboarding
                     }
-
                 }
+                .gesture(
+                    TapGesture(count: 3)
+                        .onEnded { _ in
+                            showDevTestingSheet = true
+                        }
+                )
+                .sheet(isPresented: $showDevTestingSheet) {
+                    DevTestingView()
+                        .environmentObject(mainVM)
+                        .environmentObject(pollVM)
+                }
+          
             }
-            .gesture(
-                TapGesture(count: 3)
-                    .onEnded { _ in
-                        showDevTestingSheet = true
+            .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    if mainVM.currentPage != .onboarding && mainVM.currentPage != .splash {
+                        ToolbarItem(placement: .principal) {
+                            HStack {
+                                Text("inbox") 
+                                    .sfPro(type: .bold, size: .h3p1)
+                                    .onTapGesture {
+                                        withAnimation {
+                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                            Analytics.shared.log(event: "Tabbar: Tapped Inbox")
+                                            mainVM.currentPage = .inbox
+                                        }
+                                    }.opacity(mainVM.currentPage == .inbox ? 1 : 0.3)
+                                Spacer()
+                                Text("play")
+                                    .sfPro(type: .bold, size: .h3p1)
+                                    .onTapGesture {
+                                        withAnimation {
+                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                            Analytics.shared.log(event: "Tabbar: Tapped Polls")
+                                            if let endTime = pollVM.cooldownEndTime {
+                                                pollVM.completedPoll = false
+                                                mainVM.currentPage = .cooldown
+                                            } else {
+                                                mainVM.currentPage = .poll
+                                            }
+                                        }
+                                    }.opacity(mainVM.currentPage == .poll || mainVM.currentPage == .cooldown ? 1 : 0.3)
+                                Spacer()
+                                Text("profile")
+                                    .sfPro(type: .bold, size: .h3p1)
+                                    .onTapGesture {
+                                        withAnimation {
+                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                            Analytics.shared.log(event: "Tabbar: Tapped Profile")
+                                            mainVM.currentPage = .profile
+                                        }
+                                    }
+                                    .opacity(mainVM.currentPage == .profile ? 1 : 0.3)
+                            }
+                            .foregroundColor(.black)
+                        }
                     }
-            )
-            .sheet(isPresented: $showDevTestingSheet) {
-                DevTestingView()
-                    .environmentObject(mainVM)
-                    .environmentObject(pollVM)
-            }
+                }
+        }
+    }
+    
+    private func fetchUserData(_ user: User) async {
+        async let notifications = inboxVM.fetchNotifications(for: user)
+        async let peopleList = profileVM.fetchPeopleList(user: user)
+//        do {
+//            try await FirebaseService.shared.updateAllObjects(collection: "users")
+//
+//        } catch {
+//            print(error.localizedDescription)
+//        }
+
+        // Wait for both tasks to complete
+        _ = await (notifications, peopleList)
+    }
+    
+    private func fetchPolls(user: User) async {
+        await pollVM.fetchPolls(for: user)
+        withAnimation {
+            mainVM.currentPage = .poll
         }
     }
 
@@ -131,4 +227,5 @@ struct DevTestingView: View {
 #Preview {
     ContentView()
         .modelContainer(for: Item.self, inMemory: true)
+        .environmentObject(MainViewModel())
 }

@@ -83,15 +83,16 @@ struct SharedComponents {
         var img: Image?
         var title: String
         var isDisabled: Bool
-        var isOption: Bool = false
+        var isOption: Bool
         @State private var opacity: Double = 1
         var action: () -> Void
         
-        init(img: Image? = nil, title: String = "Continue", action: @escaping () -> Void, isDisabled: Bool = false) {
+        init(img: Image? = nil, title: String = "Continue", isOption: Bool = false, action: @escaping () -> Void, isDisabled: Bool = false) {
              self.img = img
              self.title = title
              self.action = action
              self.isDisabled = isDisabled
+             self.isOption = isOption
          }
         
         var body: some View {
@@ -119,7 +120,7 @@ struct SharedComponents {
                         Spacer()
                         Text(title)
                             .foregroundColor(.black)
-                            .sfPro(type: .semibold, size: .h3p1)
+                            .sfPro(type: .bold, size: .h3p1)
                         Spacer()
                         if let img = img {
                             img
@@ -129,7 +130,7 @@ struct SharedComponents {
                         }
                     }.padding(.horizontal, 32)
                 }
-                .frame(height: isOption ? 96 : 72)
+                .frame(height: isOption ? 104 : 72)
                 .scaleEffect(opacity == 1 ? 1 : 0.95)
                 .opacity(opacity)
             }
@@ -140,10 +141,82 @@ struct SharedComponents {
         }
     }
 
+    
+    struct SecondaryButton: View {
+        var img: Image?
+        var title: String
+        var isDisabled: Bool
+        var isOption: Bool
+        @State private var opacity: Double = 1
+        var action: () -> Void
+        
+        init(img: Image? = nil, title: String = "Continue", isOption: Bool = false, action: @escaping () -> Void, isDisabled: Bool = false) {
+             self.img = img
+             self.title = title
+             self.action = action
+             self.isDisabled = isDisabled
+             self.isOption = isOption
+         }
+        
+        var body: some View {
+            Button(action: {
+                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                self.opacity = 0.7
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    withAnimation(.spring()) {
+                        self.opacity = 1
+                        self.action()
+                    }
+                }
+            }) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(Color.white)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16)
+                                .stroke(Color.black.opacity(1), lineWidth: 5)
+                                .padding(1)
+                                .mask(RoundedRectangle(cornerRadius: 16))
+                        )
+                    
+                    HStack {
+                        Spacer()
+                        Text(title)
+                            .foregroundColor(.black)
+                            .sfPro(type: .bold, size: .p2)
+                        Spacer()
+                        if let img = img {
+                            img
+                                .resizable()
+                                .frame(width: 20, height: 20)
+                                .foregroundColor(.black)
+                        }
+                    }.padding(.horizontal, 4)
+                }
+                .frame(height: isOption ? 104 : 48)
+                .scaleEffect(opacity == 1 ? 1 : 0.95)
+                .opacity(opacity)
+            }
+            .disabled(isDisabled)
+            .opacity(isDisabled ? 0.5 : 1)
+            .drawingGroup()
+            .shadow(color: Color.black, radius: 0, x: 0, y: 3)
+        }
+    }
+
     struct PrimaryButton_Previews: PreviewProvider {
         static var previews: some View {
             PrimaryButton( action: {})
                 .padding()
+        }
+    }
+    
+    struct Divider: View {
+        var body: some View {
+            Rectangle()
+                .frame(width: UIScreen.size.width, height: 2)
+                .opacity(0.2)
+                .padding(.vertical)
         }
     }
 

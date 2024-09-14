@@ -214,6 +214,7 @@ extension Date {
         }
     }
     
+    
     func formatted() -> String {
         Date.dateFormatter.dateFormat = "MMM d"
         let dateString = Date.dateFormatter.string(from: self)

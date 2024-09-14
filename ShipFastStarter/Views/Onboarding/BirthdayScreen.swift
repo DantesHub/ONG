@@ -23,7 +23,7 @@ struct BirthdayScreen: View {
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
                 Spacer()
-                DatePicker("", selection: $birthdate, in: ...Date(), displayedComponents: .date)
+                DatePicker("", selection: $birthdate, displayedComponents: .date)
                     .datePickerStyle(WheelDatePickerStyle())
                     .labelsHidden()
                     .background(Color.white)

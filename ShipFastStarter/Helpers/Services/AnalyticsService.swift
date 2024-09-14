@@ -3,7 +3,6 @@ import Combine
 //import Paywall
 import SwiftUI
 import SuperwallKit
-import AppsFlyerLib
 import Mixpanel
 
 
@@ -46,7 +45,7 @@ final class Analytics: ObservableObject {
 //        Firebase.Analytics.logEvent(event, parameters: parameters)
 //        Amplitude.instance().logEvent(event, withEventProperties: parameters)
 //        Superwall.shared.register(event: event, params: parameters)
-        AppsFlyerLib.shared().logEvent(event, withValues: parameters)
+//        AppsFlyerLib.shared().logEvent(event, withValues: parameters)
         Mixpanel.mainInstance().track(event: event, properties: mixpanelParameters)
         //facebook
 //        AppEvents.shared.logEvent(AppEvents.Name("battledAnOrc"))

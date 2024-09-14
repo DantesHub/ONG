@@ -8,11 +8,11 @@
 import Foundation
 
 class MainViewModel: ObservableObject {
-    @Published var currentPage: Page = .onboarding
+    @Published var currentPage: Page = .splash
+    @Published var onboardingScreen: OnboardingScreenType = .notification
     @Published var isPro = false
     @Published var showHalfOff = false 
     @Published var onboardingProgress: Double = 0.0
-    @Published var onboardingScreen: OnboardingScreenType = .birthday
     @Published var currUser: User?
     
     init() {
@@ -26,6 +26,7 @@ class MainViewModel: ObservableObject {
                 if let user = users.first {
                     DispatchQueue.main.async {
                         self.currUser = user
+                        print("successfully fetched user", user.id, user.firstName)
                     }
                 } else {
                     print("No user found with the given phone number")
@@ -40,7 +41,7 @@ class MainViewModel: ObservableObject {
     
     func fetchUserById(_ userId: String) async {
         do {
-            let user: User = try await FirebaseService.getDocument(collection: "users", documentId: userId)
+            let user: User = try await FirebaseService.shared.getDocument(collection: "users", documentId: userId)
             DispatchQueue.main.async {
                 self.currUser = user
             }
@@ -65,4 +66,7 @@ enum Page: String {
     case onboarding = "Onboarding"
     case poll = "Polls"
     case cooldown = "Cooldown"
+    case inbox = "Inbox"
+    case profile = "Profile"
+    case splash = "Splash"
 }
