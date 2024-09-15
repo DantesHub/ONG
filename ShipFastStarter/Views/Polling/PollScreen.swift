@@ -323,7 +323,7 @@ struct PollScreen: View {
         stagedEmojiIndex = 0
         lastEmojiChangeCount = 0
         
-        shootingTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
+        shootingTimer = Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { _ in
             guard let startTime = longPressStartTime else { return }
             let elapsedTime = Date().timeIntervalSince(startTime)
             
@@ -377,7 +377,13 @@ struct PollScreen: View {
     
     func addEmoji(at location: CGPoint, emoji: String) {
         let angle = CGFloat.random(in: 0...(2 * .pi))
-        let speed = CGFloat.random(in: 5...15)
+        
+        // Calculate the elapsed time since the long press started
+        let elapsedTime = Date().timeIntervalSince(longPressStartTime ?? Date())
+        
+        
+        let speedRange: ClosedRange<CGFloat> = elapsedTime <= 30 ? 15...20 : 40...65
+        let speed = CGFloat.random(in: speedRange)
         
         let particle = EmojiParticle(
             emoji: emoji,
@@ -395,19 +401,19 @@ struct PollScreen: View {
             for i in 0..<self.emojiParticles.count {
                 self.emojiParticles[i].position.x += self.emojiParticles[i].velocity.dx
                 self.emojiParticles[i].position.y += self.emojiParticles[i].velocity.dy
-                self.emojiParticles[i].velocity.dy += 0.2
-                self.emojiParticles[i].velocity.dx *= 0.99
+                self.emojiParticles[i].velocity.dy += 0.5 // Increased gravity
+                self.emojiParticles[i].velocity.dx *= 0.98 // Reduced air resistance
             }
             
             self.emojiParticles.removeAll { particle in
-                particle.position.y > UIScreen.main.bounds.height + 50 ||
-                particle.position.x < -50 ||
-                particle.position.x > UIScreen.main.bounds.width + 50 ||
-                currentTime.timeIntervalSince(particle.creationTime) > 1.0
+                particle.position.y > UIScreen.main.bounds.height + 100 ||
+                particle.position.x < -100 ||
+                particle.position.x > UIScreen.main.bounds.width + 100 ||
+                currentTime.timeIntervalSince(particle.creationTime) > 0.5 // Increased lifetime
             }
 
-            if self.emojiParticles.count > 500 {
-                self.emojiParticles.removeFirst(self.emojiParticles.count - 500)
+            if self.emojiParticles.count > 1000 { // Increased maximum particle count
+                self.emojiParticles.removeFirst(self.emojiParticles.count - 1000)
             }
         }
     }
@@ -651,7 +657,7 @@ struct PollOptionView: View {
     }
     
     private func scheduleLongPressActions(buttonPosition: CGPoint, touchPosition: CGPoint) {
-        longPressTimer = Timer.scheduledTimer(withTimeInterval: 0.3, repeats: false) { _ in
+        longPressTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { _ in
             isLongPressActivated = true
             startAudio()
             onLongPressStart(buttonPosition, touchPosition)
