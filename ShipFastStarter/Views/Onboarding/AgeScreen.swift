@@ -24,7 +24,7 @@ struct AgeScreen: View {
                     .sfPro(type: .bold, size: .h1)
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
-                Spacer()
+                Spacer() 
                 
 //                CustomDatePicker(date: $birthdate)
 //                         .frame(height: 200)  // Adjust the height as needed

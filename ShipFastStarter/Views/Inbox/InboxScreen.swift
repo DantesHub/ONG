@@ -199,7 +199,7 @@ struct PollAnswerDetailView: View {
                 Spacer()
                 // Poll question
                 VStack(spacing: 0) {
-                    Text(inboxVM.selectedInbox?.gender == "male" ? "👦🏼" : "👧🏼")
+                    Text(inboxVM.selectedInbox?.gender == "boy" ? "👦🏼" : "👧🏼")
                         .font(.system(size: 40))
                         .frame(width: 60, height: 60)
                         .background(inboxVM.selectedInbox?.backgroundColor)

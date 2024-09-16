@@ -276,6 +276,9 @@ class InboxViewModel: ObservableObject {
  
         var updatedRequestedUser = requestedUser
         updatedRequestedUser.friends[currUser.id] = Date().toString()
+        friendRequests.removeAll { req in
+            req.user.id == requestedUser.id
+        }
         
         do {
             try await FirebaseService.shared.updateDocument(collection: "users", object: currUser)
@@ -288,7 +291,7 @@ class InboxViewModel: ObservableObject {
     func tappedDeclineFriendRequest(currUser: User, requestedUser: User) async {
         var updatedRequestedUser = requestedUser
         updatedRequestedUser.friends.removeValue(forKey: currUser.id)
-        print(updatedRequestedUser.friends, "cmon man")
+
         friendRequests.removeAll { req in
             req.user.id == requestedUser.id
         }

@@ -82,7 +82,7 @@ struct ProfileScreen: View {
                     .padding(.bottom)
                     .padding(.top, 32)
                     VStack(spacing: -28) {
-                        Text("\(profileVM.friends.count)")
+                        Text("\(mainVM.currUser?.friends.count ?? 0)")
                             .sfPro(type: .bold, size: .h1)
                             .stroke(color: .black, width: 3)
                         Text("friends")
@@ -135,7 +135,6 @@ struct ProfileScreen: View {
                         }
                         SharedComponents.SecondaryButton(title: profileVM.isCrush ? "crush ❤️" : "mark as crush 😻") {
                             Analytics.shared.log(event: profileVM.isFriend ? "ProfileScreen: Tapped Unmark crush" : "ProfileScreen: Tapped Mark Crush")
-                                                        
                         }
                     }.padding(.horizontal)
                 } else { // users own profile
@@ -144,6 +143,7 @@ struct ProfileScreen: View {
                             Analytics.shared.log(event: "ProfileScreen: Tapped Edit Profile")
                             showEditProfile = true
                         }
+                        
                         SharedComponents.SecondaryButton(title: "Settings") {
                             Analytics.shared.log(event: "ProfileScreen: Tapped Edit Settings")
                             

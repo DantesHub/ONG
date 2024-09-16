@@ -20,10 +20,16 @@ class ProfileViewModel: ObservableObject, ImageUploadable {
     @Published var showingImagePicker = false
     @Published var sourceType: UIImagePickerController.SourceType = .photoLibrary
     @Published var editProfile: Bool = false
-    
+    @Published var topEight: [User] = []
 
     init() {
         
+    }
+    
+    func fetchTop8() {
+        topEight = peopleList.sorted(by: { user1, user2 in
+            user1.aura > user2.aura
+        })
     }
 
     func addFriends(currUser: User, users: [User]) async  -> User{
@@ -153,6 +159,8 @@ class ProfileViewModel: ObservableObject, ImageUploadable {
                 usr.id == user.id
             }
         }
+        
+        fetchTop8()
         
         await loadImages()
         // Update the UI on the main thread

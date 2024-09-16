@@ -70,6 +70,7 @@ struct FriendRequests: View {
 
 struct FriendRequestView: View {
     @EnvironmentObject var inboxVM: InboxViewModel
+    @EnvironmentObject var profileVM: ProfileViewModel
     @EnvironmentObject var mainVM: MainViewModel
     var request: FriendRequest
     @State private var isPressed = false
@@ -121,8 +122,8 @@ struct FriendRequestView: View {
                                 showCheck = true
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                                     mainVM.currUser?.friendRequests.removeValue(forKey: request.user.id)
-                                    mainVM.currUser?.friends[request.user.id] = Date().toString()
-                                    
+                                    mainVM.currUser?.friends[request.user.id] = Date().toString(format: "yyyy-MM-dd HH:mm:ss")
+                                    profileVM.friends.append(request.user)
                                     if let user = mainVM.currUser {
                                         Task {
                                             await inboxVM.tappedAcceptFriendRequest(currUser: user, requestedUser: request.user)

@@ -96,12 +96,14 @@ struct PeopleScreen: View {
     @State private var selectedFriends: Set<String> = []
     @State private var showShareSheet = false
 
+    
     let columns = [
         GridItem(.flexible(), spacing: -24),
         GridItem(.flexible(), spacing: -24),
         GridItem(.flexible(), spacing: -24),
         GridItem(.flexible(), spacing: -24)
     ]
+    
     
     var body: some View {
         ZStack {

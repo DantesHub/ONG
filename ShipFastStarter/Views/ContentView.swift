@@ -208,7 +208,7 @@ struct ContentView: View {
         }) {
             Text(title)
                 .sfPro(type: .bold, size: .h3p1)
-                .foregroundColor(.black)
+                .foregroundColor(mainVM.currentPage == .poll || mainVM.currentPage == .cooldown ? .white : .black)
                 .opacity(mainVM.currentPage == page || mainVM.currentPage == .cooldown && title == "play" ? 1 : 0.3)
         }
     }
