@@ -199,19 +199,19 @@ struct ProfileScreen: View {
         .sheet(isPresented: $profileVM.showingImagePicker) {
             ImagePicker(sourceType: profileVM.sourceType, selectedImage: $profileVM.profileImage)
         }
-        .onChange(of: profileVM.profileImage) {
-            if let user = mainVM.currUser {
-                UserDefaults.standard.setValue(true, forKey: "uploadedProPic")
-                Task {
-                    do {
-                        mainVM.currUser?.proPic = try await profileVM.uploadUserProfilePicture(image: profileVM.profileImage!, user: user)
-                    } catch {
-                        print(error.localizedDescription)
-                    }
-                }
-        
-            }
-        }
+//        .onChange(of: profileVM.profileImage) {
+//            if let user = mainVM.currUser {
+//                UserDefaults.standard.setValue(true, forKey: "uploadedProPic")
+//                Task {
+//                    do {
+//                        mainVM.currUser?.proPic = try await profileVM.uploadUserProfilePicture(image: profileVM.profileImage!, user: user)
+//                    } catch {
+//                        print(error.localizedDescription)
+//                    }
+//                }
+//        
+//            }
+//        }
     }
     
     // Add this function to format the aura number without commas

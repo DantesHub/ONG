@@ -43,7 +43,6 @@ class PollViewModel: ObservableObject {
         for _ in 0..<randomNumber {
             var randGender = Int.random(in: 0...1)
             var color = Int.random(in: 0...7)
-            print(randGender, color, "what is going on?")
             randomizedPeople.append((randGender == 0 ? "boy" : "girl", Constants.colors[color]))
          }
     }

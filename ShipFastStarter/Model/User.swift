@@ -36,8 +36,8 @@ struct User: Codable, Equatable, FBObject {
     var referral: Int
     var crushId: String
     var friendsStatus: String = "Add +"
-    var friendRequests: [String: String]  // New property added
-    var dateJoined: String  // New property added
+    var friendRequests: [String: String]
+    var dateJoined: String
     
     // New properties
     var relationshipStatus: String

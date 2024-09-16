@@ -57,18 +57,20 @@ class InboxViewModel: ObservableObject {
         do {
             for friendRequest in user.friendRequests {
                 // fetch friend
-                if friendRequests.contains(where: { $0.id == friendRequest.key }) {
+                if friendRequests.contains(where: { $0.user.id == friendRequest.key }) {
                     continue
                 }
                 let friendArray: [User] = try await FirebaseService.shared.fetchDocuments(collection: "users", whereField: "id", isEqualTo: friendRequest.key)
+                // why is that it only works the second time ?
                 if let friend = friendArray.first {
+                    print(friend.firstName, "ik")
                     let timeStamp = Date.fromString((user.friendRequests[friend.id] ?? "")) ?? Date()
                     let request = FriendRequest(id: UUID().uuidString, user: friend, time: timeStamp)
                     if !friendRequests.contains(where: { req in
                         req.user.id == request.user.id
                     }) {
                         friendRequests.append(request)
-                        print(friendRequests, "gyamazawa")
+                        print(friendRequests.count, user.friendRequests.count, "gyamazawa")
                     }
                 }
                 // request
@@ -287,9 +289,12 @@ class InboxViewModel: ObservableObject {
         var updatedRequestedUser = requestedUser
         updatedRequestedUser.friends.removeValue(forKey: currUser.id)
         print(updatedRequestedUser.friends, "cmon man")
+        friendRequests.removeAll { req in
+            req.user.id == requestedUser.id
+        }
         // update in firebase
         do {
-            try await FirebaseService.shared.updateDocument(collection: "users", object: currUser)
+            try await FirebaseService.shared.updateField(collection: "users", documentId: currUser.id, field: "friendRequests", value: currUser.friendRequests)
             try await FirebaseService.shared.updateField(collection: "users", documentId: updatedRequestedUser.id, field: "friends", value: updatedRequestedUser.friends)
         } catch {
             print(error.localizedDescription)

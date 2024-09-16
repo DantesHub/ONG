@@ -131,11 +131,15 @@ struct ContentView: View {
                                     setupInitialState()
                                 }
                             }
-                        } else {
-                            Task {
+                        }
+                    } else {
+                        Task {
+                            await mainVM.fetchUser()
+                            if let currUser = mainVM.currUser {                                
                                 await fetchUserData(currUser)
                             }
                         }
+                      
                     }
                 case .background:
                     break
