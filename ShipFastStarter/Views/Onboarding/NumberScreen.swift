@@ -106,7 +106,7 @@ struct NumberScreen: View {
                 }
                 
                 Spacer()
-                
+                 
                 SharedComponents.PrimaryButton(
                     title: authVM.isVerificationCodeSent ? "Verify" : "Next",
                     action: {

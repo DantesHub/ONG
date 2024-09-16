@@ -79,7 +79,7 @@ struct LocationScreen: View {
                 print("Location access denied or restricted")
                 // You might want to show an alert or navigate to a different screen
                 withAnimation {
-                    mainVM.onboardingScreen = .grade // Navigate to the next screen even if denied
+                    mainVM.onboardingScreen = .name // Navigate to the next screen even if denied
                 }
             }
         }
@@ -90,13 +90,13 @@ struct LocationScreen: View {
         case .fullAccuracy:
             print("Full accuracy granted")
            withAnimation {
-                mainVM.onboardingScreen = .grade // Navigate to the next screen
+                mainVM.onboardingScreen = .name // Navigate to the next screen
             }
         case .reducedAccuracy:
             locationManager.requestTemporaryFullAccuracyAuthorization(purposeKey: "FindNearbySchools")
             // You might want to wait for the result of this request before navigating
             withAnimation {
-                mainVM.onboardingScreen = .grade // Navigate to the next screen
+                mainVM.onboardingScreen = .name // Navigate to the next screen
             }
         case .none:
             print("Accuracy authorization not determined")

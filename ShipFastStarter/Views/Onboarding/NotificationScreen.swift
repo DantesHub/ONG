@@ -50,7 +50,7 @@ struct NotificationScreen: View {
                             Analytics.shared.log(event: "Notifications: Tapped Don't Allow")
                             UIImpactFeedbackGenerator(style: .light).impactOccurred()
                             withAnimation {
-                                mainVM.onboardingScreen = .color
+                                mainVM.onboardingScreen = .highschool
                             }
                         }) {
                             Text("Don’t Allow")
@@ -62,7 +62,6 @@ struct NotificationScreen: View {
                         .cornerRadius(10, corners: [.bottomLeft])
                         
                         Divider()
-                        
                         Button(action: {
                             Analytics.shared.log(event: "Notifications: Tapped Allow")
                             UIImpactFeedbackGenerator(style: .light).impactOccurred()
@@ -76,6 +75,7 @@ struct NotificationScreen: View {
                                 .padding()
                         }
                         .cornerRadius(10, corners: [.bottomRight])
+                        
                     }.frame(height: 40, alignment: .center)
                     .padding(.top, 4)
                 }
@@ -104,7 +104,7 @@ struct NotificationScreen: View {
             
                 // Move to the next screen only if the app is in the foreground
                 withAnimation {
-                    mainVM.onboardingScreen = .color
+                    mainVM.onboardingScreen = .highschool
                 }
             }
         }

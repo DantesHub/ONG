@@ -20,18 +20,20 @@ struct BirthdayScreen: View {
             VStack(spacing: 24) {
                 Spacer()
                 
-                Text("what's ur birthday")
+                Text("what's ur age?")
                     .sfPro(type: .bold, size: .h1)
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
                 Spacer()
                 
-                CustomDatePicker(date: $birthdate)
-                         .frame(height: 200)  // Adjust the height as needed
-                         .background(Color.white)
-//                   .cornerRadius(16)
-//                   .stroke(color: .black, width: 3)
-//                   .padding(.horizontal)
+                DatePicker("", selection: $birthdate, displayedComponents: .date)
+                        .datePickerStyle(WheelDatePickerStyle())
+                        .labelsHidden()
+                        .background(Color.white)
+                        .cornerRadius(16)
+                        .stroke(color: .black, width: 3)
+                        .padding(.horizontal)
+    //                    .primaryShadow()
                 
                 Spacer()
 
@@ -79,43 +81,4 @@ struct BirthdayScreen: View {
 #Preview {
     BirthdayScreen()
         .environmentObject(MainViewModel())
-}
-import SwiftUI
-
-
-struct CustomDatePicker: UIViewRepresentable {
-    @Binding var date: Date
-
-    func makeUIView(context: Context) -> UIDatePicker {
-        let datePicker = UIDatePicker()
-        datePicker.datePickerMode = .date
-        datePicker.preferredDatePickerStyle = .wheels
-        datePicker.addTarget(context.coordinator, action: #selector(Coordinator.dateChanged(_:)), for: .valueChanged)
-        return datePicker
-    }
-
-    func updateUIView(_ uiView: UIDatePicker, context: Context) {
-        uiView.date = date
-
-        // Customize appearance
-        if let subview = uiView.subviews.first?.subviews.first?.subviews.first {
-            subview.alpha = 0.0
-        }
-    }
-
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
-    }
-
-    class Coordinator: NSObject {
-        var parent: CustomDatePicker
-
-        init(_ parent: CustomDatePicker) {
-            self.parent = parent
-        }
-
-        @objc func dateChanged(_ sender: UIDatePicker) {
-            parent.date = sender.date
-        }
-    }
 }

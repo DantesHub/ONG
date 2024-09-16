@@ -82,10 +82,10 @@ struct FriendButton: View {
                 .padding(.top, 8)
         }
         .onTapGesture {
-//            if mainVM.onboardingScreen == .addFriends {
+            if mainVM.onboardingScreen == .addFriends {
                 UIImpactFeedbackGenerator(style: .light).impactOccurred()
                 onTap()
-//            }
+            }
         }
     }
 }
@@ -148,24 +148,17 @@ struct PeopleScreen: View {
                     .padding(.vertical)
                 }
                 if mainVM.onboardingScreen != .addFriends {
-                      SharedComponents.PrimaryButton(title: "next") {
-                          if let user = mainVM.currUser {
-                              withAnimation {
-                              mainVM.onboardingScreen = .notification
-                              }
-                              Task {
-                                  let selectedUsers = profileVM.peopleList.filter { selectedFriends.contains($0.id) }
-                                  mainVM.currUser = await profileVM.addFriends(currUser: user, users: selectedUsers)
-                              }
-                          }
-                      }.padding(.horizontal, 32)
-                      .padding(.bottom)
+                    SharedComponents.PrimaryButton(title: "invite friends") {
+                        withAnimation {
+                            showShareSheet.toggle()
+                        }
+                    }.padding(.horizontal, 32)
+                    .padding(.bottom)
                 } else {
-                  
                     SharedComponents.PrimaryButton(title: "next") {
                         if let user = mainVM.currUser {
                             withAnimation {
-                            mainVM.onboardingScreen = .notification
+                            mainVM.onboardingScreen = .color
                             }
                             Task {
                                 let selectedUsers = profileVM.peopleList.filter { selectedFriends.contains($0.id) }

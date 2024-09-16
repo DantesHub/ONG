@@ -38,8 +38,15 @@ struct User: Codable, Equatable, FBObject {
     var friendsStatus: String = "Add +"
     var friendRequests: [String: String]  // New property added
     var dateJoined: String  // New property added
+    
+    // New properties
+    var relationshipStatus: String
+    var mbti: String
+    var movie: String
+    var music: String
+    var bio: String  // New bio property
 
-    init(id: String, firstName: String, lastName: String, username: String, schoolId: String, color: String, aura: Int, godMode: Bool, birthday: String, grade: String, number: String, votedPolls: [String], lastPollFinished: Date?, friends: [String: String], invitedFriends: [String], ogBadge: Bool, gender: String, fcmToken: String, proPic: String, referral: Int = 0, crushId: String = "", friendRequests: [String: String], dateJoined: String) {
+    init(id: String, firstName: String, lastName: String, username: String, schoolId: String, color: String, aura: Int, godMode: Bool, birthday: String, grade: String, number: String, votedPolls: [String], lastPollFinished: Date?, friends: [String: String], invitedFriends: [String], ogBadge: Bool, gender: String, fcmToken: String, proPic: String, referral: Int = 0, crushId: String = "", friendRequests: [String: String], dateJoined: String, relationshipStatus: String, mbti: String, movie: String, music: String, bio: String) {
         self.id = id
         self.firstName = firstName
         self.lastName = lastName
@@ -62,7 +69,12 @@ struct User: Codable, Equatable, FBObject {
         self.referral = referral
         self.crushId = crushId
         self.friendRequests = friendRequests
-        self.dateJoined = dateJoined  // Initialize the new property
+        self.dateJoined = dateJoined
+        self.relationshipStatus = relationshipStatus
+        self.mbti = mbti
+        self.movie = movie
+        self.music = music
+        self.bio = bio
     }
 
     static var exUser = User(
@@ -88,7 +100,12 @@ struct User: Codable, Equatable, FBObject {
         referral: 0,
         crushId: "",
         friendRequests: [:],
-        dateJoined: "2024-09-15"  // Example date, you can adjust as needed
+        dateJoined: "2024-09-15",
+        relationshipStatus: "Single",
+        mbti: "INTJ",
+        movie: "Inception",
+        music: "Rock",
+        bio: "Hello, I'm Naveed!"
     )
 
     
@@ -101,6 +118,8 @@ struct User: Codable, Equatable, FBObject {
 
     enum CodingKeys: String, CodingKey {
         case id, firstName, lastName, username, schoolId, color, aura, godMode, birthday, grade, number, votedPolls, lastPollFinished, friends, invitedFriends, ogBadge, gender, fcmToken, proPic, referral, crushId, friendRequests, dateJoined
+        // New coding keys
+        case relationshipStatus, mbti, movie, music, bio
     }
 
     init(from decoder: Decoder) throws {
@@ -137,6 +156,13 @@ struct User: Codable, Equatable, FBObject {
         } else {
             lastPollFinished = nil
         }
+        
+        // New property decoding (now required)
+        relationshipStatus = try container.decodeIfPresent(String.self, forKey: .relationshipStatus) ?? "single af"
+        mbti = try container.decodeIfPresent(String.self, forKey: .mbti) ?? "INTJ"
+        movie = try container.decodeIfPresent(String.self, forKey: .movie) ?? "whiplash"
+        music = try container.decodeIfPresent(String.self, forKey: .music) ?? "the end"
+        bio = try container.decodeIfPresent(String.self, forKey: .bio) ?? "a school to work on ur ideas"
     }
 
     func encodeToDictionary() -> [String: Any]? {

@@ -17,6 +17,7 @@ struct FriendRequests: View {
         ZStack {
             Color.white.edgesIgnoringSafeArea(.all)
             VStack {
+                InboxScreen().customToolbar
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 24) {
                         if inboxVM.friendRequests.isEmpty {
@@ -33,10 +34,9 @@ struct FriendRequests: View {
                             Text("Friend Requests")
                                 .font(.system(size: 22, weight: .bold))
                                 .padding(.leading, 20)
-                                .padding(.top, 20)
-                            
+                                .foregroundColor(.black)
                             VStack(spacing: 24) {
-                                ForEach(inboxVM.friendRequests) { request in
+                                ForEach(inboxVM.friendRequests, id: \.user.id) { request in
                                     FriendRequestView(request: request)
                                 }
                             }
@@ -73,7 +73,8 @@ struct FriendRequestView: View {
     @EnvironmentObject var mainVM: MainViewModel
     var request: FriendRequest
     @State private var isPressed = false
-    
+    @State private var showCheck = false
+
     var body: some View {
         ZStack {
             ZStack {
@@ -91,6 +92,7 @@ struct FriendRequestView: View {
                     VStack(alignment: .leading, spacing: 4) {
                         Text("\(request.user.firstName) \((request.user.lastName))")
                             .sfPro(type: .bold, size: .p2)
+                            .foregroundColor(Color.black)
                         Text("\(request.user.grade)")
                             .sfPro(type: .bold, size: .p2)
                             .foregroundColor(Color.black.opacity(0.5))
@@ -98,23 +100,41 @@ struct FriendRequestView: View {
                     
                     Spacer()
                     VStack {
-                        AcceptButton(isPressed: $isPressed) {
-                            Analytics.shared.log(event: "FriendRequests: Tapped Accept")
-                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                mainVM.currUser?.friendRequests.removeValue(forKey: request.user.id)
-                                mainVM.currUser?.friends[request.user.id] = Date().toString()
-
-                                if let user = mainVM.currUser {
-                                    Task {
-                                        await inboxVM.tappedAcceptFriendRequest(currUser: user, requestedUser: request.user)
+                        if showCheck {
+                            Image(systemName: "checkmark.circle.fill")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .font(Font.title.weight(.bold))
+                                .frame(width: 32)
+                                .foregroundColor(.brightGreen)
+                                .padding(2)
+                                .background(Circle()
+                                    .fill(.darkGreen)
+                                            
+                                    .stroke(color: .darkGreen))
+                                .cornerRadius(40)
+                                .offset(x: -12)
+                        } else {
+                            AcceptButton(isPressed: $isPressed) {
+                                Analytics.shared.log(event: "FriendRequests: Tapped Accept")
+                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                showCheck = true
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                                    mainVM.currUser?.friendRequests.removeValue(forKey: request.user.id)
+                                    mainVM.currUser?.friends[request.user.id] = Date().toString()
+                                    
+                                    if let user = mainVM.currUser {
+                                        Task {
+                                            await inboxVM.tappedAcceptFriendRequest(currUser: user, requestedUser: request.user)
+                                        }
                                     }
-                                }
-                                withAnimation {
-                                    inboxVM.friendRequests.removeAll { $0.user.id == request.user.id }
+                                    withAnimation {
+                                        inboxVM.friendRequests.removeAll { $0.user.id == request.user.id }
+                                    }
                                 }
                             }
                         }
+                   
                     }
                 }.padding()
             }
@@ -130,10 +150,9 @@ struct FriendRequestView: View {
                 .position(x: UIScreen.main.bounds.width - 30, y: 12)
                 .onTapGesture {
                     UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                    mainVM.currUser?.friendRequests.removeValue(forKey: request.user.id)
                     if let user = mainVM.currUser {
                         Analytics.shared.log(event: "FriendRequests: Tapped Decline")
-                        mainVM.currUser?.friendRequests.removeValue(forKey: request.user.id)
-                        
                         Task {
                             await inboxVM.tappedDeclineFriendRequest(currUser: user, requestedUser: request.user)
                         }

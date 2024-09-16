@@ -16,9 +16,12 @@ class ProfileViewModel: ObservableObject, ImageUploadable {
     @Published var isVisitingProfile: Bool = false
     @Published var isCrush: Bool = false
     @Published var isFriend: Bool = false
+    @Published var showFriendsScreen: Bool = false
     @Published var showingImagePicker = false
     @Published var sourceType: UIImagePickerController.SourceType = .photoLibrary
+    @Published var editProfile: Bool = false
     
+
     init() {
         
     }
@@ -128,9 +131,15 @@ class ProfileViewModel: ObservableObject, ImageUploadable {
                 newPerson.friendsStatus =  "Sent 💌"
             } else if newPerson.friends.contains(where: { k,v in
                 k == user.id // they are friends ✅, we need to unfriend
+            }) && !newPerson.friendRequests.contains(where: { k,v in
+                k == user.id
             }) {
                 newPerson.friendsStatus =  "Friends ✅"
-                friends.append(newPerson)
+                if !friends.contains(where: { usr in
+                    usr.id == newPerson.id
+                }) {
+                    friends.append(newPerson)
+                }
             } else { // the friend declined the other users request so we need to show + Add status
                 newPerson.friendsStatus =  "Add +"
             }
@@ -139,6 +148,7 @@ class ProfileViewModel: ObservableObject, ImageUploadable {
             if let index = peopleList.firstIndex(where: { $0.id == newPerson.id }) {
                 peopleList[index] = newPerson
             }
+            
             peopleList.removeAll { usr in
                 usr.id == user.id
             }
@@ -196,6 +206,17 @@ class ProfileViewModel: ObservableObject, ImageUploadable {
                 continuation.resume(throwing: error)
             }
         }
+    }
+}
+
+func updateUserProfile(_ user: User) async throws {
+    do {
+        try await FirebaseService.shared.updateDocument(collection: "users", object: user)
+        DispatchQueue.main.async {
+            self.objectWillChange.send()
+        }
+    } catch {
+        throw error
     }
 }
 }

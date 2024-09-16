@@ -67,7 +67,7 @@ struct PollComplete: View {
                             Analytics.shared.log(event: "PollCompleted: Tapped Continue")
                             pollVM.completedPoll = false
                         }
-                        .scaleEffect(auraScale)
+                        .scaleEffect(auraScale - 0.25)
                         .opacity(auraOpacity)
                         .animation(.spring(response: 0.5, dampingFraction: 0.6, blendDuration: 0.5), value: auraScale)
                         .animation(.easeInOut(duration: 0.5), value: auraOpacity)

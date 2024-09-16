@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		881A09F62C963B5800D8A858 /* AboutScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 881A09F52C963B5800D8A858 /* AboutScreen.swift */; };
+		881A09F82C9641F000D8A858 /* FriendsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 881A09F72C9641F000D8A858 /* FriendsScreen.swift */; };
+		881A09FA2C96721600D8A858 /* AgeScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 881A09F92C96721600D8A858 /* AgeScreen.swift */; };
 		8838DC362C8921D400500C6E /* ShadowModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8838DC352C8921D400500C6E /* ShadowModifier.swift */; };
 		8838DC3A2C89228100500C6E /* SharedComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8838DC392C89228100500C6E /* SharedComponents.swift */; };
 		8838DC3E2C8A5B7B00500C6E /* PollCooldownScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8838DC3D2C8A5B7B00500C6E /* PollCooldownScreen.swift */; };
@@ -37,7 +40,7 @@
 		884B24752C87B96E00229F1E /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B24742C87B96E00229F1E /* User.swift */; };
 		884B24772C87B97500229F1E /* Poll.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B24762C87B97500229F1E /* Poll.swift */; };
 		884B24792C87B97D00229F1E /* PollOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B24782C87B97D00229F1E /* PollOption.swift */; };
-		884B247B2C87B98500229F1E /* HighSchool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B247A2C87B98500229F1E /* HighSchool.swift */; };
+		884B247B2C87B98500229F1E /* Highschool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B247A2C87B98500229F1E /* Highschool.swift */; };
 		884B247D2C87B99D00229F1E /* VibeCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B247C2C87B99D00229F1E /* VibeCheck.swift */; };
 		884B247F2C87BECE00229F1E /* PollViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B247E2C87BECE00229F1E /* PollViewModel.swift */; };
 		884B24822C87E13B00229F1E /* ProfileScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B24812C87E13B00229F1E /* ProfileScreen.swift */; };
@@ -89,6 +92,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		881A09F52C963B5800D8A858 /* AboutScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutScreen.swift; sourceTree = "<group>"; };
+		881A09F72C9641F000D8A858 /* FriendsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendsScreen.swift; sourceTree = "<group>"; };
+		881A09F92C96721600D8A858 /* AgeScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgeScreen.swift; sourceTree = "<group>"; };
 		8838DC352C8921D400500C6E /* ShadowModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShadowModifier.swift; sourceTree = "<group>"; };
 		8838DC392C89228100500C6E /* SharedComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedComponents.swift; sourceTree = "<group>"; };
 		8838DC3D2C8A5B7B00500C6E /* PollCooldownScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PollCooldownScreen.swift; sourceTree = "<group>"; };
@@ -117,7 +123,7 @@
 		884B24742C87B96E00229F1E /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		884B24762C87B97500229F1E /* Poll.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Poll.swift; sourceTree = "<group>"; };
 		884B24782C87B97D00229F1E /* PollOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PollOption.swift; sourceTree = "<group>"; };
-		884B247A2C87B98500229F1E /* HighSchool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighSchool.swift; sourceTree = "<group>"; };
+		884B247A2C87B98500229F1E /* Highschool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Highschool.swift; sourceTree = "<group>"; };
 		884B247C2C87B99D00229F1E /* VibeCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VibeCheck.swift; sourceTree = "<group>"; };
 		884B247E2C87BECE00229F1E /* PollViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PollViewModel.swift; sourceTree = "<group>"; };
 		884B24812C87E13B00229F1E /* ProfileScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileScreen.swift; sourceTree = "<group>"; };
@@ -205,6 +211,8 @@
 			children = (
 				884B24812C87E13B00229F1E /* ProfileScreen.swift */,
 				8838DC7B2C936B1900500C6E /* ImageUploadExtension.swift */,
+				881A09F52C963B5800D8A858 /* AboutScreen.swift */,
+				881A09F72C9641F000D8A858 /* FriendsScreen.swift */,
 			);
 			path = Profile;
 			sourceTree = "<group>";
@@ -338,7 +346,7 @@
 				884B24742C87B96E00229F1E /* User.swift */,
 				884B24762C87B97500229F1E /* Poll.swift */,
 				884B24782C87B97D00229F1E /* PollOption.swift */,
-				884B247A2C87B98500229F1E /* HighSchool.swift */,
+				884B247A2C87B98500229F1E /* Highschool.swift */,
 				884B247C2C87B99D00229F1E /* VibeCheck.swift */,
 				884B24872C8803D300229F1E /* Question.swift */,
 			);
@@ -365,6 +373,7 @@
 				8838DC562C8E454A00500C6E /* NotificationScreen.swift */,
 				8838DC752C923C0E00500C6E /* LockedHighschoolScreen.swift */,
 				8838DC792C9293CC00500C6E /* UploadProfileScreen.swift */,
+				881A09F92C96721600D8A858 /* AgeScreen.swift */,
 			);
 			path = Onboarding;
 			sourceTree = "<group>";
@@ -519,7 +528,7 @@
 				88B37D322C2406DA000A7D91 /* Constants.swift in Sources */,
 				888FF3C42C867DF50025EC1B /* NameScreen.swift in Sources */,
 				884B24822C87E13B00229F1E /* ProfileScreen.swift in Sources */,
-				884B247B2C87B98500229F1E /* HighSchool.swift in Sources */,
+				884B247B2C87B98500229F1E /* Highschool.swift in Sources */,
 				8838DC3A2C89228100500C6E /* SharedComponents.swift in Sources */,
 				8838DC432C8A908400500C6E /* InboxScreen.swift in Sources */,
 				88B37D542C2411FC000A7D91 /* Extensions.swift in Sources */,
@@ -553,6 +562,7 @@
 				888FF3BC2C867CD80025EC1B /* LocationScreen.swift in Sources */,
 				88C1E5642C86A6B300C9317E /* FirebaseService.swift in Sources */,
 				884B24792C87B97D00229F1E /* PollOption.swift in Sources */,
+				881A09F62C963B5800D8A858 /* AboutScreen.swift in Sources */,
 				88C1E56A2C86D95B00C9317E /* NetworkViewModel.swift in Sources */,
 				8838DC512C8D11EA00500C6E /* ColorScreen.swift in Sources */,
 				88B37D4C2C241110000A7D91 /* Array.swift in Sources */,
@@ -562,7 +572,9 @@
 				8838DC742C911A9600500C6E /* String.swift in Sources */,
 				88B37D0D2C23FD60000A7D91 /* ShipFastStarterApp.swift in Sources */,
 				884B247D2C87B99D00229F1E /* VibeCheck.swift in Sources */,
+				881A09FA2C96721600D8A858 /* AgeScreen.swift in Sources */,
 				88B37D372C2407DF000A7D91 /* AnalyticsService.swift in Sources */,
+				881A09F82C9641F000D8A858 /* FriendsScreen.swift in Sources */,
 				884B24882C8803D300229F1E /* Question.swift in Sources */,
 				8838DC762C923C0E00500C6E /* LockedHighschoolScreen.swift in Sources */,
 				888FF3BE2C867CEF0025EC1B /* Onboarding.swift in Sources */,
@@ -709,7 +721,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = ONG.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 13;
+				CURRENT_PROJECT_VERSION = 16;
 				DEVELOPMENT_ASSET_PATHS = "\"ShipFastStarter/Preview Content\"";
 				DEVELOPMENT_TEAM = VY92D2R4AT;
 				ENABLE_PREVIEWS = YES;
@@ -730,7 +742,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.2;
+				MARKETING_VERSION = 1.1.5;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ong.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -750,7 +762,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = ONG.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 13;
+				CURRENT_PROJECT_VERSION = 16;
 				DEVELOPMENT_ASSET_PATHS = "\"ShipFastStarter/Preview Content\"";
 				DEVELOPMENT_TEAM = VY92D2R4AT;
 				ENABLE_PREVIEWS = YES;
@@ -771,7 +783,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.2;
+				MARKETING_VERSION = 1.1.5;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ong.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";

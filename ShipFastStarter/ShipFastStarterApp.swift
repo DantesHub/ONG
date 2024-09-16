@@ -20,7 +20,6 @@ import FirebaseMessaging
 @main
 struct ShipFastStarterApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
-    @Environment(\.scenePhase) private var scenePhase
     @StateObject var mainVM: MainViewModel = MainViewModel()
     @StateObject var pollVM: PollViewModel = PollViewModel()
     @StateObject var highschoolVM: HighSchoolViewModel = HighSchoolViewModel()
@@ -61,28 +60,6 @@ struct ShipFastStarterApp: App {
                 }
             }
             .colorScheme(.dark)
-            .onChange(of: scenePhase) { oldPhase, newPhase in
-                    switch newPhase {
-                    case .active:
-                        if mainVM.onboardingScreen == .lockedHighschool, let currUser = mainVM.currUser {
-                            if !UserDefaults.standard.bool(forKey: "finishedOnboarding") {
-                                Task {
-                                    await highschoolVM.checkHighSchoolLock(for: currUser)
-                                    if !highschoolVM.isHighSchoolLocked {
-                                        mainVM.onboardingScreen = .addFriends
-                                    }
-                                }
-                            }
-                          
-                        }
-                    case .background:
-                        break
-                    case .inactive:
-                        break
-                    @unknown default:
-                        break
-                    }
-             }
             .onAppear {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                     withAnimation {

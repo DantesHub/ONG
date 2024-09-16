@@ -21,6 +21,10 @@ struct DevTestingView: View {
                     let sixHoursAgo = Date().addingTimeInterval(-6 * 60 * 60)
                     mainVM.currUser?.lastPollFinished = sixHoursAgo
                     if let user = mainVM.currUser {
+                        pollVM.currentPollIndex = 0
+                        Task {
+                            await pollVM.fetchPolls(for: user)
+                        }
                         pollVM.resetCooldown(user: user)
                         mainVM.currentPage = .poll
                     }
@@ -30,6 +34,7 @@ struct DevTestingView: View {
                     mainVM.onboardingScreen = .highschool
                     mainVM.currentPage = .onboarding
                 }
+                
                 Button("Reset App State") {
                     if let user = mainVM.currUser {
                         Task {

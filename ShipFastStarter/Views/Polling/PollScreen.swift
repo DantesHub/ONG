@@ -79,6 +79,8 @@ struct PollScreen: View {
                                 HStack(alignment: .center) {
                                     if shuffleCounter < 2 {
                                         Button(action: {
+                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                            Analytics.shared.log(event: "PollScreen: Tapped Shuffle")
                                             if let user = mainVM.currUser {
                                                 pollVM.shuffleOptions(excludingUserId: user.id)
                                                 shuffleCounter += 1
@@ -177,13 +179,13 @@ struct PollScreen: View {
                             .font(.title)
                             .foregroundColor(.white)
                     }
-                }.onTapGesture {
-                    if pollVM.showProgress {
-                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                        shuffleCounter = 0
-                        animateTransition()
-                    }
                 }
+        }.onTapGesture {
+            if pollVM.showProgress {
+                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                shuffleCounter = 0
+                animateTransition()
+            }
         }
     }
 
@@ -237,11 +239,11 @@ struct PollScreen: View {
             // All polls completed
             mainVM.currUser?.lastPollFinished = Date()
             pollVM.completedPoll = true
-            mainVM.currentPage = .cooldown
             if let user = mainVM.currUser {
                 UserDefaults.standard.setValue(0, forKey: Constants.currentIndex)
                 mainVM.currUser?.aura += 300
                 pollVM.finishPoll(user: user)
+                mainVM.currentPage = .cooldown
             }
         }
     }

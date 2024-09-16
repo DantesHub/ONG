@@ -8,50 +8,24 @@ struct InboxScreen: View {
     var body: some View {
         ZStack {
             Color.white.edgesIgnoringSafeArea(.all)
-            VStack {
+            VStack(spacing: 0) {
+                // Add a custom "toolbar" view
+                customToolbar
+                
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 24) {
                         if inboxVM.newUsersWhoVoted.isEmpty && inboxVM.oldUsersWhoVoted.isEmpty {
-                            Spacer()
-                            Text("No one has voted for you yet!\n\nTip: Answer more questions to show up in more polls")
-                                .foregroundColor(Color.black.opacity(0.7))
-                                    .font(.system(size: 22, weight: .bold))
-                                .multilineTextAlignment(.center)
-                                .padding(.horizontal, 48)
-                                .opacity(0.3)
-                                .offset(y: 64)
-                            Spacer()
+                            emptyStateView
                         } else {
-                            if !inboxVM.newUsersWhoVoted.isEmpty {
-                                Text("New")
-                                    .font(.system(size: 22, weight: .bold))
-                                    .padding(.leading, 20)
-                                    .foregroundColor(.black)
-                                ForEach(inboxVM.newUsersWhoVoted) { item in
-                                    InboxItemView(item: item)
-                                }
-                            }
-                            
-                            if !inboxVM.oldUsersWhoVoted.isEmpty {
-                                Text("Past")
-                                    .foregroundColor(.black)
-                                    .font(.system(size: 22, weight: .bold))
-                                    .padding(.leading, 20)
-                                    .padding(.top, 10)
-                                
-                                ForEach(inboxVM.oldUsersWhoVoted) { item in
-                                    InboxItemView(item: item)
-                                }
-                            }
+                            newVotesSection
+                            pastVotesSection
                         }
-                        
-                        Spacer()
                     }
                     .padding(.top, 20)
                 }
+                .background(Color.white)
             }
         }
-
         .onAppear {
             if let user = mainVM.currUser {
                 Task {
@@ -64,6 +38,63 @@ struct InboxScreen: View {
         }
         .onAppearAnalytics(event: "InboxScreen: Screenload")
     }
+    
+
+    
+    private var emptyStateView: some View {
+        VStack {
+            Spacer()
+            Text("No one has voted for you yet!\n\nTip: Answer more questions to show up in more polls")
+                .foregroundColor(Color.black.opacity(0.7))
+                .font(.system(size: 22, weight: .bold))
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 48)
+                .opacity(0.3)
+                .offset(y: 64)
+            Spacer()
+        }
+    }
+    
+    private var newVotesSection: some View {
+        Group {
+            if !inboxVM.newUsersWhoVoted.isEmpty {
+                Text("New")
+                    .font(.system(size: 22, weight: .bold))
+                    .padding(.leading, 20)
+                    .foregroundColor(.black)
+                ForEach(inboxVM.newUsersWhoVoted) { item in
+                    InboxItemView(item: item)
+                }
+            }
+        }
+    }
+    
+    private var pastVotesSection: some View {
+        Group {
+            if !inboxVM.oldUsersWhoVoted.isEmpty {
+                Text("Past")
+                    .foregroundColor(.black)
+                    .font(.system(size: 22, weight: .bold))
+                    .padding(.leading, 20)
+                    .padding(.top, 10)
+                
+                ForEach(inboxVM.oldUsersWhoVoted) { item in
+                    InboxItemView(item: item)
+                }
+            }
+        }
+    }
+    
+    var customToolbar: some View {
+       HStack {
+           Text("")
+               .sfPro(type: .bold, size: .h3p1)
+               .foregroundColor(.black)
+       }
+       .frame(height: 1)
+       .frame(maxWidth: .infinity)
+       .background(Color.white)
+   }
 }
 
 struct InboxItem: Identifiable {

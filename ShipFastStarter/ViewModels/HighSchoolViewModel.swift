@@ -19,8 +19,9 @@ struct School: Codable, Identifiable {
 class HighSchoolViewModel: ObservableObject {
     @Published var schools: [School] = []
     @Published var searchQuery = ""
-    @Published var isHighSchoolLocked = false
+    @Published var isHighSchoolLocked = true
     @Published var totalKids = 0
+    @Published var selectedHighschool: Highschool = Highschool.exHighSchool
     private var cancellables = Set<AnyCancellable>()
     
     init() {
@@ -34,24 +35,30 @@ class HighSchoolViewModel: ObservableObject {
     }
     
     @MainActor
-    func checkHighSchoolLock(for user: User) async {
-            do {
-                let users: [User] = try await FirebaseService.shared.fetchDocuments(
-                    collection: "users",
-                    whereField: "schoolId",
-                    isEqualTo: user.schoolId
-                )
-                
-                let userCount = users.count
-                totalKids = userCount
-                    // Adjust this threshold as needed
-                self.isHighSchoolLocked = userCount <= 16
-                DispatchQueue.main.async {
-                    self.objectWillChange.send()
-                }
-            } catch {
-                print("Error checking high school lock: \(error.localizedDescription)")
+    func checkHighSchoolLock(for user: User, id: String) async {
+        do {
+            selectedHighschool = try await FirebaseService.shared.getDocument(collection: "highschools", documentId: id)
+            totalKids = selectedHighschool.students.count
+            // Adjust this threshold as needed
+            self.isHighSchoolLocked = totalKids <= 12
+            DispatchQueue.main.async {
+                self.objectWillChange.send()
             }
+        } catch {
+            print("Error checking high school lock: \(error.localizedDescription)")
+        }
+    }
+    
+    @MainActor
+    func updateNumStudents(user: User, for highschoolId: String) {
+        Task {        
+            var students = selectedHighschool.students
+            students.append(user.id)
+            selectedHighschool.students = students
+            try await FirebaseService.shared.updateField(collection: "highschools", documentId: highschoolId, field: "students", value: students)
+            totalKids = students.count
+        }
+     
     }
     
     func searchSchools(query: String) {                
@@ -78,8 +85,7 @@ class HighSchoolViewModel: ObservableObject {
                            city: result.city,
                            state: result.state)
                 }
-            }
-            .store(in: &cancellables)
+            }.store(in: &cancellables)
     }
 }
 

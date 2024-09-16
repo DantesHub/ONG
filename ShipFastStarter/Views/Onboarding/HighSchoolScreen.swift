@@ -43,25 +43,35 @@ struct HighSchoolScreen: View {
                         mainVM.currUser?.schoolId = "buildspace"
                         if let currUser = mainVM.currUser {
                             Task {
-                                await viewModel.checkHighSchoolLock(for: currUser)
+                                await viewModel.checkHighSchoolLock(for: currUser, id: "buildspace")
+                                if !viewModel.selectedHighschool.students.contains(currUser.id) {
+                                    viewModel.updateNumStudents(user: currUser, for: "buildspace")
+                                }
+                                
                                 if viewModel.isHighSchoolLocked {
                                     withAnimation {
                                         mainVM.onboardingScreen = .lockedHighschool
                                     }
                                 } else {
                                     withAnimation {
-                                        mainVM.onboardingScreen = .addFriends
+                                        mainVM.onboardingScreen = .grade
                                     }
                                 }
                             }
                         }
                     }
-                }
-                .environmentObject(mainVM)
+                }.environmentObject(mainVM)
+                
                 HighschoolButton(title: "Test Highschool", totalNum: viewModel.totalKids) {
                     withAnimation {
                         mainVM.currUser?.schoolId = "123e4567-e89b-12d3-a456-426614174000"
-                        mainVM.onboardingScreen = .addFriends
+                        if let currUser = mainVM.currUser {
+                            Task {
+                                await viewModel.checkHighSchoolLock(for: currUser, id: "123e4567-e89b-12d3-a456-426614174000")
+                                viewModel.updateNumStudents(user: currUser, for: "123e4567-e89b-12d3-a456-426614174000")
+                            }
+                        }                  
+                        mainVM.onboardingScreen = .grade
                     }
                 }
                 .environmentObject(mainVM)
@@ -70,8 +80,8 @@ struct HighSchoolScreen: View {
             }
         }
         .onAppear {
-       
             isSearchFocused = true
+                        
         }
     }
 }

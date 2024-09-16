@@ -61,7 +61,7 @@ struct LockedHighschoolScreen: View {
                         .offset(x: -80, y: -80)
                         .rotationEffect(.degrees(-12))
                     VStack(spacing: -12) {
-                        Text("\(20 - highschoolVM.totalKids) more")
+                        Text("\(12 - highschoolVM.totalKids) more")
                         Text("needed")
                         Text("to unlock")
                     }
@@ -193,15 +193,6 @@ struct LockedHighschoolScreen: View {
                 .environmentObject(profileVM)
                 .environmentObject(mainVM)
         }.onAppear {
-            if let user = mainVM.currUser {
-                Task {
-                    await highschoolVM.checkHighSchoolLock(for: user)
-                }
-                
-//                if !highschoolVM.isHighSchoolLocked {
-//                    mainVM.onboardingScreen = .addFriends
-//                }
-            }
         }
     }
 }

@@ -16,7 +16,8 @@ struct ContentView: View {
     @StateObject var pollVM = PollViewModel()
     @StateObject var inboxVM = InboxViewModel()
     @StateObject var profileVM = ProfileViewModel()
-    
+    @Environment(\.scenePhase) private var scenePhase
+
     @Environment(\.modelContext) private var modelContext
     @Query private var items: [Item]
     
@@ -118,6 +119,33 @@ struct ContentView: View {
                 .environmentObject(mainVM)
                 .environmentObject(pollVM)
         }
+        .onChange(of: scenePhase) { oldPhase, newPhase in
+                switch newPhase {
+                case .active:
+                    if mainVM.onboardingScreen == .lockedHighschool, let currUser = mainVM.currUser {
+                        if !UserDefaults.standard.bool(forKey: "finishedOnboarding") {
+                            Task {
+                                await highschoolVM.checkHighSchoolLock(for: currUser, id: currUser.schoolId)
+                                if !highschoolVM.isHighSchoolLocked {
+                                    mainVM.onboardingScreen = .addFriends
+                                    setupInitialState()
+                                }
+                            }
+                        } else {
+                            Task {
+                                await fetchUserData(currUser)
+                            }
+                        }
+                    }
+                case .background:
+                    break
+                case .inactive:
+                    break
+                @unknown default:
+                    break
+                }
+         }
+
     }
     
     @ViewBuilder
@@ -135,11 +163,20 @@ struct ContentView: View {
         case .home:
             HomeScreen()
         case .poll, .cooldown:
-            PeopleScreen()
-                .environmentObject(profileVM)
-                .environmentObject(authVM)
-                .environmentObject(mainVM)
-                .environmentObject(pollVM)
+           if let endTime = pollVM.cooldownEndTime {
+               PollCooldownScreen()
+                   .environmentObject(profileVM)
+                   .environmentObject(authVM)
+                   .environmentObject(mainVM)
+                   .environmentObject(pollVM)
+            } else {
+                PollScreen()
+                    .environmentObject(profileVM)
+                    .environmentObject(authVM)
+                    .environmentObject(mainVM)
+                    .environmentObject(pollVM)
+            }
+         
         case .inbox:
             InboxScreen()
                 .environmentObject(mainVM)
@@ -168,7 +205,7 @@ struct ContentView: View {
             Text(title)
                 .sfPro(type: .bold, size: .h3p1)
                 .foregroundColor(.black)
-                .opacity(mainVM.currentPage == page ? 1 : 0.3)
+                .opacity(mainVM.currentPage == page || mainVM.currentPage == .cooldown && title == "play" ? 1 : 0.3)
         }
     }
     
@@ -186,7 +223,11 @@ struct ContentView: View {
         withAnimation {
             switch mainVM.currentPage {
             case .inbox:
-                mainVM.currentPage = .poll
+                if let endTime = pollVM.cooldownEndTime {
+                    mainVM.currentPage = .cooldown
+                } else {
+                    mainVM.currentPage = .poll
+                }
             case .poll, .cooldown:
                 mainVM.currentPage = .profile
             case .friendRequests:
@@ -201,7 +242,11 @@ struct ContentView: View {
         withAnimation {
             switch mainVM.currentPage {
             case .profile:
-                mainVM.currentPage = .poll
+                if let endTime = pollVM.cooldownEndTime {
+                    mainVM.currentPage = .cooldown
+                } else {
+                    mainVM.currentPage = .poll
+                }
             case .poll, .cooldown:
                 mainVM.currentPage = .inbox
             case .inbox:
@@ -223,7 +268,6 @@ struct ContentView: View {
                     await profileVM.fetchPeopleList(user: user)
                     await fetchUserData(user)
                     pollVM.checkCooldown(user: user)
-                    await highschoolVM.checkHighSchoolLock(for: user)
                     
                     if pollVM.cooldownEndTime != nil {
                         pollVM.completedPoll = false
@@ -238,12 +282,16 @@ struct ContentView: View {
         }
     }
     
+    
     private func fetchUserData(_ user: User) async {
         async let notifications = inboxVM.fetchNotifications(for: user)
         async let peopleList = profileVM.fetchPeopleList(user: user)
-        _ = await (notifications, peopleList)
+        async let profilePic = profileVM.fetchUserProfilePicture(user: user)
+        _ = await (notifications, peopleList, profilePic)
     }
     
+    
+        
     private func fetchPolls(user: User) async {
         Task {
             await pollVM.fetchPolls(for: user)

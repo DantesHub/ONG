@@ -57,11 +57,19 @@ class InboxViewModel: ObservableObject {
         do {
             for friendRequest in user.friendRequests {
                 // fetch friend
+                if friendRequests.contains(where: { $0.id == friendRequest.key }) {
+                    continue
+                }
                 let friendArray: [User] = try await FirebaseService.shared.fetchDocuments(collection: "users", whereField: "id", isEqualTo: friendRequest.key)
                 if let friend = friendArray.first {
                     let timeStamp = Date.fromString((user.friendRequests[friend.id] ?? "")) ?? Date()
                     let request = FriendRequest(id: UUID().uuidString, user: friend, time: timeStamp)
-                    friendRequests.append(request)
+                    if !friendRequests.contains(where: { req in
+                        req.user.id == request.user.id
+                    }) {
+                        friendRequests.append(request)
+                        print(friendRequests, "gyamazawa")
+                    }
                 }
                 // request
             }

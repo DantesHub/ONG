@@ -51,7 +51,7 @@ class AuthViewModel: ObservableObject {
     func verifyCode(verificationCode: String, completion: @escaping (Result<AuthDataResult, Error>) -> Void) {
         //MARK: - revert
 //        self.verificationID = "AD8T5IukNKy2_E8SYbz2j1A0drSfYbnEIi1ntBYqO2Wy-qLO2j1mZuyspme0M7grLxHfLDXJb2Q4LKHvJNEMhlarFilxINRcK7tVBni2w9gafQEBFLqLFtsOQs1bvBrzaGEu6KkByF6VlzhBxa0MG7IhLfLPF3tLdA"
-        print(verificationID, "gotta go")
+//        print(verificationID, "gotta go")
         if let verfId = verificationID {
             let credential = PhoneAuthProvider.provider().credential(
                 withVerificationID: verfId,

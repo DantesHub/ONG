@@ -82,7 +82,7 @@ struct UploadProfileScreen: View {
                                     print(error.localizedDescription)
                                 }
                         }
-                            mainVM.onboardingScreen = .highschool
+                            mainVM.onboardingScreen = .notification
                         }
                     }.padding(.horizontal, 32)
                     .padding(.bottom)

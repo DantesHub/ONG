@@ -53,7 +53,7 @@ class PollViewModel: ObservableObject {
     }
 
     func fetchPolls(for user: User) async {
-        if UserDefaults.standard.integer(forKey: Constants.currentIndex) != 0 {
+        if UserDefaults.standard.integer(forKey: Constants.currentIndex) != 0  {
             currentPollIndex = UserDefaults.standard.integer(forKey: Constants.currentIndex)
             if pollSet.isEmpty {
                 if let pollIds = UserDefaults.standard.array(forKey: Constants.pollIds) {
@@ -72,6 +72,14 @@ class PollViewModel: ObservableObject {
                         }
                        
                     }
+                    if pollSet.isEmpty {
+                        Task {
+                            UserDefaults.standard.setValue(0, forKey: Constants.currentIndex)
+                            currentPollIndex = 0
+                            await initPolls(for: user)
+                        }
+                        return
+                    }
                     self.pollSet.sort { $0.createdAt > $1.createdAt }
                     // Limit pollSet to the first 8 polls
                     self.pollSet = Array(self.pollSet.prefix(8))
@@ -81,12 +89,15 @@ class PollViewModel: ObservableObject {
                     self.selectedPoll = pollSet[currentPollIndex]
                     self.getPollOptions(excludingUserId: user.id)
                     updateQuestionEmoji()
-                    
                 }
             }
             return
         }
         
+        await initPolls(for: user)
+    }
+    
+    func initPolls(for user: User) async {
         do {
             let polls: [Poll] = try await FirebaseService.shared.fetchDocuments(
                 collection: "polls",
