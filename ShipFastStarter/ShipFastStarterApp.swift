@@ -179,6 +179,8 @@
 //  Created by Dante Kim on 6/20/24.
 //
 
+
+
 import SwiftUI
 import SwiftData
 import SwiftData
@@ -201,12 +203,7 @@ struct ShipFastStarterApp: App {
     @State private var showSplash = true
 
     init() {
-
         setup()
-
-      setup()
-        
-
     }
     
     var sharedModelContainer: ModelContainer = {
@@ -226,6 +223,7 @@ struct ShipFastStarterApp: App {
 
     var body: some Scene {
         WindowGroup {
+            
             ZStack {
                 ContentView()
                     .environmentObject(mainVM)

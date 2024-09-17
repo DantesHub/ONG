@@ -8,11 +8,33 @@
 import SwiftUI
 
 struct HomeScreen: View {
+
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        TestDatePickerView()
     }
 }
+
 
 #Preview {
     HomeScreen()
 }
+
+
+struct TestDatePickerView: View {
+    @State private var birthDate = Date.now
+
+    var body: some View {
+        GeometryReader { geometry in
+            ZStack {
+                
+                DatePicker(selection: $birthDate, in: ...Date.now, displayedComponents: .date) {
+                    Text("Select a date")
+                }
+                .datePickerStyle(WheelDatePickerStyle())
+
+            }
+            .frame(width: geometry.size.width, height: geometry.size.height) // Ensure ZStack takes the full size
+        }
+    }
+}
+

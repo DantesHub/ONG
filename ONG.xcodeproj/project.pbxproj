@@ -79,6 +79,7 @@
 		88C1E5782C876E7500C9317E /* ONG-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 88C1E5772C876E7500C9317E /* ONG-Info.plist */; };
 		C45CF5572C9166E900D58633 /* FirebaseDynamicLinks in Frameworks */ = {isa = PBXBuildFile; productRef = C45CF5562C9166E900D58633 /* FirebaseDynamicLinks */; };
 		C45CF55A2C91C24700D58633 /* FacebookShare in Frameworks */ = {isa = PBXBuildFile; productRef = C45CF5592C91C24700D58633 /* FacebookShare */; };
+		C4C38B712C984BEB003FDE11 /* SwiftUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4C38B702C984BEB003FDE11 /* SwiftUIView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -145,6 +146,7 @@
 		88C1E5692C86D95B00C9317E /* NetworkViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkViewModel.swift; sourceTree = "<group>"; };
 		88C1E5712C876CF100C9317E /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "ShipFastStarter/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		88C1E5772C876E7500C9317E /* ONG-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "ONG-Info.plist"; sourceTree = "<group>"; };
+		C4C38B702C984BEB003FDE11 /* SwiftUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -233,6 +235,7 @@
 				88B37D1D2C23FD78000A7D91 /* Views */,
 				88B37D1C2C23FD74000A7D91 /* ViewModels */,
 				88B37D0C2C23FD60000A7D91 /* ShipFastStarterApp.swift */,
+				C4C38B702C984BEB003FDE11 /* SwiftUIView.swift */,
 				88B37D102C23FD60000A7D91 /* Item.swift */,
 				88B37D122C23FD60000A7D91 /* Assets.xcassets */,
 				88B37D142C23FD60000A7D91 /* Preview Content */,
@@ -539,6 +542,7 @@
 				884B247D2C87B99D00229F1E /* VibeCheck.swift in Sources */,
 				88B37D372C2407DF000A7D91 /* AnalyticsService.swift in Sources */,
 				884B24882C8803D300229F1E /* Question.swift in Sources */,
+				C4C38B712C984BEB003FDE11 /* SwiftUIView.swift in Sources */,
 				888FF3BE2C867CEF0025EC1B /* Onboarding.swift in Sources */,
 				88C1E5662C86A6C400C9317E /* AuthViewModel.swift in Sources */,
 				8838DC6D2C8F9C1D00500C6E /* Image.swift in Sources */,

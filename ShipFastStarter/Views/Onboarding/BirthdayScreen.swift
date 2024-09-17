@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct BirthdayScreen: View {
+
     @EnvironmentObject var mainVM: MainViewModel
     @State private var birthdate = Date()
     @State private var yearsOld = 0
@@ -31,6 +32,7 @@ struct BirthdayScreen: View {
                     .stroke(color: .black, width: 3)
                     .padding(.horizontal)
 //                    .primaryShadow()
+
                 Spacer()
 
                 Text("you are \(calculateAge()) years old")
@@ -76,3 +78,5 @@ struct BirthdayScreen_Previews: PreviewProvider {
 #Preview {
     BirthdayScreen()
 }
+
+

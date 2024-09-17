@@ -45,7 +45,7 @@ struct OnboardingScreen: View {
                     .padding(.top)
                 Spacer()
                 
-                
+
                 SharedComponents.PrimaryButton(title: "continue") {
                     mainVM.currUser = User.exUser
                     mainVM.onboardingScreen = .birthday

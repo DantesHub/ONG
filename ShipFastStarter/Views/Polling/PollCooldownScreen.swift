@@ -50,7 +50,7 @@ struct PollCooldownScreen: View {
                                         let image = UIImage(named: "AppIcon")
                                         let content = "I'm inviting you to download and install the ong app"
                                         
-                                        let activityVC = UIActivityViewController(activityItems: [ url, image, content], applicationActivities: nil)
+                                        let activityVC = UIActivityViewController(activityItems: [ url, TestView().snapshot(), content], applicationActivities: nil)
                                         
                                         activityVC.setValue("ONG", forKey: "subject")
                                         
@@ -59,6 +59,7 @@ struct PollCooldownScreen: View {
                                     }
                                 }
                             )
+                            TestView()
                             SharedComponents.PrimaryButton(
                                 title: "share on facebook",
                                 action: {
@@ -78,8 +79,9 @@ struct PollCooldownScreen: View {
                                         guard let url = url else { return }
                                         
                                          
-                                         let image = UIImage(named: "temp")
-                                         shareToInstagramStories(image!)
+//                                         let image = TestView().snapshot()
+//                                         let image = UIImage(named: "temp")
+                                         shareToInstagramStories(TestView().snapshot())
                                        
                                     }
                                 }
@@ -113,7 +115,8 @@ struct PollCooldownScreen: View {
     
     func shareToInstagramStories(_ image: UIImage) {
         guard let instagramStoriesUrl = URL(string: "instagram-stories://share?source_application=com.ong.app") else { return }
-        guard let imageData = image.jpegData(compressionQuality: 0.8) else { return } // Use JPEG compression
+        guard let imageData = image.pngData() else { return }
+//                jpegData(compressionQuality: 0.8) else { return } // Use JPEG compression
 //        guard let linkUrl = URL(string: link) else { return }  Validate the link URL
         if UIApplication.shared.canOpenURL(instagramStoriesUrl) {
             let pasteboardItems: [String: Any] = [
@@ -206,3 +209,55 @@ struct PollCooldownScreen_Previews: PreviewProvider {
             .environmentObject(PollViewModel())
     }
 }
+
+
+
+struct TestView: View {
+    var body: some View {
+        GeometryReader { geometry in
+            ZStack {
+                if let image = UIImage(named: "temp") {
+                    Image(uiImage: image)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: 150) // Half the height of the parent
+                        .padding(20)
+                        
+                } else {
+                    Text("Image not found")
+                        .foregroundColor(.red)
+                }
+
+                Text("Hello, world!")
+                    .font(.largeTitle)
+                    .foregroundColor(.black)
+                    .frame(width: geometry.size.width * 0.9, height: geometry.size.height * 0.1) // Ensure the text fits properly
+            }
+            .frame(width: geometry.size.width, height: geometry.size.height) // Ensure ZStack takes the full size
+        }
+    }
+}
+
+
+extension View {
+    func snapshot() -> UIImage {
+        
+        let controller = UIHostingController(rootView: self)
+        let view = controller.view
+        
+        // Set an explicit size for the view
+        let targetSize = CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
+        view?.bounds = CGRect(origin: .zero, size: targetSize)
+        view?.backgroundColor = .clear
+        view?.layoutIfNeeded()
+        
+        let renderer = UIGraphicsImageRenderer(size: targetSize)
+        return renderer.image { _ in
+            view?.drawHierarchy(in: controller.view.bounds, afterScreenUpdates: true)
+            //        }
+        }
+        
+        
+    }
+}
+
