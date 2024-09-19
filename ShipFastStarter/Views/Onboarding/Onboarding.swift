@@ -152,9 +152,10 @@ struct CustomProgressViewStyle: ProgressViewStyle {
     }
 }
 
-extension UITableView {
-    open override func layoutSubviews() {
-        super.layoutSubviews()
-        backgroundColor = .black
-    }
-}
+//extension UITableView {
+//    open override func layoutSubviews() {
+//        super.layoutSubviews()
+//        backgroundColor = .black
+//    }
+//    
+//}
