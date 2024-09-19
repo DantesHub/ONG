@@ -136,10 +136,11 @@ class ProfileViewModel: ObservableObject, ImageUploadable {
             if newPerson.friendRequests.keys.contains(user.id) {
                 newPerson.friendsStatus =  "Sent 💌"
             } else if newPerson.friends.contains(where: { k,v in
-                k == user.id // they are friends ✅, we need to unfriend
+                k == user.id  // they are friends ✅, we need to unfriend
             }) && !newPerson.friendRequests.contains(where: { k,v in
                 k == user.id
-            }) {
+            }) && user.friends.contains(where: { k,v in
+                k == newPerson.id }) {
                 newPerson.friendsStatus =  "Friends ✅"
                 if !friends.contains(where: { usr in
                     usr.id == newPerson.id

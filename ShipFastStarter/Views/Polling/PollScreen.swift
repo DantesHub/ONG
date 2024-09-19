@@ -226,10 +226,12 @@ struct PollScreen: View {
         if pollVM.currentPollIndex < pollVM.pollSet.count - 1 {
             pollVM.currentPollIndex += 1
             UserDefaults.standard.setValue(pollVM.currentPollIndex, forKey: Constants.currentIndex)
-            pollVM.selectedPoll = pollVM.pollSet[pollVM.currentPollIndex]
             
             Task {
-                 pollVM.getPollOptions(excludingUserId: user.id)
+                pollVM.selectedPoll = pollVM.pollSet[pollVM.currentPollIndex]
+                pollVM.allOptions = pollVM.selectedPoll.pollOptions
+                pollVM.getPollOptions(excludingUserId: user)
+                await pollVM.updatePollOptionsInFB()
             }
 
             pollVM.showProgress = false

@@ -417,6 +417,18 @@ class FirebaseService {
         }
     }
 
+    func updateFields(collection: String, documentId: String, fields: [String: Any]) async throws {
+        let docRef = FirebaseService.db.collection(collection).document(documentId)
+        
+        do {
+            try await docRef.updateData(fields)
+            print("Document successfully updated with multiple fields")
+        } catch {
+            print("Error updating document with multiple fields: \(error)")
+            throw error
+        }
+    }
+
     func deleteDocument(collection: String, documentId: String) async throws {
         let documentRef = FirebaseService.db.collection(collection).document(documentId)
         try await documentRef.delete()

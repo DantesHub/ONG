@@ -139,8 +139,9 @@ struct ContentView: View {
                                 await fetchUserData(currUser)
                             }
                         }
-                      
                     }
+                                        
+                    
                 case .background:
                     break
                 case .inactive:
@@ -208,7 +209,7 @@ struct ContentView: View {
         }) {
             Text(title)
                 .sfPro(type: .bold, size: .h3p1)
-                .foregroundColor(mainVM.currentPage == .poll || mainVM.currentPage == .cooldown ? .white : .black)
+                .foregroundColor(mainVM.currentPage == .cooldown ? .white : .black)
                 .opacity(mainVM.currentPage == page || mainVM.currentPage == .cooldown && title == "play" ? 1 : 0.3)
         }
     }
@@ -292,6 +293,7 @@ struct ContentView: View {
         async let peopleList = profileVM.fetchPeopleList(user: user)
         async let profilePic = profileVM.fetchUserProfilePicture(user: user)
         _ = await (notifications, peopleList, profilePic)
+        pollVM.entireSchool = profileVM.peopleList
     }
     
     

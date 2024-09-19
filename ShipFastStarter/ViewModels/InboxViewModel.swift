@@ -270,7 +270,7 @@ class InboxViewModel: ObservableObject {
         
         return "just now"
     }
-    
+            
     //MARK: - Friend requests
     func tappedAcceptFriendRequest(currUser: User, requestedUser: User) async {
  
@@ -279,9 +279,10 @@ class InboxViewModel: ObservableObject {
         friendRequests.removeAll { req in
             req.user.id == requestedUser.id
         }
-        
+        var fieldsToUpdate = ["friendRequests": currUser.friendRequests, "friends": currUser.friends]
         do {
-            try await FirebaseService.shared.updateDocument(collection: "users", object: currUser)
+//            try await FirebaseService.shared.updateDocument(collection: "users", object: currUser)
+            try await FirebaseService.shared.updateFields(collection: "users", documentId: currUser.id, fields: fieldsToUpdate)
             try await FirebaseService.shared.updateField(collection: "users", documentId: updatedRequestedUser.id, field: "friends", value: updatedRequestedUser.friends)
         } catch {
             print(error.localizedDescription)

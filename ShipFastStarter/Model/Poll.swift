@@ -31,12 +31,7 @@ struct Poll: Codable, Equatable, FBObject {
         id: "example_poll_id",
         title: "Example Poll",
         createdAt: Date(),
-        pollOptions: [
-            PollOption(id: UUID().uuidString, type: "Poll", option: "Option 1", userId: "user1", votes: [:], gradeLevel: "All"),
-            PollOption(id: UUID().uuidString, type: "Poll", option: "Option 2", userId: "user2", votes: [:], gradeLevel: "All"),
-            PollOption(id: UUID().uuidString, type: "Poll", option: "Option 3", userId: "user3", votes: [:], gradeLevel: "All"),
-            PollOption(id: UUID().uuidString, type: "Poll", option: "Option 4", userId: "user4", votes: [:], gradeLevel: "All")
-        ],
+        pollOptions: [],
         isActive: true,
         schoolId: "example_school_id",
         grade: "All",

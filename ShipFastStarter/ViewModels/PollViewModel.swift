@@ -15,6 +15,8 @@ class PollViewModel: ObservableObject {
     @Published var allPolls: [Poll] = []
     @Published var selectedPoll: Poll = Poll.exPoll
     @Published var currentFourOptions: [PollOption] = []
+    @Published var allOptions: [PollOption] = []
+    @Published var currentTwelveOptions: [PollOption] = []
     @Published var showProgress: Bool = false
     @Published var animateProgress: Bool = false
     @Published var animateAllOptions: Bool = false
@@ -26,6 +28,8 @@ class PollViewModel: ObservableObject {
     @Published var randomizedPeople: [(String, String)] = []
     @Published var currentPollOptionIndex: Int = 0
     @Published var currentPollIndex: Int = 0
+    @Published var friends: [User] = []
+    @Published var entireSchool: [User] = []
     
     private var timer: Timer?
 
@@ -63,6 +67,7 @@ class PollViewModel: ObservableObject {
                                 whereField: "id",
                                 isEqualTo: poll
                             )
+                            
                             if let first = polls.first {
                                 pollSet.append(first)
                             }
@@ -71,6 +76,7 @@ class PollViewModel: ObservableObject {
                         }
                        
                     }
+                    
                     if pollSet.isEmpty {
                         Task {
                             UserDefaults.standard.setValue(0, forKey: Constants.currentIndex)
@@ -79,6 +85,9 @@ class PollViewModel: ObservableObject {
                         }
                         return
                     }
+                    
+                    
+                    
                     self.pollSet.sort { $0.createdAt > $1.createdAt }
                     // Limit pollSet to the first 8 polls
                     self.pollSet = Array(self.pollSet.prefix(8))
@@ -86,7 +95,10 @@ class PollViewModel: ObservableObject {
                     let pollIds = pollSet.map { $0.id }
                     UserDefaults.standard.setValue(pollIds, forKey: Constants.pollIds)
                     self.selectedPoll = pollSet[currentPollIndex]
-                    self.getPollOptions(excludingUserId: user.id)
+                    allOptions = selectedPoll.pollOptions
+                    self.getPollOptions(excludingUserId: user)
+                    await updatePollOptionsInFB()
+                    
                     updateQuestionEmoji()
                 }
             }
@@ -94,6 +106,17 @@ class PollViewModel: ObservableObject {
         }
         
         await initPolls(for: user)
+    }
+    
+    func updatePollOptionsInFB() async {
+        if self.selectedPoll.pollOptions.count != allOptions.count { // update in firebase
+            self.selectedPoll.pollOptions = allOptions
+            do {
+                try await FirebaseService.shared.updateDocument(collection: "polls", field: "id", isEqualTo: selectedPoll.id, object: self.selectedPoll)
+            } catch {
+                print(error.localizedDescription)
+            }
+        }
     }
     
     func initPolls(for user: User) async {
@@ -120,7 +143,9 @@ class PollViewModel: ObservableObject {
 
             if let first = self.pollSet.first {
                 self.selectedPoll = first
-                self.getPollOptions(excludingUserId: user.id)
+                allOptions = first.pollOptions
+                self.getPollOptions(excludingUserId: user)
+                await updatePollOptionsInFB()
                 updateQuestionEmoji()
             }
           
@@ -131,39 +156,38 @@ class PollViewModel: ObservableObject {
 
     func answerPoll(user: User, option: PollOption) async {
         print("Answering poll for option: \(option.option)")
-        if var updatedPoll = pollSet.first(where: { $0.id == selectedPoll.id }),
-           let optionIndex = updatedPoll.pollOptions.firstIndex(where: { $0.id == option.id }) {
+       
+        if let optionIndex = selectedPoll.pollOptions.firstIndex(where: { $0.id == option.id }) {
             
             let currentDate = Date()
             let dateString = ISO8601DateFormatter().string(from: currentDate)
             
             // Update votes with the new structure
-            if updatedPoll.pollOptions[optionIndex].votes == nil {
-                updatedPoll.pollOptions[optionIndex].votes = [:]
+            if selectedPoll.pollOptions[optionIndex].votes == nil {
+                selectedPoll.pollOptions[optionIndex].votes = [:]
             }
-            if var voteObj = updatedPoll.pollOptions[optionIndex].votes?[user.id] {
+            
+            
+            if var voteObj = selectedPoll.pollOptions[optionIndex].votes?[user.id] {
                 var currentVotes = Int(voteObj["numVotes"] ?? "100") ?? 100
                 currentVotes += 100
-                updatedPoll.pollOptions[optionIndex].votes?[user.id] = [
+                selectedPoll.pollOptions[optionIndex].votes?[user.id] = [
                     "date": dateString,
                     "numVotes": String(currentVotes),
                     "viewedNotification": "false"
                 ]
             } else {
-                updatedPoll.pollOptions[optionIndex].votes?[user.id] = [
+                selectedPoll.pollOptions[optionIndex].votes?[user.id] = [
                     "date": dateString,
                     "numVotes": "100",
                     "viewedNotification": "false"
                 ]
             }
             
-          
+            selectedPoll.usersWhoVoted.append(user.id)
             
-            updatedPoll.usersWhoVoted.append(user.id)
-            
-            selectedPoll = updatedPoll
-            if let index = pollSet.firstIndex(where: { $0.id == updatedPoll.id }) {
-                pollSet[index] = updatedPoll
+            if let index = pollSet.firstIndex(where: { $0.id == selectedPoll.id }) {
+                pollSet[index] = selectedPoll
             }
             
             updateTotalVotes()
@@ -178,12 +202,14 @@ class PollViewModel: ObservableObject {
             do {
                 try await FirebaseService.shared.updateDocument(
                     collection: "polls",
-                    object: updatedPoll
+                    object: selectedPoll
                 )
                 
                 var updatedUser = user
-                updatedUser.votedPolls.append(updatedPoll.id)
+                updatedUser.votedPolls.append(selectedPoll.id)
                 updatedUser.aura += 100
+                
+                print("updated polls")
                 
                 try await FirebaseService.shared.updateDocument(
                     collection: "users",
@@ -214,12 +240,15 @@ class PollViewModel: ObservableObject {
                 ) as [User]
                 let id = UUID().uuidString
                 selectedPoll.id = id
-                let options = createOptions(users: users ?? [])
+                
+                allOptions = []
+                getPollOptions(excludingUserId: user)
+
                 let poll = Poll(
                     id: id,
                     title: question.question,
                     createdAt: Date(),
-                    pollOptions: options,
+                    pollOptions: allOptions,
                     isActive: true,
                     schoolId: user.schoolId,
                     grade: user.grade,
@@ -227,8 +256,8 @@ class PollViewModel: ObservableObject {
                     category: question.category,
                     usersWhoVoted: [] // Initialize with empty array
                 )
+                
                 selectedPoll = poll
-
                 pollSet.append(poll)
                 newPolls.append(poll)
             }
@@ -253,90 +282,163 @@ class PollViewModel: ObservableObject {
             self.pollSet.sort { $0.createdAt > $1.createdAt }
             if let first = self.pollSet.first {
                 self.selectedPoll = first
-                self.getPollOptions(excludingUserId: user.id)
+                allOptions = first.pollOptions
+                self.getPollOptions(excludingUserId: user)
             }
         } catch {
             print("Error creating polls: \(error.localizedDescription)")
         }
     }
     
-    func createOptions(users: [User]) -> [PollOption] {
-        // if user has made in app purchase they have highest priority
-        // number of votedPolls they have should be close second
-        // number of friends they have
-        // random
-
-        let maxVotedPolls = users.map { $0.votedPolls.count }.max() ?? 1
-        let maxFriends = users.map { $0.friends.count }.max() ?? 1
-
-        // Calculate a score for each user
-        let scoredUsers = users.map { user -> (User, Double) in
-            let votedPollsScore = Double(user.votedPolls.count) / Double(maxVotedPolls)
-            let friendsScore = Double(user.friends.count) / Double(maxFriends)
-            
-            // Calculate the final score with some randomness
-            let randomFactor = Double.random(in: 0...0.2)
-            let score = (votedPollsScore * 0.6) + (friendsScore * 0.3) + randomFactor
-            
-            return (user, score)
+    func createNewOptions(user: User, friends: [User]) {
+        let friendOptions = friends.filter { friend in
+            let friendNotAnOption = allOptions.contains { $0.userId != friend.id }
+            return friendNotAnOption
         }
-
-        // Sort users by their scores in descending order
-        let sortedUsers = scoredUsers.sorted { $0.1 > $1.1 }
-
-        // Select top 4 users, but with a chance to include lower-ranked users
-        var selectedUsers: [User] = []
-        var remainingUsers = sortedUsers
-
-        while selectedUsers.count < 12 && !remainingUsers.isEmpty {
-            let randomThreshold = Double.random(in: 0...1)
-            let index: Int
-            
-            if randomThreshold < 0.7 {
-                // 70% chance to select from top half
-                index = Int.random(in: 0..<min(remainingUsers.count, max(remainingUsers.count / 2, 1)))
-            } else {
-                // 30% chance to select from anywhere
-                index = Int.random(in: 0..<remainingUsers.count)
-            }
-            
-            selectedUsers.append(remainingUsers[index].0)
-            remainingUsers.remove(at: index)
-
-        }
-
-        // Convert selected users to PollOptions, ensuring we have exactly 12 options
-        let options = selectedUsers.prefix(12).map { user in
-            PollOption(
+        
+        for friend in friendOptions {
+            var newOption = PollOption(
                 id: UUID().uuidString,
                 type: "Poll",
-                option: "\(user.firstName) \(user.lastName)",
-                userId: user.id,
-                votes: [:], // Initialize with empty dictionary
-                gradeLevel: user.grade
+                option: "\(friend.firstName) \(friend.lastName)",
+                userId: friend.id,
+                votes: [:],
+                gradeLevel: friend.grade
             )
+            
+            newOption.priorityScore = 5
+            if newOption.gradeLevel == user.grade {
+                newOption.priorityScore += 2
+            }
+            
+            allOptions.append(newOption)
         }
-
-        return options
+        
+        // start creating new ones
+        //MARK: - experiemnt do we put in the top 3 voters or do we put randoms from the grade that havent had the chance ?
+        // priority #3 getting users from the grade who don't have much aura
+        var sortedUsersInGrade = entireSchool.filter { $0.grade == user.grade }.sorted { (usr1, usr2) -> Bool in
+            let aura1 = friends.first(where: { $0.id == usr1.id })?.aura ?? 0
+            let aura2 = friends.first(where: { $0.id == usr2.id })?.aura ?? 0
+            return aura1 < aura2
+        }
+        
+        // means we're creating a new poll
+        if allOptions.count < 12 {
+            sortedUsersInGrade.shuffle()
+        }
+        
+        
+        // Filter out users who are already in the friends array
+        let filteredUsersInGrade = sortedUsersInGrade.filter { user in
+            !friends.contains { $0.id == user.id }
+        }
+        
+        // this should push up users who arent getting votes
+        for (idx, userInGrade) in filteredUsersInGrade.enumerated() {
+            if !allOptions.contains(where: { option in
+                option.userId == userInGrade.id
+            }) {
+                if allOptions.count == 10 {
+                    break
+                }
+                
+                var newOption = PollOption(
+                    id: UUID().uuidString,
+                    type: "Poll",
+                    option: "\(userInGrade.firstName) \(userInGrade.lastName)",
+                    userId: userInGrade.id,
+                    votes: [:],
+                    gradeLevel: userInGrade.grade
+                )
+                
+                newOption.priorityScore += 3
+                allOptions.append(newOption)
+            }
+        }
+          
+        // finally if allOptions is still not > 12 we will add in rest of school here
+        // Filter entireSchool to exclude users already in allOptions
+        var remainingUsers = entireSchool.filter { schoolUser in
+            !allOptions.contains { $0.userId == schoolUser.id }
+        }
+        
+        remainingUsers.shuffle()
+        
+        // Add remaining users to allOptions if needed
+        for remainUser in remainingUsers {
+            if allOptions.count >= 12 {
+                break
+            }
+            
+            var newOption = PollOption(
+                id: UUID().uuidString,
+                type: "Poll",
+                option: "\(remainUser.firstName) \(remainUser.lastName)",
+                userId: remainUser.id,
+                votes: [:],
+                gradeLevel: remainUser.grade
+            )
+            
+            allOptions.append(newOption)
+        }
+        
     }
 
-    func getPollOptions(excludingUserId userId: String) {
-        guard !selectedPoll.pollOptions.isEmpty else {
-            print("Selected poll has no options")
-            return
+    
+
+
+    func getPollOptions(excludingUserId user: User) {
+     
+        // first get the top 10 most relavant options
+        // priority #1
+        
+        var updatedOptions: [PollOption] = []
+        var totalFriendOptions = 0
+        var totalSameGradeOptions = 0
+        for option in allOptions {
+            var updatedOption = option
+            let hasVotes = (option.votes?.values.reduce(0) { $0 + (Int($1["numVotes"] ?? "0") ?? 0) } ?? 0) > 0
+            let isFriend = friends.contains { $0.id == option.userId }
+            let sameGrade = friends.contains { $0.grade == option.gradeLevel }
+            
+            if hasVotes && isFriend {
+                updatedOption.priorityScore += 7
+                totalFriendOptions += 1
+            } else if isFriend {
+                totalFriendOptions += 1
+                updatedOption.priorityScore += 5
+            } else if hasVotes {
+                updatedOption.priorityScore += 1
+            }
+            
+            if sameGrade {
+                updatedOption.priorityScore += 2
+                totalSameGradeOptions += 1
+                
+            }
+            
+            updatedOptions.append(option)
         }
         
-        // Filter out options with the user's ID
-        let availableOptions = selectedPoll.pollOptions.filter { $0.userId != userId }
+        // Sort priority options by score
+        updatedOptions.sort { $0.priorityScore > $1.priorityScore }
+        allOptions = updatedOptions
         
-        guard !availableOptions.isEmpty else {
-            print("No available options after filtering")
-            return
+        print(totalFriendOptions, totalSameGradeOptions,  "totalFriend & Grade options")
+        // totalPriorityScore determines relevancy for the polloptions
+        // increase the relevancy of the options
+        if (user.friends.count > 7 && totalFriendOptions <= 7) || totalSameGradeOptions < 8 || allOptions.count < 12  { // create new friend options
+            createNewOptions(user: user, friends: friends)
+            // Sort priority options by score
+            allOptions.sort { $0.priorityScore > $1.priorityScore }
         }
         
+        currentTwelveOptions = Array(allOptions.prefix(12)).shuffled()
         // Take up to 4 options from the available options
-        currentFourOptions = Array(availableOptions.prefix(4))
-        currentPollOptionIndex = min(4, availableOptions.count)
+        currentFourOptions = Array(currentTwelveOptions.prefix(4))
+        currentPollOptionIndex = min(4, allOptions.count)
+        
         
         updateQuestionEmoji()
         updateTotalVotes()
@@ -345,16 +447,15 @@ class PollViewModel: ObservableObject {
         // Print debug information
         print("getPollOptions called")
         print("Selected poll has \(selectedPoll.pollOptions.count) total options")
-        print("Available options after filtering: \(availableOptions.count)")
+        print("Available options after filtering: \(updatedOptions.count)")
         print("Current four options: \(currentFourOptions.map { $0.option })")
     }
 
     func shuffleOptions(excludingUserId: String) {
-        let totalOptions = selectedPoll.pollOptions.count
-        var availableOptions = selectedPoll.pollOptions.filter { $0.userId != excludingUserId }
+        let totalOptions = allOptions.count
+        var availableOptions = currentTwelveOptions.filter { $0.userId != excludingUserId }
 
         if currentPollOptionIndex >= totalOptions {
-            availableOptions.shuffle()
             currentPollOptionIndex = 0
         }
         

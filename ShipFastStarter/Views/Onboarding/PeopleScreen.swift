@@ -12,7 +12,7 @@ struct FriendButton: View {
     let user: User
     let isSelected: Bool
     let onTap: () -> Void
-    
+
     var body: some View {
         VStack(spacing: 8) {
             ZStack {

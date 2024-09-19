@@ -17,6 +17,7 @@ struct PollOption: Codable, Equatable, FBObject {
     // id: [date: timeStamp, numVotes: "100", viewedNotification: "true"]
     let gradeLevel: String
     var computedProgress: Double = 0 // Make this mutable
+    var priorityScore = 0
 
     init(id: String, type: String, option: String, userId: String, votes: [String: [String: String]], gradeLevel: String) {
         self.id = id

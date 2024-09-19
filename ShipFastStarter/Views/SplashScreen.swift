@@ -9,7 +9,7 @@ import SwiftUI
 struct SplashScreen: View {
     var body: some View {
         ZStack {
-            Color.pink.edgesIgnoringSafeArea(.all)
+            Color.primaryBackground.edgesIgnoringSafeArea(.all)
             VStack {
                 Text("ONG")
                     .sfPro(type: .black, size: .logo)
@@ -17,7 +17,7 @@ struct SplashScreen: View {
                     .rotationEffect(.degrees(-12))
                     .stroke(color: .black, width: 11)
                 
-                Text("Get ready to vote!")
+                Text("get ready to vote!")
                     .sfPro(type: .bold, size: .h1)
                     .foregroundColor(.white)
                     .padding(.top, 20)
@@ -25,6 +25,8 @@ struct SplashScreen: View {
         }
     }
 }
+
+
 #Preview {
     SplashScreen()
 }
