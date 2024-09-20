@@ -199,7 +199,11 @@ struct PollScreen: View {
 
                                 Spacer()
                                 Button(action: {
-                                    skipPoll()
+                                    Analytics.shared.log(event: "PollScreen: tapped Skip")
+                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                    withAnimation {
+                                        skipPoll()
+                                    }
                                 }) {
                                     ZStack {
                                         RoundedRectangle(cornerRadius: 16)
@@ -318,11 +322,16 @@ struct PollScreen: View {
         } else {
             // All polls completed
             mainVM.currUser?.lastPollFinished = Date()
-            pollVM.completedPoll = true
             if let user = mainVM.currUser {
                 UserDefaults.standard.setValue(0, forKey: Constants.currentIndex)
                 mainVM.currUser?.aura += 300
+                pollVM.completedPoll = true
                 pollVM.finishPoll(user: user)
+                Task {
+                    await profileVM.fetchPeopleList(user: user)
+                }
+                pollVM.isNewPollReady = false
+                pollVM.completedPoll = true
                 mainVM.currentPage = .cooldown
             }
         }
@@ -642,7 +651,7 @@ struct PollOptionView: View {
 
     private func setupAudioPlayer() {
         // Replace "YourSoundFileName" with the actual name of your sound file
-        guard let soundURL = Bundle.main.url(forResource: "YourSoundFileName", withExtension: "mp3") else {
+        guard let soundURL = Bundle.main.url(forResource: "holdDown", withExtension: "mp3") else {
             print("Sound file not found")
             return
         }

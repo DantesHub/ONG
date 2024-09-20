@@ -24,7 +24,7 @@ class MainViewModel: ObservableObject {
             do {
                 let users: [User] = try await FirebaseService.getFilteredDocuments(collection: "users", filterField: "number", filterValue: number)
                 if let user = users.first {
-                    DispatchQueue.main.async {
+                    await MainActor.run {
                         self.currUser = user
                         print("successfully fetched user", user.id, user.firstName)
                     }
@@ -35,7 +35,9 @@ class MainViewModel: ObservableObject {
                 print("Error fetching user: \(error.localizedDescription)")
             }
         } else {
-            self.currUser = User.exUser
+            await MainActor.run {
+                self.currUser = User.exUser
+            }
         }
     }
     

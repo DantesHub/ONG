@@ -46,6 +46,11 @@ struct DevTestingView: View {
                             }
                         }
                     }
+                    // Delete all UserDefaults
+                    let domain = Bundle.main.bundleIdentifier!
+                    UserDefaults.standard.removePersistentDomain(forName: domain)
+                    UserDefaults.standard.synchronize()
+                    print("All UserDefaults have been deleted")
                     
                     resetAppState()
 

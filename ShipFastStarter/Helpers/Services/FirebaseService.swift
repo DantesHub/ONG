@@ -314,8 +314,8 @@ class FirebaseService {
             for doc in documents {
                 if var user = try? doc.data() {
                     let documentRef = documentCollection.document(doc.documentID)
-                    user["friendRequests"] = [:]
-                    user["friends"] = [:]
+//                    user["friendRequests"] = [:]
+                    user["aura"] = 100
                     print(doc.documentID, "documentID")
                     try await documentRef.updateData(user)
                   }

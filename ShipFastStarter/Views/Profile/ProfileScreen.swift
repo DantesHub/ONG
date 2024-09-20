@@ -23,7 +23,8 @@ struct ProfileScreen: View {
     @State private var isFriendRequest = false
     @State private var isFriends = false
     @State private var sentRequest = false
-
+    @State private var showSettings = false
+    
     init(user: User? = nil) {
         _user = State(initialValue: user ?? User.exUser)
     }
@@ -142,7 +143,7 @@ struct ProfileScreen: View {
                     .padding(.bottom)
                     .padding(.top, 32)
                     VStack(spacing: -28) {
-                        Text("\(profileVM.isVisitingUser ? user.friends.count : profileVM.friends.count )")
+                        Text("\(profileVM.friends.count)")
                             .sfPro(type: .bold, size: .h1)
                             .stroke(color: .black, width: 3)
                         Text("friends")
@@ -153,16 +154,14 @@ struct ProfileScreen: View {
                     .shadow(color: .black.opacity(0.7), radius: 0, x: 3, y: 3)
                     .offset(x: -100, y: 65)
                     .onTapGesture {
-                        if !profileVM.isVisitingUser {
-                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                            withAnimation {
-                                Analytics.shared.log(event: "ProfileScreen: Tapped Friends")
-                                profileVM.showFriendsScreen = true
-                            }
+                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                        withAnimation {
+                            Analytics.shared.log(event: "ProfileScreen: Tapped Friends")
+                            profileVM.showFriendsScreen = true
                         }
                     }
                     VStack(spacing: -36) {
-                        Text(formatAura(profileVM.isVisitingUser ? user.aura : mainVM.currUser?.aura ?? 0))
+                        Text(formatAura(user.aura))
                             .sfPro(type: .bold, size: .h1Big)
                             .stroke(color: .primaryBackground, width: 3)
                         Text("aura") 
@@ -225,7 +224,7 @@ struct ProfileScreen: View {
                         
                         SharedComponents.SecondaryButton(title: "Settings") {
                             Analytics.shared.log(event: "ProfileScreen: Tapped Edit Settings")
-                            
+                            showSettings = true
                         }
                     }.padding(.horizontal)
                  
@@ -247,6 +246,10 @@ struct ProfileScreen: View {
                 Spacer()
             }
             // show highschool.
+        }
+        .sheet(isPresented: $showSettings) {
+            SettingsScreen(showSettings: $showSettings)
+                .environmentObject(mainVM)
         }
         .onAppear {
             updateUser()
@@ -466,6 +469,14 @@ struct ImagePicker: UIViewControllerRepresentable {
         let imagePicker = UIImagePickerController()
         imagePicker.sourceType = sourceType
         imagePicker.delegate = context.coordinator
+        
+        // Set the default camera to front
+        if sourceType == .camera {
+            if UIImagePickerController.isCameraDeviceAvailable(.front) {
+                imagePicker.cameraDevice = .front
+            }
+        }
+        
         return imagePicker
     }
     

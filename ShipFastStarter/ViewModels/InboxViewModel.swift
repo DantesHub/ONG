@@ -103,7 +103,6 @@ class InboxViewModel: ObservableObject {
                                     if let dateStr = voteInfo["date"],
                                        let numVotes = voteInfo["numVotes"],
                                        let date = ISO8601DateFormatter().date(from: dateStr) {
-                                        print(dateStr, "facetime", date, Date())
                                         let newInboxItem = InboxItem(
                                             id: UUID().uuidString,
                                             userId: voterId,

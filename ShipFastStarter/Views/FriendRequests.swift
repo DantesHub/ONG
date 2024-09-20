@@ -60,14 +60,16 @@ struct FriendRequests: View {
                         }
                         .padding(.horizontal, 24)
                         .padding(.bottom, 32)
-                        
-                        Text("ppl from ur school")
-                            .sfPro(type: .bold, size: .h2)
-                            .multilineTextAlignment(.center)
-                            .foregroundColor(.black)
-                            .frame(maxWidth: UIScreen.size.width)
-                            .padding(.horizontal, 32)
-                            .padding(.top)
+                        if !profileVM.peopleList.isEmpty {
+                            Text("ppl from ur school")
+                                .sfPro(type: .bold, size: .h2)
+                                .multilineTextAlignment(.center)
+                                .foregroundColor(.black)
+                                .frame(maxWidth: UIScreen.size.width)
+                                .padding(.horizontal, 32)
+                                .padding(.top)
+                        }
+                   
                         LazyVGrid(columns: columns, spacing: 12) {
                             ForEach(profileVM.peopleList.filter({ usr in
                                 !(mainVM.currUser?.friends ?? [:]).contains { (k,v) in

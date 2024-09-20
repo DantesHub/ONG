@@ -31,7 +31,7 @@ struct PollCooldownScreen: View {
                 ZStack {
                     Color.primaryBackground.ignoresSafeArea()
                     VStack(spacing: 0) {
-                        if pollVM.isNewPollReady {
+                        if pollVM.isNewPollReady && pollVM.cooldownEndTime == nil {
                             Text("new polls are\navailable!")
                                 .sfPro(type: .bold, size: .h1)
                                 .foregroundColor(.white)
@@ -45,11 +45,9 @@ struct PollCooldownScreen: View {
                                     action: {
                                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                         withAnimation {
-                                            withAnimation {
-                                                mainVM.currentPage = .poll
-                                                pollVM.isNewPollReady = false
-                                                Analytics.shared.log(event: "PollCooldown: Tapped Start")
-                                            }
+                                            pollVM.isNewPollReady = false
+                                            mainVM.currentPage = .poll
+                                            Analytics.shared.log(event: "PollCooldown: Tapped Start")
                                         }
                                     }
                                 )

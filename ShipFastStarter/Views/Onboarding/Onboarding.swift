@@ -90,11 +90,11 @@ struct OnboardingView: View {
             case .age:
                 mainVM.onboardingScreen = .first
             case .gender:
-                mainVM.onboardingScreen = .birthday
+                mainVM.onboardingScreen = .first
             case .birthday:
                 mainVM.onboardingScreen = .gender
             case .name:
-                mainVM.onboardingScreen = .gender
+                mainVM.onboardingScreen = .grade
             case .number:
                 if authVM.isVerificationCodeSent {
                     authVM.isVerificationCodeSent = false
@@ -106,9 +106,9 @@ struct OnboardingView: View {
             case .location:
                 mainVM.onboardingScreen = .gender
             case .grade:
-                mainVM.onboardingScreen = .highschool
+                mainVM.onboardingScreen = .gender
             case .lastName:
-                mainVM.onboardingScreen = .name
+                mainVM.onboardingScreen = .grade
             case .highschool:
                 mainVM.onboardingScreen = .notification
             case .username:
@@ -129,7 +129,7 @@ struct OnboardingView: View {
     func updateProgressIndex(for screen: OnboardingScreenType) {
 //        let screenOrder: [OnboardingScreenType] = [.first, .birthday, .location, .grade, .name, .lastName, .username]
 //        .location,
-        let screenOrder: [OnboardingScreenType] = [.first, .birthday,  .gender, .name,  .lastName, .username, .number, .uploadProfile, .notification, .highschool, .lockedHighschool, .grade, .addFriends, .notification, .color]
+        let screenOrder: [OnboardingScreenType] = [.first, .birthday,  .gender, .grade, .name,  .lastName, .username, .number, .uploadProfile, .notification, .highschool, .lockedHighschool, .addFriends, .notification, .color]
         if let index = screenOrder.firstIndex(of: screen) {
             currentProgressIndex = min(index, totalSteps)
         }

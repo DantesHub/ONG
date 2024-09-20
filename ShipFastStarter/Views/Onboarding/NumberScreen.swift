@@ -115,30 +115,28 @@ struct NumberScreen: View {
 //                            verificationCode = "333333"
 //                            verifyCode()
 //                            mainVM.currUser?.fcmToken = UserDefaults.standard.string(forKey: "fcmToken") ?? ""
+//                            let formattedNumber = "+1\(phoneNumber)"
 //                            if var user = mainVM.currUser {
 //                                mainVM.currUser?.number = formattedNumber
 //                                user.number = formattedNumber
 //                            }
 //                            UserDefaults.standard.setValue(formattedNumber, forKey: "userNumber")
-                            if authVM.tappedLogin {
-                                let formattedNumber = "+1\(phoneNumber)"
-
-                                Task {
-                                    UserDefaults.standard.setValue(formattedNumber, forKey: "usersNumber")
-                                    await mainVM.fetchUser()
-                                    if let user = mainVM.currUser, user.username != "naveedjohnmo" {
-                                        UserDefaults.standard.setValue(true, forKey: "finishedOnboarding")
-                                        async let notifications = inboxVM.fetchNotifications(for: user)
-                                        async let peopleList = profileVM.fetchPeopleList(user: user)
-                                        async let profilePic = profileVM.fetchUserProfilePicture(user: user)
-                                        _ = await (notifications, peopleList, profilePic)
-                                        await pollVM.fetchPolls(for: user)
-                                        pollVM.entireSchool = profileVM.peopleList
-                                        mainVM.currentPage = .poll
-                                        authVM.tappedLogin = false
-                                    }
-                                }
-                            }
+//                            if authVM.tappedLogin {
+//                                Task {
+//                                    isLoading = true
+//                                    await mainVM.fetchUser()
+//                                    if let user = mainVM.currUser, user.username != "naveedjohnmo" {
+//                                        async let notifications = inboxVM.fetchNotifications(for: user)
+//                                        async let peopleList = profileVM.fetchPeopleList(user: user)
+//                                        async let profilePic = profileVM.fetchUserProfilePicture(user: user)
+//                                        _ = await (notifications, peopleList, profilePic)
+//                                        pollVM.entireSchool = profileVM.peopleList
+//                                        mainVM.currentPage = .poll
+//                                        authVM.tappedLogin = false
+//                                        isLoading = false
+//                                    }
+//                                }
+//                            }
                             sendVerificationCode()
                         } else {
                             verifyCode()
@@ -228,6 +226,7 @@ struct NumberScreen: View {
                     case .success(let authResult):
                         if authVM.tappedLogin {
                             Task {
+                                isLoading = true
                                 await mainVM.fetchUser()
                                 if let user = mainVM.currUser, user.username != "naveedjohnmo" {
                                     async let notifications = inboxVM.fetchNotifications(for: user)
@@ -235,6 +234,7 @@ struct NumberScreen: View {
                                     async let profilePic = profileVM.fetchUserProfilePicture(user: user)
                                     _ = await (notifications, peopleList, profilePic)
                                     pollVM.entireSchool = profileVM.peopleList
+                                    isLoading = false
                                     mainVM.currentPage = .poll
                                     authVM.tappedLogin = false
                                 }

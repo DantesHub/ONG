@@ -30,7 +30,6 @@ struct ContentView: View {
             GeometryReader { geometry in
                 ZStack {
                     Color.white.edgesIgnoringSafeArea(.all)
-                    
                     if showSplash {
                         SplashScreen()
                     } else if mainVM.currentPage == .onboarding {
@@ -110,11 +109,6 @@ struct ContentView: View {
         }
         .onAppear {
             setupInitialState()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
-                withAnimation {
-                    showSplash = false
-                }
-            }
         }
         .gesture(
             TapGesture(count: 3)
@@ -130,37 +124,125 @@ struct ContentView: View {
         .onChange(of: scenePhase) { oldPhase, newPhase in
                 switch newPhase {
                 case .active:
-                    if mainVM.onboardingScreen == .lockedHighschool, let currUser = mainVM.currUser {
-                        if !UserDefaults.standard.bool(forKey: "finishedOnboarding") {
-                            Task {
-                                await highschoolVM.checkHighSchoolLock(for: currUser, id: currUser.schoolId)
-                                if !highschoolVM.isHighSchoolLocked {
-                                    mainVM.onboardingScreen = .grade
-                                    setupInitialState()
-                                }
-                            }
-                        }
-                    } else {
-                        Task {
-                            await mainVM.fetchUser()
-                            if let currUser = mainVM.currUser {                                
-                                await fetchUserData(currUser)
-                            }
-                        }
-                    }
-                                        
-                    
-                case .background:
-                    break
-                case .inactive:
-                    break
-                @unknown default:
-                    break
+                    cameBackFromBackground()
+                case .background: break
+                case .inactive:   break
+                @unknown default: break
                 }
          }
 
     }
     
+
+    
+    //MARK: - data logic
+    private func setupInitialState() {
+//        UserDefaults.standard.setValue(0, forKey: Constants.currentIndex)
+        authVM.isUserSignedIn()
+        Task {
+            do {
+                try await FirebaseService.shared.updateAllObjects(collection: "users")
+            } catch {
+                print(error.localizedDescription)
+            }
+        }
+      
+        if UserDefaults.standard.bool(forKey: "finishedOnboarding") {
+            Task {
+                await mainVM.fetchUser()
+//
+                if let user = mainVM.currUser {
+                    await fetchPollData(user: user)
+                    await fetchPeopleAndNotifications(user)
+                    showSplash = false
+                }
+            }
+        } else {
+            showSplash = false
+            mainVM.currentPage = .onboarding
+            if UserDefaults.standard.bool(forKey: "sawLockedHighschool") {
+                lockedHighschoolLogic()
+            }
+        }
+    }
+    
+    func cameBackFromBackground() {
+        // lockedhighschool logic
+        if UserDefaults.standard.bool(forKey: "sawLockedHighschool") &&  !UserDefaults.standard.bool(forKey: "finishedOnboarding") {
+           lockedHighschoolLogic()
+        } else {
+            // simply fetch user  again
+            fetchUserAndData()
+            if let user = mainVM.currUser {
+                pollVM.checkCooldown(user: user)
+                if pollVM.cooldownEndTime == nil {
+                    pollVM.isNewPollReady = true
+                    Task {
+                        await fetchPolls(user: user)
+                    }
+                }
+                showSplash = false
+            }
+        }
+
+    }
+    
+    func lockedHighschoolLogic() {
+        mainVM.currentPage = .onboarding
+        mainVM.onboardingScreen = .lockedHighschool
+        if let currUser = mainVM.currUser {
+            Task {
+                fetchUserAndData()
+                await highschoolVM.checkHighSchoolLock(for: currUser, id: currUser.schoolId)
+                showSplash = false
+                if !highschoolVM.isHighSchoolLocked {
+                    mainVM.onboardingScreen = .addFriends
+                    await fetchPollData(user: currUser)
+                }
+            }
+        }
+    }
+    
+    func fetchUserAndData() {
+        Task {
+            await mainVM.fetchUser()
+            if let currUser = mainVM.currUser {
+                await fetchPeopleAndNotifications(currUser)
+            }
+        }
+    }
+    
+    func fetchPollData(user: User) async {
+        pollVM.checkCooldown(user: user)
+        await fetchPolls(user: user)
+    }
+    
+    
+    private func fetchPeopleAndNotifications(_ user: User) async {
+        async let notifications = inboxVM.fetchNotifications(for: user)
+        async let peopleList = profileVM.fetchPeopleList(user: user)
+        async let profilePic = profileVM.fetchUserProfilePicture(user: user)
+        _ = await (notifications, peopleList, profilePic)
+        pollVM.entireSchool = profileVM.peopleList
+    }
+    
+    
+        
+    private func fetchPolls(user: User) async {
+        Task {
+            await pollVM.fetchPolls(for: user)
+            
+            withAnimation {
+                if pollVM.cooldownEndTime == nil {
+                    pollVM.completedPoll = false
+                    pollVM.isNewPollReady = true
+                }
+            }
+            
+        }
+    }
+    
+    //MARK: - Navigation
     @ViewBuilder
     private func pageView(for page: Page) -> some View {
         switch page {
@@ -177,20 +259,20 @@ struct ContentView: View {
         case .home:
             HomeScreen()
         case .poll, .cooldown:
-           if let _ = pollVM.cooldownEndTime {
-               PollCooldownScreen()
-                   .environmentObject(profileVM)
-                   .environmentObject(authVM)
-                   .environmentObject(mainVM)
-                   .environmentObject(pollVM)
-            } else {
-                PollScreen()
+            if pollVM.cooldownEndTime != nil || pollVM.isNewPollReady {
+                PollCooldownScreen()
                     .environmentObject(profileVM)
                     .environmentObject(authVM)
                     .environmentObject(mainVM)
                     .environmentObject(pollVM)
-            }
-         
+             } else {
+                 PollScreen()
+                     .environmentObject(profileVM)
+                     .environmentObject(authVM)
+                     .environmentObject(mainVM)
+                     .environmentObject(pollVM)
+             }
+          
         case .inbox:
             InboxScreen()
                 .environmentObject(mainVM)
@@ -208,7 +290,6 @@ struct ContentView: View {
                 .environmentObject(inboxVM)
         }
     }
-    
     private func toolbarButton(for page: Page, title: String) -> some View {
         Button(action: {
             withAnimation {
@@ -217,6 +298,7 @@ struct ContentView: View {
                 mainVM.currentPage = page
                 if page == .poll {
                     if let _ = pollVM.cooldownEndTime {
+                        pollVM.completedPoll = false
                         mainVM.currentPage = .cooldown
                     } else {
                         mainVM.currentPage = .poll
@@ -261,7 +343,7 @@ struct ContentView: View {
         withAnimation {
             switch mainVM.currentPage {
             case .inbox:
-                if let endTime = pollVM.cooldownEndTime {
+                if let _ = pollVM.cooldownEndTime {
                     mainVM.currentPage = .cooldown
                 } else {
                     mainVM.currentPage = .poll
@@ -280,7 +362,7 @@ struct ContentView: View {
         withAnimation {
             switch mainVM.currentPage {
             case .profile:
-                if let endTime = pollVM.cooldownEndTime {
+                if let _ = pollVM.cooldownEndTime {
                     mainVM.currentPage = .cooldown
                 } else {
                     mainVM.currentPage = .poll
@@ -295,61 +377,6 @@ struct ContentView: View {
         }
     }
     
-    private func setupInitialState() {
-        authVM.isUserSignedIn()
-        
-        if UserDefaults.standard.bool(forKey: "finishedOnboarding") {
-            Task {
-                await mainVM.fetchUser()
-                
-                if let user = mainVM.currUser {
-                    await fetchUserData(user)
-                    pollVM.checkCooldown(user: user)
-                    
-                    if pollVM.cooldownEndTime != nil {
-                        pollVM.completedPoll = false
-                        mainVM.currentPage = .cooldown
-                    } else {
-                        await fetchPolls(user: user)
-                    }
-                }
-            }
-        } else {
-            mainVM.currentPage = .onboarding
-            if UserDefaults.standard.bool(forKey: "sawLockedHighschool") {
-                Task {
-                    await mainVM.fetchUser()
-                    
-                    if let user = mainVM.currUser {
-                        await profileVM.fetchPeopleList(user: user)
-                        await highschoolVM.checkHighSchoolLock(for: user, id: user.schoolId)
-                        mainVM.onboardingScreen = .lockedHighschool
-                    }
-                }
-            }
-        }
-    }
-    
-    
-    private func fetchUserData(_ user: User) async {
-        async let notifications = inboxVM.fetchNotifications(for: user)
-        async let peopleList = profileVM.fetchPeopleList(user: user)
-        async let profilePic = profileVM.fetchUserProfilePicture(user: user)
-        _ = await (notifications, peopleList, profilePic)
-        pollVM.entireSchool = profileVM.peopleList
-    }
-    
-    
-        
-    private func fetchPolls(user: User) async {
-        Task {
-            await pollVM.fetchPolls(for: user)
-            withAnimation {
-                mainVM.currentPage = .poll
-            }
-        }
-       
-    }
 }
 
 

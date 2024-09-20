@@ -48,6 +48,8 @@
 		884B24862C87E7BB00229F1E /* PollComplete.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B24852C87E7BB00229F1E /* PollComplete.swift */; };
 		884B24882C8803D300229F1E /* Question.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B24872C8803D300229F1E /* Question.swift */; };
 		887C78382C9CD1E400CEDC72 /* StartPollScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 887C78372C9CD1E400CEDC72 /* StartPollScreen.swift */; };
+		887C783A2C9D4D1200CEDC72 /* holdDown.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 887C78392C9D4D1200CEDC72 /* holdDown.mp3 */; };
+		887C783C2C9E15EC00CEDC72 /* SettingsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 887C783B2C9E15EC00CEDC72 /* SettingsScreen.swift */; };
 		888FF3BA2C8679F10025EC1B /* ContactsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 888FF3B92C8679F10025EC1B /* ContactsScreen.swift */; };
 		888FF3BC2C867CD80025EC1B /* LocationScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 888FF3BB2C867CD80025EC1B /* LocationScreen.swift */; };
 		888FF3BE2C867CEF0025EC1B /* Onboarding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 888FF3BD2C867CEF0025EC1B /* Onboarding.swift */; };
@@ -132,6 +134,8 @@
 		884B24852C87E7BB00229F1E /* PollComplete.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PollComplete.swift; sourceTree = "<group>"; };
 		884B24872C8803D300229F1E /* Question.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Question.swift; sourceTree = "<group>"; };
 		887C78372C9CD1E400CEDC72 /* StartPollScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartPollScreen.swift; sourceTree = "<group>"; };
+		887C78392C9D4D1200CEDC72 /* holdDown.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = holdDown.mp3; sourceTree = "<group>"; };
+		887C783B2C9E15EC00CEDC72 /* SettingsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsScreen.swift; sourceTree = "<group>"; };
 		888FF3B92C8679F10025EC1B /* ContactsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsScreen.swift; sourceTree = "<group>"; };
 		888FF3BB2C867CD80025EC1B /* LocationScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationScreen.swift; sourceTree = "<group>"; };
 		888FF3BD2C867CEF0025EC1B /* Onboarding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Onboarding.swift; sourceTree = "<group>"; };
@@ -301,6 +305,7 @@
 				8838DC772C9251BA00500C6E /* InviteFriendsModal.swift */,
 				8838DC7D2C93ED7F00500C6E /* FriendRequests.swift */,
 				8838DC7F2C9550BB00500C6E /* DevTestingView.swift */,
+				887C783B2C9E15EC00CEDC72 /* SettingsScreen.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -321,6 +326,7 @@
 		88B37D1F2C23FD83000A7D91 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				887C78392C9D4D1200CEDC72 /* holdDown.mp3 */,
 				88B37D212C23FD91000A7D91 /* Fonts */,
 				88B37D202C23FD8C000A7D91 /* Animations */,
 				88B37D432C240D77000A7D91 /* Colors.xcassets */,
@@ -509,6 +515,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				887C783A2C9D4D1200CEDC72 /* holdDown.mp3 in Resources */,
 				88B37D442C240D77000A7D91 /* Colors.xcassets in Resources */,
 				88C1E5732C876CF100C9317E /* GoogleService-Info.plist in Resources */,
 				88B37D162C23FD60000A7D91 /* Preview Assets.xcassets in Resources */,
@@ -532,6 +539,7 @@
 				888FF3C42C867DF50025EC1B /* NameScreen.swift in Sources */,
 				884B24822C87E13B00229F1E /* ProfileScreen.swift in Sources */,
 				884B247B2C87B98500229F1E /* Highschool.swift in Sources */,
+				887C783C2C9E15EC00CEDC72 /* SettingsScreen.swift in Sources */,
 				8838DC3A2C89228100500C6E /* SharedComponents.swift in Sources */,
 				8838DC432C8A908400500C6E /* InboxScreen.swift in Sources */,
 				88B37D542C2411FC000A7D91 /* Extensions.swift in Sources */,
@@ -725,7 +733,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = ONG.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 22;
+				CURRENT_PROJECT_VERSION = 25;
 				DEVELOPMENT_ASSET_PATHS = "\"ShipFastStarter/Preview Content\"";
 				DEVELOPMENT_TEAM = VY92D2R4AT;
 				ENABLE_PREVIEWS = YES;
@@ -746,7 +754,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2.1;
+				MARKETING_VERSION = 1.2.4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ong.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -766,7 +774,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = ONG.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 22;
+				CURRENT_PROJECT_VERSION = 25;
 				DEVELOPMENT_ASSET_PATHS = "\"ShipFastStarter/Preview Content\"";
 				DEVELOPMENT_TEAM = VY92D2R4AT;
 				ENABLE_PREVIEWS = YES;
@@ -787,7 +795,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2.1;
+				MARKETING_VERSION = 1.2.4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ong.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";

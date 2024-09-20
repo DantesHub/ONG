@@ -20,9 +20,9 @@ class PollViewModel: ObservableObject {
     @Published var showProgress: Bool = false
     @Published var animateProgress: Bool = false
     @Published var animateAllOptions: Bool = false
-    @Published var isNewPollReady: Bool = false
+    @Published var isNewPollReady: Bool = true
     @Published var questionEmoji: String = ""
-    @Published var completedPoll: Bool = true
+    @Published var completedPoll: Bool = false
     @Published var totalVotes: Int = 0
     @Published var cooldownEndTime: Date?
     @Published var timeRemaining: TimeInterval = 0
@@ -57,6 +57,7 @@ class PollViewModel: ObservableObject {
     }
 
     func fetchPolls(for user: User) async {
+        print(" *******  *******  ******* fetching or initializing polls  ******* ******* *******")
         if UserDefaults.standard.integer(forKey: Constants.currentIndex) != 0  {
             currentPollIndex = UserDefaults.standard.integer(forKey: Constants.currentIndex)
             if pollSet.isEmpty {
@@ -180,7 +181,7 @@ class PollViewModel: ObservableObject {
             } else {
                 selectedPoll.pollOptions[optionIndex].votes?[user.id] = [
                     "date": dateString,
-                    "numVotes": "100",
+                    "numVotes": String(Int(totalVotes)),
                     "viewedNotification": "false"
                 ]
             }
@@ -545,6 +546,7 @@ class PollViewModel: ObservableObject {
     }
 
     func finishPoll(user: User) {
+        self.isNewPollReady = false
         let cooldownDuration: TimeInterval = 6 * 60 * 60
         cooldownEndTime = Date().addingTimeInterval(cooldownDuration)
         startCooldownTimer()
@@ -578,6 +580,7 @@ class PollViewModel: ObservableObject {
             let cooldownEndTime = lastPollFinished.addingTimeInterval(cooldownDuration)
             if Date() < cooldownEndTime {
                 self.cooldownEndTime = cooldownEndTime
+                self.isNewPollReady = false
                 startCooldownTimer()
             } else {
                 self.cooldownEndTime = nil
