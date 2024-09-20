@@ -14,6 +14,7 @@ struct OnboardingView: View {
     @EnvironmentObject var authVM: AuthViewModel
     @EnvironmentObject var pollVM: AuthViewModel
     @EnvironmentObject var profileVM: ProfileViewModel
+    @EnvironmentObject var inboxVM: InboxViewModel
     @EnvironmentObject var highschoolVM: HighSchoolViewModel
     @State private var currentProgressIndex: Int = 0
     
@@ -56,7 +57,7 @@ struct OnboardingView: View {
                     }.padding(.top)
                     .padding(.horizontal, 8)                  
                 }
-
+                
                 switch mainVM.onboardingScreen {
                     case .first: OnboardingScreen()
                     case .age: BirthdayScreen()

@@ -12,6 +12,12 @@ struct FriendRequests: View {
     @EnvironmentObject var mainVM: MainViewModel
     @EnvironmentObject var profileVM: ProfileViewModel
     @State private var showShareSheet = false
+    let columns = [
+        GridItem(.flexible(), spacing: -24),
+        GridItem(.flexible(), spacing: -24),
+        GridItem(.flexible(), spacing: -24),
+        GridItem(.flexible(), spacing: -24)
+    ]
     
     var body: some View {
         ZStack {
@@ -22,32 +28,77 @@ struct FriendRequests: View {
                     VStack(alignment: .leading, spacing: 24) {
                         if inboxVM.friendRequests.isEmpty {
                             Spacer()
-                            Text("No friend requests yet!\n\nTip: Add more friends to get more requests")
+                            Text("no friend requests yet!")
                                 .foregroundColor(Color.black.opacity(0.7))
                                 .font(.system(size: 22, weight: .bold))
                                 .multilineTextAlignment(.center)
-                                .padding(.horizontal, 48)
+                                .frame(maxWidth: UIScreen.size.width)
+                                .padding(.horizontal, 32)
                                 .opacity(0.3)
-                                .offset(y: 64)
-                            Spacer()
+                                .padding(.top, 32)
                         } else {
-                            Text("Friend Requests")
+                            Text("friend requests")
                                 .font(.system(size: 22, weight: .bold))
                                 .padding(.leading, 20)
                                 .foregroundColor(.black)
                             VStack(spacing: 24) {
                                 ForEach(inboxVM.friendRequests, id: \.user.id) { request in
                                     FriendRequestView(request: request)
+                                        .onTapGesture {
+                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                            withAnimation {
+                                                profileVM.isVisitingUser = true
+                                                profileVM.visitedUser = request.user
+                                            }
+                                        }
                                 }
                             }
                         }
-                        Spacer()
                         SharedComponents.PrimaryButton(title: "invite friends") {
                             Analytics.shared.log(event: "LockedHighschool: Tapped Invite")
                             showShareSheet.toggle()
                         }
                         .padding(.horizontal, 24)
                         .padding(.bottom, 32)
+                        
+                        Text("ppl from ur school")
+                            .sfPro(type: .bold, size: .h2)
+                            .multilineTextAlignment(.center)
+                            .foregroundColor(.black)
+                            .frame(maxWidth: UIScreen.size.width)
+                            .padding(.horizontal, 32)
+                            .padding(.top)
+                        LazyVGrid(columns: columns, spacing: 12) {
+                            ForEach(profileVM.peopleList.filter({ usr in
+                                !(mainVM.currUser?.friends ?? [:]).contains { (k,v) in
+                                    k == usr.id
+                                }
+                            }), id: \.id) { user in
+                                FriendButton(
+                                    user: user,
+                                    isSelected: false,
+                                    onTap: {
+                                        Analytics.shared.log(event: "ProfileScreen: Tapped Homie")
+                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                        withAnimation {
+                                            profileVM.isVisitingUser = true
+                                            profileVM.visitedUser = user
+                                        }      
+                                    }
+                                )  
+                                .onTapGesture {
+                                    Analytics.shared.log(event: "ProfileScreen: Tapped Homie")
+                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                    withAnimation {
+                                        profileVM.isVisitingUser = true
+                                        profileVM.visitedUser = user
+                                    }
+                                }
+                            }
+                        }
+                        .padding(.vertical)
+                        
+
                     }
                 }
                 
@@ -138,6 +189,7 @@ struct FriendRequestView: View {
                    
                     }
                 }.padding()
+             
             }
             .cornerRadius(16)
             .primaryShadow()

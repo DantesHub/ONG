@@ -13,7 +13,8 @@ class ProfileViewModel: ObservableObject, ImageUploadable {
     @Published var profileImage: UIImage?
     @Published var peopleList: [User] = []
     @Published var friends: [User] = []
-    @Published var isVisitingProfile: Bool = false
+    @Published var visitedUser: User? 
+    @Published var isVisitingUser: Bool = false
     @Published var isCrush: Bool = false
     @Published var isFriend: Bool = false
     @Published var showFriendsScreen: Bool = false
@@ -21,6 +22,7 @@ class ProfileViewModel: ObservableObject, ImageUploadable {
     @Published var sourceType: UIImagePickerController.SourceType = .photoLibrary
     @Published var editProfile: Bool = false
     @Published var topEight: [User] = []
+    @Published var currentUser: User?
 
     init() {
         
@@ -222,6 +224,7 @@ func updateUserProfile(_ user: User) async throws {
     do {
         try await FirebaseService.shared.updateDocument(collection: "users", object: user)
         DispatchQueue.main.async {
+            self.currentUser = user
             self.objectWillChange.send()
         }
     } catch {

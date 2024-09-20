@@ -53,7 +53,7 @@ struct UploadProfileScreen: View {
                                 .padding(1)
                                 .mask(RoundedRectangle(cornerRadius: 16))
                         )
-                        Image(systemName: "plus")
+                        Image(systemName: "person.fill")
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 64, height: 64)

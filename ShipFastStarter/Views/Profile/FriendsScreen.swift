@@ -61,7 +61,14 @@ struct FriendsScreen: View {
                                         }
                                     }
                                 }
-                            )
+                            ).onTapGesture {
+                                Analytics.shared.log(event: "ProfileScreen: Tapped Homie")
+                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                withAnimation {
+                                    profileVM.isVisitingUser = true
+                                    profileVM.visitedUser = user
+                                }
+                            }
                         }
                     }
                     .padding(.vertical)

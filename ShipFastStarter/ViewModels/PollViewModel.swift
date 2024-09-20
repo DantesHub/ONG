@@ -20,6 +20,7 @@ class PollViewModel: ObservableObject {
     @Published var showProgress: Bool = false
     @Published var animateProgress: Bool = false
     @Published var animateAllOptions: Bool = false
+    @Published var isNewPollReady: Bool = false
     @Published var questionEmoji: String = ""
     @Published var completedPoll: Bool = true
     @Published var totalVotes: Int = 0
@@ -154,7 +155,7 @@ class PollViewModel: ObservableObject {
         }
     }
 
-    func answerPoll(user: User, option: PollOption) async {
+    func answerPoll(user: User, option: PollOption, optionUser: User, totalVotes: Int) async {
         print("Answering poll for option: \(option.option)")
        
         if let optionIndex = selectedPoll.pollOptions.firstIndex(where: { $0.id == option.id }) {
@@ -170,7 +171,7 @@ class PollViewModel: ObservableObject {
             
             if var voteObj = selectedPoll.pollOptions[optionIndex].votes?[user.id] {
                 var currentVotes = Int(voteObj["numVotes"] ?? "100") ?? 100
-                currentVotes += 100
+                currentVotes += totalVotes
                 selectedPoll.pollOptions[optionIndex].votes?[user.id] = [
                     "date": dateString,
                     "numVotes": String(currentVotes),
@@ -207,7 +208,9 @@ class PollViewModel: ObservableObject {
                 
                 var updatedUser = user
                 updatedUser.votedPolls.append(selectedPoll.id)
-                updatedUser.aura += 100
+                
+                var updatedOptionUser = optionUser
+                updatedOptionUser.aura += totalVotes
                 
                 print("updated polls")
                 
@@ -215,6 +218,13 @@ class PollViewModel: ObservableObject {
                     collection: "users",
                     object: updatedUser
                 )
+                
+                try await FirebaseService.shared.updateDocument(
+                    collection: "users",
+                    object: updatedOptionUser
+                )
+                
+                
                 print("Firebase update completed")
             } catch {
                 print("Error answering poll: \(error.localizedDescription)")
@@ -571,10 +581,12 @@ class PollViewModel: ObservableObject {
                 startCooldownTimer()
             } else {
                 self.cooldownEndTime = nil
+                self.isNewPollReady = true
                 stopCooldownTimer()
             }
         } else {
             self.cooldownEndTime = nil
+            self.isNewPollReady = true
             stopCooldownTimer()
         }
     }

@@ -170,16 +170,6 @@ struct LockedHighschoolScreen: View {
                     }
          
             }
-            
-            if showShareSheet {
-                Color.black.edgesIgnoringSafeArea(.all).opacity(0.5)
-                    .onTapGesture {
-                        withAnimation {
-                            showShareSheet.toggle()
-                        }
-                    }
-            }
-            
         }
         .navigationBarBackButtonHidden(true)
         .onAppearAnalytics(event: "LockedHighschoolScreen: Screenload")
@@ -193,6 +183,7 @@ struct LockedHighschoolScreen: View {
                 .environmentObject(profileVM)
                 .environmentObject(mainVM)
         }.onAppear {
+            UserDefaults.standard.setValue(true, forKey: "sawLockedHighschool")
         }
     }
 }

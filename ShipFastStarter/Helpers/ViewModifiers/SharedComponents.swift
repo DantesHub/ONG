@@ -220,7 +220,7 @@ struct SharedComponents {
         var body: some View {
             Rectangle()
                 .foregroundColor(.black)
-                .frame(width: UIScreen.size.width, height: 2)
+                .frame(width: UIScreen.size.width, height: 1)
                 .opacity(0.2)
                 .padding(.vertical)
         }

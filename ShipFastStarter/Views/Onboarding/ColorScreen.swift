@@ -40,10 +40,13 @@ struct ColorScreen: View {
                                         if let currUser = mainVM.currUser {
                                             Task {
                                                 try await FirebaseService.shared.updateDocument(collection: "users", object: currUser)
+                                                await pollVM.fetchPolls(for: currUser)
                                                 Analytics.shared.identifyUser(user: currUser)
                                             }
                                         }
-                                        mainVM.currentPage = .poll
+                                        
+                                        pollVM.isNewPollReady = true
+                                        mainVM.currentPage = .cooldown
                                     }
                                 }
                         }

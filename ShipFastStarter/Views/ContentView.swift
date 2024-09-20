@@ -40,6 +40,7 @@ struct ContentView: View {
                                 .environmentObject(mainVM)
                                 .environmentObject(pollVM)
                                 .environmentObject(profileVM)
+                                .environmentObject(inboxVM)
                                 .environmentObject(highschoolVM)
                                 .frame(width: geometry.size.width, height: geometry.size.height)
                         }
@@ -100,6 +101,13 @@ struct ContentView: View {
                 }
             }
         }
+        .sheet(isPresented: $profileVM.isVisitingUser) {
+            ProfileScreen()
+                .environmentObject(mainVM)
+                .environmentObject(authVM)
+                .environmentObject(profileVM)
+                .environmentObject(inboxVM)
+        }
         .onAppear {
             setupInitialState()
             DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
@@ -127,7 +135,7 @@ struct ContentView: View {
                             Task {
                                 await highschoolVM.checkHighSchoolLock(for: currUser, id: currUser.schoolId)
                                 if !highschoolVM.isHighSchoolLocked {
-                                    mainVM.onboardingScreen = .addFriends
+                                    mainVM.onboardingScreen = .grade
                                     setupInitialState()
                                 }
                             }
@@ -165,10 +173,11 @@ struct ContentView: View {
                 .environmentObject(pollVM)
                 .environmentObject(profileVM)
                 .environmentObject(highschoolVM)
+                .environmentObject(inboxVM)
         case .home:
             HomeScreen()
         case .poll, .cooldown:
-           if let endTime = pollVM.cooldownEndTime {
+           if let _ = pollVM.cooldownEndTime {
                PollCooldownScreen()
                    .environmentObject(profileVM)
                    .environmentObject(authVM)
@@ -192,6 +201,7 @@ struct ContentView: View {
                 .environmentObject(mainVM)
                 .environmentObject(authVM)
                 .environmentObject(profileVM)
+                .environmentObject(inboxVM)
         case .friendRequests:
             FriendRequests()
                 .environmentObject(profileVM)
@@ -205,12 +215,35 @@ struct ContentView: View {
                 UIImpactFeedbackGenerator(style: .light).impactOccurred()
                 Analytics.shared.log(event: "Tabbar: Tapped \(title)")
                 mainVM.currentPage = page
+                if page == .poll {
+                    if let _ = pollVM.cooldownEndTime {
+                        mainVM.currentPage = .cooldown
+                    } else {
+                        mainVM.currentPage = .poll
+                    }
+                }
             }
         }) {
             Text(title)
                 .sfPro(type: .bold, size: .h3p1)
-                .foregroundColor(mainVM.currentPage == .cooldown ? .white : .black)
-                .opacity(mainVM.currentPage == page || mainVM.currentPage == .cooldown && title == "play" ? 1 : 0.3)
+                .foregroundColor(getButtonColor(for: page, title: title))
+                .opacity(getButtonOpacity(for: page, title: title))
+        }
+    }
+    
+    private func getButtonColor(for page: Page, title: String) -> Color {
+        if mainVM.currentPage == .cooldown {
+            return .white
+        } else {
+            return .black
+        }
+    }
+    
+    private func getButtonOpacity(for page: Page, title: String) -> Double {
+        if mainVM.currentPage == page || (mainVM.currentPage == .cooldown && title == "play") {
+            return 1.0
+        } else {
+            return 0.3
         }
     }
     
@@ -270,7 +303,6 @@ struct ContentView: View {
                 await mainVM.fetchUser()
                 
                 if let user = mainVM.currUser {
-                    await profileVM.fetchPeopleList(user: user)
                     await fetchUserData(user)
                     pollVM.checkCooldown(user: user)
                     
@@ -284,6 +316,17 @@ struct ContentView: View {
             }
         } else {
             mainVM.currentPage = .onboarding
+            if UserDefaults.standard.bool(forKey: "sawLockedHighschool") {
+                Task {
+                    await mainVM.fetchUser()
+                    
+                    if let user = mainVM.currUser {
+                        await profileVM.fetchPeopleList(user: user)
+                        await highschoolVM.checkHighSchoolLock(for: user, id: user.schoolId)
+                        mainVM.onboardingScreen = .lockedHighschool
+                    }
+                }
+            }
         }
     }
     

@@ -345,7 +345,7 @@ class FirebaseService {
 
   func uploadImage(_ image: UIImage, path: String, completion: @escaping (Result<String, Error>) -> Void) {
     print("Starting image upload process for path: \(path)")
-      if  let newImage = image.resized(to: CGSize(width: 256, height: 256)) {
+      if  let newImage = image.resized(to: CGSize(width: 1024, height: 1024)) {
           guard let imageData = newImage.jpegData(compressionQuality: 0.5) else {
               print("Failed to convert image to JPEG data")
               completion(.failure(NSError(domain: "FirebaseService", code: 0, userInfo: [NSLocalizedDescriptionKey: "Failed to convert image to data"])))

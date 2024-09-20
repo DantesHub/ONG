@@ -101,11 +101,11 @@ struct User: Codable, Equatable, FBObject {
         crushId: "",
         friendRequests: [:],
         dateJoined: "2024-09-15",
-        relationshipStatus: "Single",
+        relationshipStatus: "signgle af",
         mbti: "INTJ",
-        movie: "Inception",
-        music: "Rock",
-        bio: "Hello, I'm Naveed!"
+        movie: "whiplash",
+        music: "the end",
+        bio: "a school to work on ur ideas"
     )
 
     

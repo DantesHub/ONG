@@ -37,10 +37,12 @@ class HighSchoolViewModel: ObservableObject {
     @MainActor
     func checkHighSchoolLock(for user: User, id: String) async {
         do {
+            totalKids = 0
             selectedHighschool = try await FirebaseService.shared.getDocument(collection: "highschools", documentId: id)
             totalKids = selectedHighschool.students.count
             // Adjust this threshold as needed
-            self.isHighSchoolLocked = totalKids <= 12
+            self.isHighSchoolLocked = totalKids <= 11
+            
             DispatchQueue.main.async {
                 self.objectWillChange.send()
             }

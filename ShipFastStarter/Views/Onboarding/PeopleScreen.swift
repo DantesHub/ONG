@@ -9,6 +9,8 @@ import SwiftUI
 
 struct FriendButton: View {
     @EnvironmentObject var mainVM: MainViewModel
+    @EnvironmentObject var profileVM: ProfileViewModel
+
     let user: User
     let isSelected: Bool
     let onTap: () -> Void
@@ -78,13 +80,21 @@ struct FriendButton: View {
             
             Text("\(user.firstName)")
                 .sfPro(type: .bold, size: .p2)
-                .foregroundColor(.white)
+                .foregroundColor(mainVM.currentPage == .friendRequests ? .black : .white)
                 .padding(.top, 8)
         }
         .onTapGesture {
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
             if mainVM.onboardingScreen == .addFriends {
-                UIImpactFeedbackGenerator(style: .light).impactOccurred()
                 onTap()
+            } else {
+                if mainVM.currentPage != .onboarding {
+                    withAnimation {
+                        profileVM.visitedUser = user
+                        profileVM.isVisitingUser = true
+                    }
+                }
+            
             }
         }
     }

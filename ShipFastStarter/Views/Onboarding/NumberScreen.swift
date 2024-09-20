@@ -12,6 +12,7 @@ struct NumberScreen: View {
     @EnvironmentObject var mainVM: MainViewModel
     @EnvironmentObject var pollVM: PollViewModel
     @EnvironmentObject var profileVM: ProfileViewModel
+    @EnvironmentObject var inboxVM: InboxViewModel
     @State private var phoneNumber = ""
     @State private var verificationCode = ""
     @FocusState private var isPhoneNumberFocused: Bool
@@ -111,7 +112,6 @@ struct NumberScreen: View {
                     title: authVM.isVerificationCodeSent ? "Verify" : "Next",
                     action: {
                         if !authVM.isVerificationCodeSent {
-//                            let formattedNumber = "+1\(phoneNumber)"
 //                            verificationCode = "333333"
 //                            verifyCode()
 //                            mainVM.currUser?.fcmToken = UserDefaults.standard.string(forKey: "fcmToken") ?? ""
@@ -120,9 +120,29 @@ struct NumberScreen: View {
 //                                user.number = formattedNumber
 //                            }
 //                            UserDefaults.standard.setValue(formattedNumber, forKey: "userNumber")
+                            if authVM.tappedLogin {
+                                let formattedNumber = "+1\(phoneNumber)"
+
+                                Task {
+                                    UserDefaults.standard.setValue(formattedNumber, forKey: "usersNumber")
+                                    await mainVM.fetchUser()
+                                    if let user = mainVM.currUser, user.username != "naveedjohnmo" {
+                                        UserDefaults.standard.setValue(true, forKey: "finishedOnboarding")
+                                        async let notifications = inboxVM.fetchNotifications(for: user)
+                                        async let peopleList = profileVM.fetchPeopleList(user: user)
+                                        async let profilePic = profileVM.fetchUserProfilePicture(user: user)
+                                        _ = await (notifications, peopleList, profilePic)
+                                        await pollVM.fetchPolls(for: user)
+                                        pollVM.entireSchool = profileVM.peopleList
+                                        mainVM.currentPage = .poll
+                                        authVM.tappedLogin = false
+                                    }
+                                }
+                            }
                             sendVerificationCode()
                         } else {
                             verifyCode()
+                        
                         }
                     }
                 )
@@ -196,19 +216,7 @@ struct NumberScreen: View {
         }
     }
     
-    func fetchUserData(_ user: User) async {
-       async let peopleList = profileVM.fetchPeopleList(user: user)
-//        do {
-//            try await FirebaseService.shared.updateAllObjects(collection: "users")
-//
-//        } catch {
-//            print(error.localizedDescription)
-//        }
-
-       // Wait for both tasks to complete
-       _ = await (peopleList)
-   }
-    
+ 
     private func verifyCode() {
         isVerifying = true
         mainVM.currUser?.fcmToken = UserDefaults.standard.string(forKey: "fcmToken") ?? ""
@@ -218,24 +226,35 @@ struct NumberScreen: View {
                     isVerifying = false
                     switch result {
                     case .success(let authResult):
-                        FirebaseService.shared.addDocument(user, collection: "users") { str in
-                            UserDefaults.standard.setValue(user.id, forKey: Constants.userId)
-                            authVM.signInSuccessful = true
-                            authVM.isVerified = true
+                        if authVM.tappedLogin {
                             Task {
-                                if let user = mainVM.currUser {
-                                    await fetchUserData(user)
-                                    await pollVM.fetchPolls(for: user)
+                                await mainVM.fetchUser()
+                                if let user = mainVM.currUser, user.username != "naveedjohnmo" {
+                                    async let notifications = inboxVM.fetchNotifications(for: user)
+                                    async let peopleList = profileVM.fetchPeopleList(user: user)
+                                    async let profilePic = profileVM.fetchUserProfilePicture(user: user)
+                                    _ = await (notifications, peopleList, profilePic)
+                                    pollVM.entireSchool = profileVM.peopleList
+                                    mainVM.currentPage = .poll
+                                    authVM.tappedLogin = false
                                 }
                             }
-                            
-                            
-                            withAnimation {
-                                mainVM.onboardingScreen = .uploadProfile
+                        } else {
+                            FirebaseService.shared.addDocument(user, collection: "users") { str in
+                                UserDefaults.standard.setValue(user.id, forKey: Constants.userId)
+                                authVM.signInSuccessful = true
+                                authVM.isVerified = true
+                          
+                                
+                                
+                                withAnimation {
+                                    mainVM.onboardingScreen = .uploadProfile
+                                }
+                                
+                                print("Successfully verified and signed in: \(authResult.user.uid)")
                             }
-                            
-                            print("Successfully verified and signed in: \(authResult.user.uid)")
                         }
+                     
                       
                     case .failure(let error):
                         authVM.errorString = error.localizedDescription

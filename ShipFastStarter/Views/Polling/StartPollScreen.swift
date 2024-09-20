@@ -7,13 +7,12 @@
 
 import SwiftUI
 
-struct PollCooldownScreen: View {
+struct StartPollScreen: View {
     @Environment(\.presentationMode) var presentationMode
     @EnvironmentObject var pollVM: PollViewModel
     @EnvironmentObject var profileVM: ProfileViewModel
     @EnvironmentObject var mainVM: MainViewModel
     @State private var timer: Timer?
-    @State private var showShareSheet = false
     
     let columns = [
         GridItem(.flexible(), spacing: -24),
@@ -31,64 +30,23 @@ struct PollCooldownScreen: View {
                 ZStack {
                     Color.primaryBackground.ignoresSafeArea()
                     VStack(spacing: 0) {
-                        if pollVM.isNewPollReady {
-                            Text("new polls are\navailable!")
-                                .sfPro(type: .bold, size: .h1)
-                                .foregroundColor(.white)
-                                .padding(.top, 16)
-                                .multilineTextAlignment(.center)
-                            
-                            Spacer()
-                            VStack(spacing: 16) {
-                                SharedComponents.PrimaryButton(
-                                    title: "Start",
-                                    action: {
-                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                        withAnimation {
-                                            withAnimation {
-                                                mainVM.currentPage = .poll
-                                                pollVM.isNewPollReady = false
-                                                Analytics.shared.log(event: "PollCooldown: Tapped Start")
-                                            }
-                                        }
-                                    }
-                                )
-                            }
-                            .padding(.horizontal, 24)
-                        } else {
-                            Text("new polls in")
-                                .sfPro(type: .bold, size: .h1)
-                                .foregroundColor(.white)
-                                .padding(.top, 16)
-                            Text("\(pollVM.timeRemainingString())")
-                                .sfPro(type: .bold, size: .title)
-                                .foregroundColor(.white)
-                                .multilineTextAlignment(.center)
-                            
-                                Text("--- or ---")
-                                    .sfPro(type: .semibold, size: .h2)
-                                    .foregroundColor(.white.opacity(0.5))
-                                    .padding(.vertical, 32)
-                            VStack(spacing: 16) {
-                                Text("skip the wait!")
-                                    .sfPro(type: .semibold, size: .h2)
-                                    .foregroundColor(.white)
-                                SharedComponents.PrimaryButton(
-                                    title: "Invite a friend",
-                                    action: {
-                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                        withAnimation {
-                                            showShareSheet = true
-                                        }
-                                    }
-                                )
-                            }
-                            .padding(.horizontal, 24)
-                        }
-                   
+                        Text("new polls are available")
+                            .sfPro(type: .bold, size: .h1)
+                            .foregroundColor(.white)
+                            .padding(.top, 16)                  
                         
 
-                  
+                        VStack(spacing: 16) {              
+                            SharedComponents.PrimaryButton(
+                                title: "Start",
+                                action: {
+                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                    withAnimation {
+                                    }
+                                }
+                            )
+                        }
+                        .padding(.horizontal, 24)
                         Spacer()
 
                         VStack {
@@ -158,43 +116,21 @@ struct PollCooldownScreen: View {
                         Spacer()
                     }
                     .padding(.top, 42)
-                }  .sheet(isPresented: $showShareSheet) {
-                    InviteFriendsModal()
-                        .presentationDetents([.height(300)])
-                        .presentationDragIndicator(.visible)
                 }
             }
        
         }.onAppear {
-            if let user = mainVM.currUser {
-                pollVM.checkCooldown(user: user)
-                startTimer()
-            }
-        }
-        .onDisappear {
-            timer?.invalidate()
-        }
-     
+            
+        }.onAppearAnalytics(event: "StartPollScreen: Screenload")
     }
-    
-    private func startTimer() {
-        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
-            if let cooldownEndTime = pollVM.cooldownEndTime, cooldownEndTime <= Date() {
-                pollVM.cooldownEndTime = nil
-                timer?.invalidate()
-            }
-        }
-    }
-
  
 }
 
-struct PollCooldownScreen_Previews: PreviewProvider {
+struct StartPollScreen_Previews: PreviewProvider {
     static var previews: some View {
-        PollCooldownScreen()
+        StartPollScreen()
             .environmentObject(PollViewModel())
-            .environmentObject(MainViewModel())
             .environmentObject(ProfileViewModel())
-
+            .environmentObject(MainViewModel())
     }
 }

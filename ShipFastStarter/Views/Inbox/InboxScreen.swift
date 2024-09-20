@@ -225,7 +225,7 @@ struct PollAnswerDetailView: View {
                 // Poll options in vertical layout
                 VStack(spacing: 24) {
                     ForEach(Array(inboxVM.currentFourOptions.enumerated()), id: \.element.id) { index, option in
-                        PollOptionView(option: option, isCompleted: true, isSelected: index == 0)
+//                        PollOptionView(option: option, isCompleted: true, isSelected: index == 0)
                     }
                 }
                 .padding()

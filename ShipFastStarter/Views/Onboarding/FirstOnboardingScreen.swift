@@ -8,12 +8,29 @@
 import SwiftUI
 
 struct OnboardingScreen: View {
+    @EnvironmentObject var authVM: AuthViewModel
     @EnvironmentObject var mainVM: MainViewModel
-    
+    @EnvironmentObject var pollVM: PollViewModel
+    @EnvironmentObject var profileVM: ProfileViewModel
+    @EnvironmentObject var inboxVM: InboxViewModel
+
     var body: some View {
         ZStack {
             Color.primaryBackground.edgesIgnoringSafeArea(.all)
             VStack(alignment: .center) {
+                Text("login")
+                    .underline()
+                    .sfPro(type: .semibold, size: .h2)
+                    .foregroundColor(.white)
+                    .opacity(0.7)
+                    .onTapGesture {
+                        withAnimation {
+                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                            Analytics.shared.log(event: "FirstOnboarding: Tapped Login")
+                            authVM.tappedLogin = true
+                        }
+                    }
+                    .padding(.vertical)
                 Spacer()
                 HStack {
                     ZStack {
@@ -49,7 +66,14 @@ struct OnboardingScreen: View {
                 .padding(.horizontal, 24)
             }
         }.frame(maxWidth: .infinity, alignment: .center)
-       
+            .sheet(isPresented: $authVM.tappedLogin) {
+                NumberScreen()
+                    .environmentObject(mainVM)
+                    .environmentObject(authVM)
+                    .environmentObject(inboxVM)
+                    .environmentObject(profileVM)
+                    .environmentObject(pollVM)
+            }
     }
 }
 

@@ -13,7 +13,7 @@ class MainViewModel: ObservableObject {
     @Published var isPro = false
     @Published var showHalfOff = false 
     @Published var onboardingProgress: Double = 0.0
-    @Published var currUser: User?
+    @Published var currUser: User? 
     
     init() {
         
@@ -58,6 +58,12 @@ class MainViewModel: ObservableObject {
     
     func addVotedPoll(_ pollId: String) {
         self.currUser?.votedPolls.append(pollId)
+    }
+    
+    func updateCurrentUser(_ updatedUser: User) {
+        DispatchQueue.main.async {
+            self.currUser = updatedUser
+        }
     }
 }
 

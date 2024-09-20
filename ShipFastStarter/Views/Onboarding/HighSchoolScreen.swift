@@ -11,6 +11,7 @@ import SwiftUI
 struct HighSchoolScreen: View {
     @EnvironmentObject var mainVM: MainViewModel
     @EnvironmentObject var viewModel: HighSchoolViewModel
+    @EnvironmentObject var profileVM: ProfileViewModel
     @FocusState private var isSearchFocused: Bool
     
     var body: some View {
@@ -40,12 +41,16 @@ struct HighSchoolScreen: View {
 //                .listStyle(PlainListStyle())
                 HighschoolButton(title: "Buildspace", totalNum: 4) {
                     withAnimation {
+//                        mainVM.currUser = User.exUser
                         mainVM.currUser?.schoolId = "buildspace"
                         if let currUser = mainVM.currUser {
                             Task {
+                                try 
+                                await FirebaseService.shared.updateField(collection: "users", documentId: currUser.id, field: "schoolId", value: "buildspace")
                                 await viewModel.checkHighSchoolLock(for: currUser, id: "buildspace")
+                                viewModel.updateNumStudents(user: currUser, for: "buildspace")
                                 if !viewModel.selectedHighschool.students.contains(currUser.id) {
-                                    viewModel.updateNumStudents(user: currUser, for: "buildspace")
+                                    await profileVM.fetchPeopleList(user: currUser)
                                 }
                                 
                                 if viewModel.isHighSchoolLocked {
@@ -67,10 +72,13 @@ struct HighSchoolScreen: View {
                         mainVM.currUser?.schoolId = "123e4567-e89b-12d3-a456-426614174000"
                         if let currUser = mainVM.currUser {
                             Task {
-                                await viewModel.checkHighSchoolLock(for: currUser, id: "123e4567-e89b-12d3-a456-426614174000")
+                                await profileVM.fetchPeopleList(user: currUser)
                                 viewModel.updateNumStudents(user: currUser, for: "123e4567-e89b-12d3-a456-426614174000")
+
+                                await viewModel.checkHighSchoolLock(for: currUser, id: "123e4567-e89b-12d3-a456-426614174000")
                             }
-                        }                  
+                        }   
+                        
                         mainVM.onboardingScreen = .grade
                     }
                 }
