@@ -67,6 +67,15 @@ struct ShipFastStarterApp: App {
                     }
                 }
             }
+            .onReceive(NotificationCenter.default.publisher(for: Notification.Name("HandleDeepLink"))) { notification in
+                if let title = notification.userInfo?["title"] as? String {
+                    if title.contains("from") { // inbox
+                        mainVM.currentPage = .inbox
+                    } else { // friend request
+                        mainVM.currentPage = .friendRequests
+                    }
+                }
+            }
         }
         .modelContainer(sharedModelContainer)
     }
@@ -212,8 +221,16 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 //   
     
     
-    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: () -> Void) {
-        print("hello")
+    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+        let userInfo = response.notification.request.content.userInfo
+        let title = response.notification.request.content.title
+        
+        
+        NotificationCenter.default.post(name: Notification.Name("HandleDeepLink"), object: nil, userInfo: [
+            "deepLink": "bumping",
+            "title": title
+        ])
+        completionHandler()
     }
 
     

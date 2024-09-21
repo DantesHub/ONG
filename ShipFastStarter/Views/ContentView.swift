@@ -27,6 +27,7 @@ struct ContentView: View {
     @State private var showSplash = true
     @State private var dragGesture: DragGesture.Value?
     
+
     var body: some View {
         NavigationView {
             GeometryReader { geometry in
@@ -150,6 +151,24 @@ struct ContentView: View {
             feedVM.allFriends = profileVM.friends
             feedVM.fetchNextPage()
         }
+//        .onChange(of: deepLink) { _ in
+//            // Handle deep link here
+//            if let deepLink = deepLink {
+//                switch deepLink {
+//                case "pollScreen":
+//                    mainVM.currentPage = .poll
+//                case "feedScreen":
+//                    mainVM.currentPage = .feed
+//                // Add more cases as needed
+//                default:
+//                    print("Unknown deep link")
+//                }
+//            }
+//            // Reset deep link after handling
+//            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+//                self.deepLink = nil
+//            }
+//        }
     }
     
     

@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct FeedPost: Identifiable, Equatable, Hashable {
+struct FeedPost: Identifiable, Equatable {
     let id: String
     let user: User
     let votedByUser: User
@@ -15,10 +15,6 @@ struct FeedPost: Identifiable, Equatable, Hashable {
     let question: String
     let pollId: String
     let timestamp: Date
-    
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
-    }
 }
 
 class FeedViewModel: ObservableObject {
@@ -31,17 +27,11 @@ class FeedViewModel: ObservableObject {
     private var currentPage = 0
     private let pageSize = 20
     private var hasMoreData = true
-    private var processedPostIds = Set<String>()
 
     func setInitialData(polls: [Poll], friends: [User], users: [User]) {
         self.allPolls = polls
         self.allFriends = friends
-        self.allUsers = users + [currUser]
-        self.currentPage = 0
-        self.feedPosts.removeAll()
-        self.processedPostIds.removeAll()
-        self.hasMoreData = true
-        fetchNextPage()
+        self.allUsers = users
     }
 
     func fetchNextPage() {
@@ -50,18 +40,8 @@ class FeedViewModel: ObservableObject {
         let startIndex = currentPage * pageSize
         let endIndex = min(startIndex + pageSize, allPolls.count)
         
-        allPolls = allPolls.reversed()
-        let pollsToProcess = Array(allPolls)
-        let newPosts = processPollsForFeed(polls: pollsToProcess)
-        
-        for post in newPosts {
-            if !processedPostIds.contains(post.id) {
-                feedPosts.append(post)
-                processedPostIds.insert(post.id)
-            }
-        }
-        
-        feedPosts.sort(by: { $0.timestamp > $1.timestamp })
+        let newPosts = processPollsForFeed(polls: Array(allPolls))
+        feedPosts.append(contentsOf: newPosts)
         
         currentPage += 1
         hasMoreData = endIndex < allPolls.count
@@ -70,12 +50,20 @@ class FeedViewModel: ObservableObject {
     private func processPollsForFeed(polls: [Poll]) -> [FeedPost] {
         var newPosts: [FeedPost] = []
         let dateFormatter = ISO8601DateFormatter()
-        
+        print(polls.count, "sukima switch")
+        allUsers.append(currUser)
         for poll in polls {
             for option in poll.pollOptions {
                 guard let votes = option.votes, !votes.isEmpty else { continue }
+                let sortedVotes = votes.sorted {
+                    guard let date1 = dateFormatter.date(from: $0.value["date"] ?? ""),
+                          let date2 = dateFormatter.date(from: $1.value["date"] ?? "") else {
+                        return false
+                    }
+                    return date1 > date2
+                }
                 
-                for (voterId, voteInfo) in votes {
+                for (voterId, voteInfo) in sortedVotes {
                     guard let votedUser = allUsers.first(where: { $0.id == option.userId }),
                           let votingUser = allUsers.first(where: { $0.id == voterId }),
                           let dateString = voteInfo["date"],
@@ -85,7 +73,7 @@ class FeedViewModel: ObservableObject {
                     }
                     
                     let feedPost = FeedPost(
-                        id: "\(poll.id)_\(option.id)_\(voterId)",
+                        id: UUID().uuidString,
                         user: votedUser,
                         votedByUser: votingUser,
                         aura: Int(aura) ?? 0,

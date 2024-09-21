@@ -33,11 +33,11 @@ struct FeedScreen: View {
                             ForEach(feedVM.feedPosts) { post in
                                 ZStack {
                                     FeedPostRow(post: post)
-                                        .onAppear {
-                                            if post == feedVM.feedPosts.last {
-                                                feedVM.fetchNextPage()
-                                            }
-                                        }
+//                                        .onAppear {
+//                                            if post == feedVM.feedPosts.last {
+//                                                feedVM.fetchNextPage()
+//                                            }
+//                                        }
                                         .padding(.horizontal)
                                     Text("\(post.aura)")
                                         .foregroundColor(.white)

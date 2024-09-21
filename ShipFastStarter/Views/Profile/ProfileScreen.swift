@@ -70,7 +70,7 @@ struct ProfileScreen: View {
                         }
                         
                         if profileVM.isVisitingUser {
-                            if let url = URL(string: user.proPic), !user.proPic.isEmpty {
+                            if let url = URL(string: profileVM.visitedUser?.proPic ?? "") {
                                 CachedAsyncImage(url: url) { phase in
                                     switch phase {
                                     case .success(let image):
