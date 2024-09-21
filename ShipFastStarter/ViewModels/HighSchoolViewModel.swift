@@ -60,7 +60,6 @@ class HighSchoolViewModel: ObservableObject {
             try await FirebaseService.shared.updateField(collection: "highschools", documentId: highschoolId, field: "students", value: students)
             totalKids = students.count
         }
-     
     }
     
     func searchSchools(query: String) {                

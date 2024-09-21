@@ -125,9 +125,9 @@ class ProfileViewModel: ObservableObject, ImageUploadable {
     }
 
     func fetchPeopleList(user: User) async {
+        self.peopleList = []
         do {
             let fetchedPeopleList: [User] = try await FirebaseService.shared.fetchDocuments(collection: "users", whereField: "schoolId", isEqualTo: user.schoolId)
-            
             var updatedPeopleList = fetchedPeopleList
             var updatedFriends = self.friends
             
@@ -162,11 +162,10 @@ class ProfileViewModel: ObservableObject, ImageUploadable {
             }
             
             // Update @Published properties on the main thread
-            DispatchQueue.main.async {
-                self.peopleList = updatedPeopleList
-                self.friends = updatedFriends
-                self.fetchTop8()
-            }
+            self.peopleList = updatedPeopleList
+            self.friends = updatedFriends
+            self.fetchTop8()
+            
             
             await loadImages()
             

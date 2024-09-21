@@ -58,7 +58,7 @@ struct InboxScreen: View {
     private var newVotesSection: some View {
         Group {
             if !inboxVM.newUsersWhoVoted.isEmpty {
-                Text("New")
+                Text("ppl who voted for u")
                     .font(.system(size: 22, weight: .bold))
                     .padding(.leading, 20)
                     .foregroundColor(.black)
@@ -148,7 +148,7 @@ struct InboxItemView: View {
                 }
                 
                 Spacer()
-                Text(inboxVM.formatRelativeTime(from: item.time))
+                Text(Date.formatRelativeTime(from: item.time))
                     .sfPro(type: .medium, size: .p2)
                     .foregroundColor(.gray)
                     .padding(.trailing, 8)
@@ -172,6 +172,14 @@ struct InboxItemView: View {
                     }
                 }
             withAnimation {
+                let viewedNotifcationIds: [String] = UserDefaults.standard.array(forKey: Constants.viewedNotificationIds) as? [String] ?? []
+                var updatedArray = viewedNotifcationIds
+                if !updatedArray.contains(where: { id in
+                    id == item.accompanyingPoll.id
+                }) {
+                    updatedArray.append(item.accompanyingPoll.id)
+                }
+                
                 inboxVM.tappedNotification = true
             }
         }

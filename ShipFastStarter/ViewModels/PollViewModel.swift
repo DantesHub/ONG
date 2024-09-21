@@ -51,15 +51,12 @@ class PollViewModel: ObservableObject {
             randomizedPeople.append((randGender == 0 ? "boy" : "girl", Constants.colors[color]))
          }
     }
-    
-    func updateRandomPeople() {
-        
-    }
 
     func fetchPolls(for user: User) async {
         print(" *******  *******  ******* fetching or initializing polls  ******* ******* *******")
         if UserDefaults.standard.integer(forKey: Constants.currentIndex) != 0  {
             currentPollIndex = UserDefaults.standard.integer(forKey: Constants.currentIndex)
+            self.allPolls = pollSet
             if pollSet.isEmpty {
                 if let pollIds = UserDefaults.standard.array(forKey: Constants.pollIds) {
                     for poll in pollIds {
@@ -122,6 +119,7 @@ class PollViewModel: ObservableObject {
     }
     
     func initPolls(for user: User) async {
+        print("initing polls bro")
         do {
             let polls: [Poll] = try await FirebaseService.shared.fetchDocuments(
                 collection: "polls",
@@ -130,12 +128,21 @@ class PollViewModel: ObservableObject {
             )
             
             self.allPolls = polls
+            print(allPolls.count, "we yamaza")
             self.pollSet = polls.filter { !$0.usersWhoVoted.contains(user.id) }
             self.pollSet.sort { $0.createdAt > $1.createdAt }
             
             if pollSet.count < 8 {
                 await createPoll(user: user)
+            } else {
+                for poll in pollSet {
+                    self.selectedPoll = poll
+                    allOptions = poll.pollOptions
+                    getPollOptions(excludingUserId: user)
+                    await updatePollOptionsInFB()
+                }
             }
+            
             // Limit pollSet to the first 8 polls
             self.pollSet = Array(self.pollSet.prefix(8))
             // create array of poll ids
@@ -147,8 +154,6 @@ class PollViewModel: ObservableObject {
                 self.selectedPoll = first
                 allOptions = first.pollOptions
                 self.getPollOptions(excludingUserId: user)
-                await updatePollOptionsInFB()
-                updateQuestionEmoji()
             }
           
         } catch {
@@ -236,6 +241,8 @@ class PollViewModel: ObservableObject {
     }
 
     func createPoll(user: User) async {
+        print(" *******  *******  ******* creating polls  ******* ******* *******")
+
         var potentialQuestions = Question.bsQuestions.filter { question in
             !allPolls.contains { $0.title == question.question }
         }
@@ -244,11 +251,7 @@ class PollViewModel: ObservableObject {
         while pollSet.count < 8 && !potentialQuestions.isEmpty {
             if let question = potentialQuestions.first {
                 potentialQuestions.removeFirst()
-                let users = try? await FirebaseService.shared.fetchDocuments(
-                    collection: "users",
-                    whereField: "schoolId",
-                    isEqualTo: user.schoolId
-                ) as [User]
+           
                 let id = UUID().uuidString
                 selectedPoll.id = id
                 
@@ -306,6 +309,25 @@ class PollViewModel: ObservableObject {
             let friendNotAnOption = allOptions.contains { $0.userId != friend.id }
             return friendNotAnOption
         }
+      
+    
+        if allOptions.contains(where: { option in
+            option.userId != user.id
+        }) {
+            // add the user as an option
+            var userOption = PollOption(
+                id: UUID().uuidString,
+                type: "Poll",
+                option: "\(user.firstName) \(user.lastName)",
+                userId: user.id,
+                votes: [:],
+                gradeLevel: user.grade
+            )
+            userOption.priorityScore = -3
+            allOptions.append(userOption)
+        }
+
+        
         
         for friend in friendOptions {
             var newOption = PollOption(
@@ -335,7 +357,7 @@ class PollViewModel: ObservableObject {
         }
         
         // means we're creating a new poll
-        if allOptions.count < 12 {
+        if allOptions.count < 13 {
             sortedUsersInGrade.shuffle()
         }
         
@@ -350,7 +372,7 @@ class PollViewModel: ObservableObject {
             if !allOptions.contains(where: { option in
                 option.userId == userInGrade.id
             }) {
-                if allOptions.count == 10 {
+                if allOptions.count == 11 {
                     break
                 }
                 
@@ -378,7 +400,7 @@ class PollViewModel: ObservableObject {
         
         // Add remaining users to allOptions if needed
         for remainUser in remainingUsers {
-            if allOptions.count >= 12 {
+            if allOptions.count >= 13 {
                 break
             }
             
@@ -435,6 +457,15 @@ class PollViewModel: ObservableObject {
         // Sort priority options by score
         updatedOptions.sort { $0.priorityScore > $1.priorityScore }
         allOptions = updatedOptions
+        // Remove duplicate options with the same userId
+        var seenUserIds = Set<String>()
+        allOptions = allOptions.filter { option in
+            if seenUserIds.contains(option.userId) {
+                return false
+            }
+            seenUserIds.insert(option.userId)
+            return true
+        }
         
         print(totalFriendOptions, totalSameGradeOptions,  "totalFriend & Grade options")
         // totalPriorityScore determines relevancy for the polloptions
@@ -444,6 +475,16 @@ class PollViewModel: ObservableObject {
             // Sort priority options by score
             allOptions.sort { $0.priorityScore > $1.priorityScore }
         }
+        
+        seenUserIds = Set<String>()
+        allOptions = allOptions.filter { option in
+        if seenUserIds.contains(option.userId) {
+            return false
+        }
+        seenUserIds.insert(option.userId)
+        return true
+    }
+        
         
         currentTwelveOptions = Array(allOptions.prefix(12)).shuffled()
         // Take up to 4 options from the available options

@@ -50,6 +50,8 @@
 		887C78382C9CD1E400CEDC72 /* StartPollScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 887C78372C9CD1E400CEDC72 /* StartPollScreen.swift */; };
 		887C783A2C9D4D1200CEDC72 /* holdDown.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 887C78392C9D4D1200CEDC72 /* holdDown.mp3 */; };
 		887C783C2C9E15EC00CEDC72 /* SettingsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 887C783B2C9E15EC00CEDC72 /* SettingsScreen.swift */; };
+		887C783F2C9E33F300CEDC72 /* FeedScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 887C783E2C9E33F300CEDC72 /* FeedScreen.swift */; };
+		887C78412C9E347500CEDC72 /* FeedViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 887C78402C9E347500CEDC72 /* FeedViewModel.swift */; };
 		888FF3BA2C8679F10025EC1B /* ContactsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 888FF3B92C8679F10025EC1B /* ContactsScreen.swift */; };
 		888FF3BC2C867CD80025EC1B /* LocationScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 888FF3BB2C867CD80025EC1B /* LocationScreen.swift */; };
 		888FF3BE2C867CEF0025EC1B /* Onboarding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 888FF3BD2C867CEF0025EC1B /* Onboarding.swift */; };
@@ -136,6 +138,8 @@
 		887C78372C9CD1E400CEDC72 /* StartPollScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartPollScreen.swift; sourceTree = "<group>"; };
 		887C78392C9D4D1200CEDC72 /* holdDown.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = holdDown.mp3; sourceTree = "<group>"; };
 		887C783B2C9E15EC00CEDC72 /* SettingsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsScreen.swift; sourceTree = "<group>"; };
+		887C783E2C9E33F300CEDC72 /* FeedScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedScreen.swift; sourceTree = "<group>"; };
+		887C78402C9E347500CEDC72 /* FeedViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedViewModel.swift; sourceTree = "<group>"; };
 		888FF3B92C8679F10025EC1B /* ContactsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsScreen.swift; sourceTree = "<group>"; };
 		888FF3BB2C867CD80025EC1B /* LocationScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationScreen.swift; sourceTree = "<group>"; };
 		888FF3BD2C867CEF0025EC1B /* Onboarding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Onboarding.swift; sourceTree = "<group>"; };
@@ -223,6 +227,14 @@
 			path = Profile;
 			sourceTree = "<group>";
 		};
+		887C783D2C9E33EB00CEDC72 /* Feed */ = {
+			isa = PBXGroup;
+			children = (
+				887C783E2C9E33F300CEDC72 /* FeedScreen.swift */,
+			);
+			path = Feed;
+			sourceTree = "<group>";
+		};
 		888FF3C92C867E4A0025EC1B /* Polling */ = {
 			isa = PBXGroup;
 			children = (
@@ -288,6 +300,7 @@
 				884B247E2C87BECE00229F1E /* PollViewModel.swift */,
 				8838DC4C2C8B864E00500C6E /* InboxViewModel.swift */,
 				8838DC682C8F994B00500C6E /* ProfileViewModel.swift */,
+				887C78402C9E347500CEDC72 /* FeedViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -295,6 +308,7 @@
 		88B37D1D2C23FD78000A7D91 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				887C783D2C9E33EB00CEDC72 /* Feed */,
 				8838DC412C8A907700500C6E /* Inbox */,
 				884B24802C87E12B00229F1E /* Profile */,
 				888FF3C92C867E4A0025EC1B /* Polling */,
@@ -593,9 +607,11 @@
 				8838DC6D2C8F9C1D00500C6E /* Image.swift in Sources */,
 				8838DC802C9550BB00500C6E /* DevTestingView.swift in Sources */,
 				884B24842C87E44500229F1E /* PollScreen.swift in Sources */,
+				887C78412C9E347500CEDC72 /* FeedViewModel.swift in Sources */,
 				88B37D502C24118F000A7D91 /* API.swift in Sources */,
 				88B37D592C241355000A7D91 /* ResponseModel.swift in Sources */,
 				887C78382C9CD1E400CEDC72 /* StartPollScreen.swift in Sources */,
+				887C783F2C9E33F300CEDC72 /* FeedScreen.swift in Sources */,
 				888FF3C02C867DBC0025EC1B /* BirthdayScreen.swift in Sources */,
 				88B37D242C23FDF8000A7D91 /* MainViewModel.swift in Sources */,
 				8838DC782C9251BB00500C6E /* InviteFriendsModal.swift in Sources */,
@@ -733,7 +749,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = ONG.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 25;
+				CURRENT_PROJECT_VERSION = 29;
 				DEVELOPMENT_ASSET_PATHS = "\"ShipFastStarter/Preview Content\"";
 				DEVELOPMENT_TEAM = VY92D2R4AT;
 				ENABLE_PREVIEWS = YES;
@@ -754,7 +770,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2.4;
+				MARKETING_VERSION = 1.2.8;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ong.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -774,7 +790,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = ONG.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 25;
+				CURRENT_PROJECT_VERSION = 29;
 				DEVELOPMENT_ASSET_PATHS = "\"ShipFastStarter/Preview Content\"";
 				DEVELOPMENT_TEAM = VY92D2R4AT;
 				ENABLE_PREVIEWS = YES;
@@ -795,7 +811,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2.4;
+				MARKETING_VERSION = 1.2.8;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ong.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";

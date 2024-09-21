@@ -19,6 +19,15 @@ struct SettingsScreen: View {
             List {
                 Section(header: Text("Account")) {
                     HStack {
+                        Text("Notifications")
+                            .foregroundColor(.blue)
+                        Spacer()
+                    }.onTapGesture {
+                        Analytics.shared.log(event: "")
+                        withAnimation {
+                        }
+                    }
+                    HStack {
                         Text("Sign Out")
                             .foregroundColor(.red)
                         Spacer()
@@ -41,6 +50,14 @@ struct SettingsScreen: View {
                           } else {
                             // mainVM.currentPage = .login
                           }
+                        }
+                    }
+                    if let currUser = mainVM.currUser {
+                        Text(currUser.id)
+                    }
+                    if let currUser = mainVM.currUser {                        
+                        HStack {
+                            Text(currUser.schoolId)
                         }
                     }
                 }

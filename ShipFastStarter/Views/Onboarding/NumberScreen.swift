@@ -120,7 +120,9 @@ struct NumberScreen: View {
 //                                mainVM.currUser?.number = formattedNumber
 //                                user.number = formattedNumber
 //                            }
-//                            UserDefaults.standard.setValue(formattedNumber, forKey: "userNumber")
+                            //                            UserDefaults.standard.setValue(formattedNumber, forKey: "userNumber")
+
+//                            UserDefaults.standard.setValue(true, forKey: "finishedOnboarding")
 //                            if authVM.tappedLogin {
 //                                Task {
 //                                    isLoading = true
@@ -130,9 +132,16 @@ struct NumberScreen: View {
 //                                        async let peopleList = profileVM.fetchPeopleList(user: user)
 //                                        async let profilePic = profileVM.fetchUserProfilePicture(user: user)
 //                                        _ = await (notifications, peopleList, profilePic)
+//                                        await pollVM.fetchPolls(for: user)
 //                                        pollVM.entireSchool = profileVM.peopleList
 //                                        mainVM.currentPage = .poll
 //                                        authVM.tappedLogin = false
+//                                        let fcmToken = UserDefaults.standard.string(forKey: "fcmToken") ?? ""
+//                                        do {
+//                                            try await FirebaseService.shared.updateField(collection: "users", documentId: user.id, field: "fcmToken", value: fcmToken)
+//                                        } catch {
+//                                            print(error.localizedDescription)
+//                                        }
 //                                        isLoading = false
 //                                    }
 //                                }
@@ -227,12 +236,26 @@ struct NumberScreen: View {
                         if authVM.tappedLogin {
                             Task {
                                 isLoading = true
+                                UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+                                    if let error = error {
+                                        print("Error requesting notification authorization: \(error)")
+                                    } else {
+                                        print("Notification authorization granted: \(granted)")
+                                    }
+                                }
                                 await mainVM.fetchUser()
+                                UserDefaults.standard.setValue(true, forKey: "finishedOnboarding")
                                 if let user = mainVM.currUser, user.username != "naveedjohnmo" {
                                     async let notifications = inboxVM.fetchNotifications(for: user)
                                     async let peopleList = profileVM.fetchPeopleList(user: user)
                                     async let profilePic = profileVM.fetchUserProfilePicture(user: user)
                                     _ = await (notifications, peopleList, profilePic)
+                                    let fcmToken = UserDefaults.standard.string(forKey: "fcmToken") ?? ""
+                                    do {
+                                        try await FirebaseService.shared.updateField(collection: "users", documentId: user.id, field: "fcmToken", value: fcmToken)
+                                    } catch {
+                                        print(error.localizedDescription)
+                                    }
                                     pollVM.entireSchool = profileVM.peopleList
                                     isLoading = false
                                     mainVM.currentPage = .poll

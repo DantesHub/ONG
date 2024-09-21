@@ -314,8 +314,8 @@ class FirebaseService {
             for doc in documents {
                 if var user = try? doc.data() {
                     let documentRef = documentCollection.document(doc.documentID)
-//                    user["friendRequests"] = [:]
-                    user["aura"] = 100
+                    user["friendRequests"] = [:]
+                    user["friends"] = [:]
                     print(doc.documentID, "documentID")
                     try await documentRef.updateData(user)
                   }
@@ -345,7 +345,7 @@ class FirebaseService {
 
   func uploadImage(_ image: UIImage, path: String, completion: @escaping (Result<String, Error>) -> Void) {
     print("Starting image upload process for path: \(path)")
-      if  let newImage = image.resized(to: CGSize(width: 1024, height: 1024)) {
+      if  let newImage = image.resized(to: CGSize(width: 1024, height: 256)) {
           guard let imageData = newImage.jpegData(compressionQuality: 0.5) else {
               print("Failed to convert image to JPEG data")
               completion(.failure(NSError(domain: "FirebaseService", code: 0, userInfo: [NSLocalizedDescriptionKey: "Failed to convert image to data"])))

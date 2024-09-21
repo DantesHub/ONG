@@ -103,6 +103,15 @@ class InboxViewModel: ObservableObject {
                                     if let dateStr = voteInfo["date"],
                                        let numVotes = voteInfo["numVotes"],
                                        let date = ISO8601DateFormatter().date(from: dateStr) {
+                                        var notificationStatus = false
+                                        let viewdIds = UserDefaults.standard.array(forKey: Constants.viewedNotificationIds) as? [String] ?? []
+                                        if viewdIds.contains(where: { id in
+                                            id == poll.id
+                                        }) {
+                                            notificationStatus = true
+                                        } else {
+                                            notificationStatus = voteInfo["viewedNotification"] == "false"
+                                        }
                                         let newInboxItem = InboxItem(
                                             id: UUID().uuidString,
                                             userId: voterId,
@@ -114,7 +123,7 @@ class InboxViewModel: ObservableObject {
                                             backgroundColor: Color(usr.color),
                                             accompanyingPoll: poll,
                                             pollOption: option,
-                                            isNew: voteInfo["viewedNotification"] == "false"
+                                            isNew: notificationStatus
                                         )
                                         if voteInfo["viewedNotification"] == "false" {
                                             newVotes.append(newInboxItem)
@@ -221,54 +230,7 @@ class InboxViewModel: ObservableObject {
     }
 
     
-   func formatRelativeTime(from date: Date) -> String {
-        let now = Date()
-        let calendar = Calendar.current
-        let components = calendar.dateComponents([.year, .month, .day, .hour, .minute, .second], from: date, to: now)
-        
-        if let year = components.year, year > 0 {
-            return year == 1 ? "1 year ago" : "\(year) years ago"
-        }
-        
-        if let month = components.month, month > 0 {
-            return month == 1 ? "1 month ago" : "\(month) months ago"
-        }
-        
-        if let day = components.day, day > 0 {
-            if day == 1 {
-                return "yesterday"
-            } else if day < 7 {
-                return "\(day)d ago"
-            } else {
-                let weeks = day / 7
-                return weeks == 1 ? "1 week ago" : "\(weeks) weeks ago"
-            }
-        }
-        
-        if let hour = components.hour, hour > 0 {
-            if hour == 1 {
-                
-            }
-            if hour < 24 {
-                return "\(hour)h ago"
-            }
 
-        }
-        
-        if let minute = components.minute, minute > 0 {
-            if minute < 60 {
-                return "\(minute)m ago"
-            }
-        }
-        
-        if let second = components.second, second > 0 {
-            if second < 60 {
-                return "just now"
-            }
-        }
-        
-        return "just now"
-    }
             
     //MARK: - Friend requests
     func tappedAcceptFriendRequest(currUser: User, requestedUser: User) async {

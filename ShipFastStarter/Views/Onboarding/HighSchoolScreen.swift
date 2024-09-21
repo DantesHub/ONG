@@ -59,7 +59,7 @@ struct HighSchoolScreen: View {
                                     }
                                 } else {
                                     withAnimation {
-                                        mainVM.onboardingScreen = .grade
+                                        mainVM.onboardingScreen = .addFriends
                                     }
                                 }
                             }
@@ -79,7 +79,7 @@ struct HighSchoolScreen: View {
                             }
                         }   
                         
-                        mainVM.onboardingScreen = .grade
+                        mainVM.onboardingScreen = .addFriends
                     }
                 }
                 .environmentObject(mainVM)

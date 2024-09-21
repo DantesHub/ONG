@@ -76,6 +76,7 @@ enum Page: String {
     case cooldown = "Cooldown"
     case inbox = "Inbox"
     case profile = "Profile"
+    case feed = "Feed"
     case splash = "Splash"
     case friendRequests = "FriendRequests"
 }

@@ -228,7 +228,7 @@ struct ProfilePictureView: View {
             RoundedRectangle(cornerRadius: 12)
                 .foregroundColor(.black)
                 .frame(width: 56, height: 56)
-                .stroke(color: .black, width: 2)
+                .stroke(color: .black, width: 1.5)
             if !user.proPic.isEmpty {
                 CachedAsyncImage(url: URL(string: user.proPic)) { phase in
                     switch phase {
@@ -237,13 +237,13 @@ struct ProfilePictureView: View {
                             .resizable()
                             .scaledToFill()
                             .frame(width: 56, height: 56)
-                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
                     case .failure:
                         Image(systemName: "person.fill")
                             .resizable()
                             .scaledToFit()
                             .frame(width: 56, height: 56)
-                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
                     case .empty:
                         ProgressView()
                     @unknown default:
@@ -255,7 +255,7 @@ struct ProfilePictureView: View {
                     .resizable()
                     .scaledToFit()
                     .frame(width: 32, height: 32)
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
             }
         }.rotationEffect(.degrees(-12))
     }

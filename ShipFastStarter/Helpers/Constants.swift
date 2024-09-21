@@ -22,4 +22,6 @@ struct Constants {
            "teal",
            "yellow"
        ]
+    
+    static var viewedNotificationIds = "viewedNotificationIds"
 }

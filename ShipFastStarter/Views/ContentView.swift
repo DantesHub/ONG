@@ -16,6 +16,7 @@ struct ContentView: View {
     @StateObject var pollVM = PollViewModel()
     @StateObject var inboxVM = InboxViewModel()
     @StateObject var profileVM = ProfileViewModel()
+    @StateObject var feedVM = FeedViewModel()
     @Environment(\.scenePhase) private var scenePhase
 
     @Environment(\.modelContext) private var modelContext
@@ -24,6 +25,7 @@ struct ContentView: View {
     @State private var showDevTestingSheet = false
     @State private var offset: CGFloat = 0
     @State private var showSplash = true
+    @State private var dragGesture: DragGesture.Value?
     
     var body: some View {
         NavigationView {
@@ -45,12 +47,13 @@ struct ContentView: View {
                         }
                     } else {
                         HStack(spacing: 0) {
-                            ForEach([Page.friendRequests, Page.inbox, Page.poll, Page.profile], id: \.self) { page in
+                            ForEach([Page.friendRequests, Page.inbox, Page.feed, Page.poll, Page.profile], id: \.self) { page in
                                 pageView(for: page)
                                     .frame(width: geometry.size.width, height: geometry.size.height)
                             }
                         }
                         .offset(x: -CGFloat(pageIndex(for: mainVM.currentPage)) * geometry.size.width + offset)
+                        .contentShape(Rectangle())  // Add this line
                         .gesture(
                             DragGesture()
                                 .onChanged { gesture in
@@ -76,7 +79,7 @@ struct ContentView: View {
                                     }
                                 }
                         )
-                    
+                        .animation(.easeInOut, value: mainVM.currentPage)  // Add this line
                     }
                 }
             }
@@ -90,6 +93,8 @@ struct ContentView: View {
                                 Spacer()
                             }
                             toolbarButton(for: .inbox, title: "inbox")
+                            Spacer()
+                            toolbarButton(for: .feed, title: "feed")
                             Spacer()
                             toolbarButton(for: .poll, title: "play")
                             Spacer()
@@ -130,31 +135,45 @@ struct ContentView: View {
                 @unknown default: break
                 }
          }
-
+        .onReceive(NotificationCenter.default.publisher(for: .init("ContentViewDragGesture"))) { notification in
+            if let gesture = notification.object as? DragGesture.Value {
+                self.dragGesture = gesture
+                handleDragGesture(gesture)
+            }
+        }.onChange(of: pollVM.allPolls) {
+//            UserDefaults.standard.setValue(0, forKey: Constants.currentIndex)
+            feedVM.allPolls = pollVM.allPolls
+            if let user = mainVM.currUser {
+                feedVM.currUser = user
+            }
+            feedVM.allUsers = profileVM.peopleList
+            feedVM.allFriends = profileVM.friends
+            feedVM.fetchNextPage()
+        }
     }
     
-
     
     //MARK: - data logic
     private func setupInitialState() {
 //        UserDefaults.standard.setValue(0, forKey: Constants.currentIndex)
         authVM.isUserSignedIn()
-        Task {
-            do {
-                try await FirebaseService.shared.updateAllObjects(collection: "users")
-            } catch {
-                print(error.localizedDescription)
-            }
-        }
+//        Task {
+//            do {
+//                try await FirebaseService.shared.updateAllObjects(collection: "users")
+//            } catch {
+//                print(error.localizedDescription)
+//            }
+//        }
       
         if UserDefaults.standard.bool(forKey: "finishedOnboarding") {
             Task {
                 await mainVM.fetchUser()
 //
                 if let user = mainVM.currUser {
-                    await fetchPollData(user: user)
                     await fetchPeopleAndNotifications(user)
+                    await fetchPollData(user: user)
                     showSplash = false
+                    mainVM.currentPage = .cooldown
                 }
             }
         } else {
@@ -174,12 +193,12 @@ struct ContentView: View {
             // simply fetch user  again
             fetchUserAndData()
             if let user = mainVM.currUser {
-                pollVM.checkCooldown(user: user)
+                Task {
+                    await fetchPollData(user: user)
+                }
                 if pollVM.cooldownEndTime == nil {
                     pollVM.isNewPollReady = true
-                    Task {
-                        await fetchPolls(user: user)
-                    }
+                   
                 }
                 showSplash = false
             }
@@ -214,16 +233,21 @@ struct ContentView: View {
     
     func fetchPollData(user: User) async {
         pollVM.checkCooldown(user: user)
+        await profileVM.fetchPeopleList(user: user)
+        pollVM.entireSchool = profileVM.peopleList
+        feedVM.currUser = user
+        feedVM.allUsers = profileVM.peopleList
+        feedVM.allFriends = profileVM.friends
         await fetchPolls(user: user)
     }
     
     
     private func fetchPeopleAndNotifications(_ user: User) async {
+        print(user.schoolId, "bro what is going on")
         async let notifications = inboxVM.fetchNotifications(for: user)
-        async let peopleList = profileVM.fetchPeopleList(user: user)
         async let profilePic = profileVM.fetchUserProfilePicture(user: user)
-        _ = await (notifications, peopleList, profilePic)
-        pollVM.entireSchool = profileVM.peopleList
+        
+        _ = await (notifications, profilePic)
     }
     
     
@@ -231,12 +255,13 @@ struct ContentView: View {
     private func fetchPolls(user: User) async {
         Task {
             await pollVM.fetchPolls(for: user)
-            
+            feedVM.allPolls = pollVM.allPolls
             withAnimation {
                 if pollVM.cooldownEndTime == nil {
                     pollVM.completedPoll = false
                     pollVM.isNewPollReady = true
                 }
+           
             }
             
         }
@@ -248,6 +273,10 @@ struct ContentView: View {
         switch page {
         case .splash:
             SplashScreen()
+        case .feed:
+            FeedScreen()
+                .environmentObject(feedVM)
+                .environmentObject(mainVM)
         case .onboarding:
             OnboardingView()
                 .environmentObject(authVM)
@@ -333,9 +362,10 @@ struct ContentView: View {
         switch page {
         case .friendRequests: return 0
         case .inbox: return 1
-        case .poll, .cooldown: return 2
-        case .profile: return 3
-        default: return 2 // Default to poll/cooldown screen
+        case .feed: return 2
+        case .poll, .cooldown: return 3
+        case .profile: return 4
+        default: return 2 // Default to feed screen
         }
     }
     
@@ -343,6 +373,8 @@ struct ContentView: View {
         withAnimation {
             switch mainVM.currentPage {
             case .inbox:
+                mainVM.currentPage = .feed
+            case .feed:
                 if let _ = pollVM.cooldownEndTime {
                     mainVM.currentPage = .cooldown
                 } else {
@@ -367,16 +399,37 @@ struct ContentView: View {
                 } else {
                     mainVM.currentPage = .poll
                 }
-            case .poll, .cooldown:
-                mainVM.currentPage = .inbox
             case .inbox:
                 mainVM.currentPage = .friendRequests
+            case .feed:
+                mainVM.currentPage = .inbox
+            case .poll, .cooldown:
+                mainVM.currentPage = .feed            
             default:
                 break
             }
         }
     }
     
+    private func handleDragGesture(_ gesture: DragGesture.Value) {
+        offset = gesture.translation.width
+        
+        let pageWidth = UIScreen.main.bounds.width
+        let dragThreshold: CGFloat = 0.25
+        let draggedRatio = gesture.predictedEndTranslation.width / pageWidth
+        
+        if abs(draggedRatio) > dragThreshold {
+            if draggedRatio > 0 {
+                navigateRight()
+            } else {
+                navigateLeft()
+            }
+        }
+        
+        withAnimation(.easeOut(duration: 0.2)) {
+            offset = 0
+        }
+    }
 }
 
 

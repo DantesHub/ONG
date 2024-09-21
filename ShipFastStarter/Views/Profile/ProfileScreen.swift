@@ -154,14 +154,16 @@ struct ProfileScreen: View {
                     .shadow(color: .black.opacity(0.7), radius: 0, x: 3, y: 3)
                     .offset(x: -100, y: 65)
                     .onTapGesture {
-                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                        withAnimation {
-                            Analytics.shared.log(event: "ProfileScreen: Tapped Friends")
-                            profileVM.showFriendsScreen = true
+                        if !profileVM.isVisitingUser {
+                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                            withAnimation {
+                                Analytics.shared.log(event: "ProfileScreen: Tapped Friends")
+                                profileVM.showFriendsScreen = true
+                            }
                         }
                     }
                     VStack(spacing: -36) {
-                        Text(formatAura(user.aura))
+                        Text(formatAura(profileVM.isVisitingUser ? user.aura : mainVM.currUser?.aura ?? 0))
                             .sfPro(type: .bold, size: .h1Big)
                             .stroke(color: .primaryBackground, width: 3)
                         Text("aura") 

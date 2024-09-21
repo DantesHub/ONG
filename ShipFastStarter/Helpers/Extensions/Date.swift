@@ -214,6 +214,54 @@ extension Date {
         }
     }
     
+    static func formatRelativeTime(from date: Date) -> String {
+         let now = Date()
+         let calendar = Calendar.current
+         let components = calendar.dateComponents([.year, .month, .day, .hour, .minute, .second], from: date, to: now)
+         
+         if let year = components.year, year > 0 {
+             return year == 1 ? "1 yr" : "\(year) yrs"
+         }
+         
+         if let month = components.month, month > 0 {
+             return month == 1 ? "1 mo" : "\(month) mo"
+         }
+         
+         if let day = components.day, day > 0 {
+             if day == 1 {
+                 return "yesterday"
+             } else if day < 7 {
+                 return "\(day)d ago"
+             } else {
+                 let weeks = day / 7
+                 return weeks == 1 ? "1 wk" : "\(weeks) wks"
+             }
+         }
+         
+         if let hour = components.hour, hour > 0 {
+             if hour == 1 {
+                 
+             }
+             if hour < 24 {
+                 return "\(hour)h"
+             }
+
+         }
+         
+         if let minute = components.minute, minute > 0 {
+             if minute < 60 {
+                 return "\(minute)m"
+             }
+         }
+         
+         if let second = components.second, second > 0 {
+             if second < 60 {
+                 return "now"
+             }
+         }
+         
+         return "just now"
+     }
     
     func formatted() -> String {
         Date.dateFormatter.dateFormat = "MMM d"

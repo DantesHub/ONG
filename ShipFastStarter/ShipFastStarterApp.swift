@@ -124,13 +124,13 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         FirebaseApp.configure()
         Messaging.messaging().delegate = self
         UNUserNotificationCenter.current().delegate = self
-        //        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
-        //             if let error = error {
-        //                 print("Error requesting notification authorization: \(error)")
-        //             } else {
-        //                 print("Notification authorization granted: \(granted)")
-        //             }
-        //         }
+                UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+                     if let error = error {
+                         print("Error requesting notification authorization: \(error)")
+                     } else {
+                         print("Notification authorization granted: \(granted)")
+                     }
+                 }
         print("didFinishLaunchingWithOptions")
         // Check if the app was launched from a local notification
         //        if let notificationResponse = launchOptions?[.not] as? UNNotificationResponse {
