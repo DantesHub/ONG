@@ -24,6 +24,7 @@ struct ProfileScreen: View {
     @State private var isFriends = false
     @State private var sentRequest = false
     @State private var showSettings = false
+    @State private var isOriginalProfileScreen = false
     
     init(user: User? = nil) {
         _user = State(initialValue: user ?? User.exUser)
@@ -69,7 +70,7 @@ struct ProfileScreen: View {
                                 .frame(width: 124, height: 124)
                         }
                         
-                        if profileVM.isVisitingUser {
+                        if profileVM.isVisitingUser && !isOriginalProfileScreen {
                             if let url = URL(string: profileVM.visitedUser?.proPic ?? "") {
                                 CachedAsyncImage(url: url) { phase in
                                     switch phase {
@@ -143,7 +144,7 @@ struct ProfileScreen: View {
                     .padding(.bottom)
                     .padding(.top, 32)
                     VStack(spacing: -28) {
-                        Text("\(profileVM.friends.count)")
+                        Text("\(profileVM.isVisitingUser && !isOriginalProfileScreen ? user.friends.count : profileVM.friends.count)")
                             .sfPro(type: .bold, size: .h1)
                             .stroke(color: .black, width: 3)
                         Text("friends")
@@ -254,6 +255,11 @@ struct ProfileScreen: View {
                 .environmentObject(mainVM)
         }
         .onAppear {
+            if profileVM.isVisitingUser {
+                isOriginalProfileScreen = false
+            } else {
+                isOriginalProfileScreen = true
+            }
             updateUser()
         }
 

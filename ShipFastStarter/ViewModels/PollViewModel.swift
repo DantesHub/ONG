@@ -56,17 +56,16 @@ class PollViewModel: ObservableObject {
         print(" *******  *******  ******* fetching or initializing polls  ******* ******* *******")
         if UserDefaults.standard.integer(forKey: Constants.currentIndex) != 0  {
             currentPollIndex = UserDefaults.standard.integer(forKey: Constants.currentIndex)
-            self.allPolls = pollSet
             if pollSet.isEmpty {
                 if let pollIds = UserDefaults.standard.array(forKey: Constants.pollIds) {
                     for poll in pollIds {
                         do {
+                            
                             let polls: [Poll] = try await FirebaseService.shared.fetchDocuments(
                                 collection: "polls",
                                 whereField: "id",
                                 isEqualTo: poll
                             )
-                            
                             if let first = polls.first {
                                 pollSet.append(first)
                             }
@@ -126,6 +125,10 @@ class PollViewModel: ObservableObject {
                 whereField: "schoolId",
                 isEqualTo: user.schoolId
             )
+            
+//            self.allPolls = polls.filter { question in
+//                !Question.bsQuestions.contains { $0.question == question.title }
+//            }
             
             self.allPolls = polls
             print(allPolls.count, "we yamaza")
@@ -484,7 +487,9 @@ class PollViewModel: ObservableObject {
         return true
     }
         
-        
+        allOptions = allOptions.filter { option in
+            option.userId != user.id
+        }
         currentTwelveOptions = Array(allOptions.prefix(12)).shuffled()
         // Take up to 4 options from the available options
         currentFourOptions = Array(currentTwelveOptions.prefix(4))
@@ -500,6 +505,7 @@ class PollViewModel: ObservableObject {
         print("Selected poll has \(selectedPoll.pollOptions.count) total options")
         print("Available options after filtering: \(updatedOptions.count)")
         print("Current four options: \(currentFourOptions.map { $0.option })")
+                 
     }
 
     func shuffleOptions(excludingUserId: String) {

@@ -16,7 +16,7 @@ class ProfileViewModel: ObservableObject, ImageUploadable {
     @Published var editProfile: Bool = false
     @Published var topEight: [User] = []
     @Published var currentUser: User?
-
+    @Published var showOtherProfile = false
     init() {
         
     }

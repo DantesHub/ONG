@@ -142,13 +142,13 @@ struct ContentView: View {
                 handleDragGesture(gesture)
             }
         }.onChange(of: pollVM.allPolls) {
-//            UserDefaults.standard.setValue(0, forKey: Constants.currentIndex)
             feedVM.allPolls = pollVM.allPolls
             if let user = mainVM.currUser {
                 feedVM.currUser = user
             }
             feedVM.allUsers = profileVM.peopleList
             feedVM.allFriends = profileVM.friends
+            feedVM.hasMoreData = true
             feedVM.fetchNextPage()
         }
 //        .onChange(of: deepLink) { _ in
@@ -174,7 +174,7 @@ struct ContentView: View {
     
     //MARK: - data logic
     private func setupInitialState() {
-//        UserDefaults.standard.setValue(0, forKey: Constants.currentIndex)
+        UserDefaults.standard.setValue(0, forKey: Constants.currentIndex)
         authVM.isUserSignedIn()
 //        Task {
 //            do {
@@ -258,6 +258,7 @@ struct ContentView: View {
         feedVM.allUsers = profileVM.peopleList
         feedVM.allFriends = profileVM.friends
         await fetchPolls(user: user)
+        feedVM.fetchNextPage()
     }
     
     
@@ -273,8 +274,13 @@ struct ContentView: View {
         
     private func fetchPolls(user: User) async {
         Task {
+            print("fetching polls")
             await pollVM.fetchPolls(for: user)
             feedVM.allPolls = pollVM.allPolls
+            feedVM.currUser = user
+            feedVM.allUsers = profileVM.peopleList
+            feedVM.allFriends = profileVM.friends
+            feedVM.fetchNextPage()
             withAnimation {
                 if pollVM.cooldownEndTime == nil {
                     pollVM.completedPoll = false

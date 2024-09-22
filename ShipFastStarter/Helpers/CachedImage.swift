@@ -91,10 +91,8 @@ struct CachedAsyncImage<Content: View>: View {
     
     private func loadImage(url: URL) {
         if let cachedImage = ImageCache.shared.get(forKey: url.absoluteString) {
-            print("Using cached image for URL: \(url.absoluteString)")
             phase = .success(Image(uiImage: cachedImage))
         } else {
-            print("Loading image for URL: \(url.absoluteString)")
             phase = .empty
             
             Task {
@@ -105,7 +103,6 @@ struct CachedAsyncImage<Content: View>: View {
                         withAnimation(transaction.animation) {
                             phase = .success(Image(uiImage: uiImage))
                         }
-                        print("Successfully loaded and cached image for URL: \(url.absoluteString)")
                     } else {
                         print("Failed to create UIImage from data for URL: \(url.absoluteString)")
                         phase = .failure(URLError(.cannotDecodeContentData))

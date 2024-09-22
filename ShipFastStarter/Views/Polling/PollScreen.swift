@@ -247,9 +247,9 @@ struct PollScreen: View {
             if isLongPressing {
                 Text("\(counter)")
                     .foregroundColor(.white)
-                    .sfPro(type: counter <= 50 ? .regular : counter <= 125  ? .medium : counter <= 200 ? .semibold : .bold, size: counter <= 50 ? .h1 : counter <= 125  ? .title : counter <= 200 ? .titleHuge : .animation)
-                    .stroke(color: counter <= 50 ? .black : counter <= 125  ? .green : counter <= 200 ? Color("pink") : Color("primaryBackground"), width: 3)
-                    .rotationEffect(.degrees(counter <= 50 ? 0 : counter <= 125  ? -2 : counter <= 200 ? -4 : -8))
+                    .sfPro(type: counter <= 150 ? .regular : counter <= 225  ? .medium : counter <= 300 ? .semibold : .bold, size: counter <= 150 ? .h1 : counter <= 225  ? .title : counter <= 300 ? .titleHuge : .animation)
+                    .stroke(color: counter <= 150 ? .black : counter <= 225  ? .green : counter <= 300 ? Color("pink") : Color("primaryBackground"), width: 3)
+                    .rotationEffect(.degrees(counter <= 150 ? 0 : counter <= 225  ? -2 : counter <= 300 ? -4 : -8))
                     .padding(8)
                     .cornerRadius(8)
                     .position(x: activeButtonPosition.x, y: activeButtonPosition.y - 100)
@@ -592,10 +592,10 @@ struct PollOptionView: View {
                         if let optionUser = profileVM.peopleList.first { usr in
                             usr.id == option.userId
                         } {
-                            await pollVM.answerPoll(user: user, option: option, optionUser: optionUser, totalVotes: Int(counter <= 20 ? 100 : counter))
+                            await pollVM.answerPoll(user: user, option: option, optionUser: optionUser, totalVotes: Int(counter <= 100 ? 100 : counter))
                             print("Answer poll completed", counter)
-                            counter = 0
-                            updateCounter(0)
+                            counter = 100
+                            updateCounter(Int(counter))
                         }
                     }
                 }
@@ -676,28 +676,28 @@ struct PollOptionView: View {
     }
 
     private func startCounter() {
-        counter = 0
+        counter = 101
         emojiChangeCounter = 0
         currentEmojiIndex = 0
         shouldActivate = true
 
         counterTimer = Timer.scheduledTimer(withTimeInterval: 0.0120, repeats: true) { timer in
             if shouldActivate {
-                if counter == 0 {
-                    counter = 1
+                if counter == 100 {
+                    counter = 100
                 } else {
                     let maxValue: Double = 9_000_000
                     let growth: Double
 
-                    if counter < 400 {
+                    if counter < 500 {
                         growth = 0.2
-                    } else if counter < 800 {
+                    } else if counter < 1100 {
                         growth = counter * 0.0012
-                    } else if counter < 1_000 {
+                    } else if counter < 1_400 {
                         growth = counter * 0.0008
-                    } else if counter < 1_200 {
+                    } else if counter < 1_800 {
                         growth = counter * 0.00120
-                    } else if counter < 12_000 {
+                    } else if counter < 15_000 {
                         growth = counter * 0.0004
                     } else if counter < 120_000 {
                         growth = counter * 0.00120

@@ -26,7 +26,7 @@ class FeedViewModel: ObservableObject {
     
     private var currentPage = 0
     private let pageSize = 20
-    private var hasMoreData = true
+    var hasMoreData = true
 
     func setInitialData(polls: [Poll], friends: [User], users: [User]) {
         self.allPolls = polls
@@ -50,7 +50,6 @@ class FeedViewModel: ObservableObject {
     private func processPollsForFeed(polls: [Poll]) -> [FeedPost] {
         var newPosts: [FeedPost] = []
         let dateFormatter = ISO8601DateFormatter()
-        print(polls.count, "sukima switch")
         allUsers.append(currUser)
         for poll in polls {
             for option in poll.pollOptions {
