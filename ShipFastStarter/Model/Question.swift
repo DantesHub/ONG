@@ -40,6 +40,8 @@ struct Question {
         Question(question: "Who's most likely to come to campus in shorts?", weight: 0.76, emoji: "🩳", category: "Style"),
         Question(question: "Who's most likely to get into a street fight?", weight: 0.75, emoji: "👊", category: "Hypothetical"),
         Question(question: "Who's most likely to survive a week in the wilderness?", weight: 0.74, emoji: "🏕️", category: "Adventure"),
+        Question(question: "Who's most likely to go out and eat?", weight: 0.94, emoji: "🌮", category: "Food"),
+        Question(question: "Who spends the most at sweetgreen?", weight: 0.94, emoji: "🤑", category: "Food"),
         Question(question: "Who's most likely to accidentally become a local legend?", weight: 0.73, emoji: "🏆", category: "Hypothetical"),
         Question(question: "Who's best at making up believable excuses on the spot?", weight: 0.72, emoji: "🤥", category: "Skills"),
         Question(question: "Who's most likely to skip the group dinner?", weight: 0.71, emoji: "🍽️", category: "Social"),

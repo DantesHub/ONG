@@ -212,8 +212,7 @@ class PollViewModel: ObservableObject {
                     object: selectedPoll
                 )
                 
-                var updatedUser = user
-                updatedUser.votedPolls.append(selectedPoll.id)
+     
                 
                 var updatedOptionUser = optionUser
                 updatedOptionUser.aura += totalVotes
@@ -222,7 +221,7 @@ class PollViewModel: ObservableObject {
                 
                 try await FirebaseService.shared.updateDocument(
                     collection: "users",
-                    object: updatedUser
+                    object: user
                 )
                 
                 try await FirebaseService.shared.updateDocument(

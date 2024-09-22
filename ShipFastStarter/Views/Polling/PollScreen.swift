@@ -586,6 +586,7 @@ struct PollOptionView: View {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             withAnimation(.spring()) {
                 self.opacity = 1
+                mainVM.currUser?.votedPolls.append(pollVM.selectedPoll.id)
                 if let user = mainVM.currUser {
                     Task {
                         if let optionUser = profileVM.peopleList.first { usr in
