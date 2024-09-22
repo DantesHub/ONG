@@ -112,6 +112,7 @@ struct ContentView: View {
                 .environmentObject(authVM)
                 .environmentObject(profileVM)
                 .environmentObject(inboxVM)
+                .environmentObject(feedVM)
         }
         .onAppear {
             setupInitialState()
@@ -145,10 +146,12 @@ struct ContentView: View {
             feedVM.allPolls = pollVM.allPolls
             if let user = mainVM.currUser {
                 feedVM.currUser = user
+                feedVM.visitingUser = user
             }
             feedVM.allUsers = profileVM.peopleList
             feedVM.allFriends = profileVM.friends
             feedVM.hasMoreData = true
+            feedVM.processPollsForUserFeed()
             feedVM.fetchNextPage()
         }
 //        .onChange(of: deepLink) { _ in
@@ -338,6 +341,7 @@ struct ContentView: View {
                 .environmentObject(authVM)
                 .environmentObject(profileVM)
                 .environmentObject(inboxVM)
+                .environmentObject(feedVM)
         case .friendRequests:
             FriendRequests()
                 .environmentObject(profileVM)

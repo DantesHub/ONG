@@ -13,50 +13,90 @@ struct FeedScreen: View {
                 InboxScreen().customToolbar
              
                 if feedVM.feedPosts.isEmpty {
-                        Text("gotta get some friends!")
-                            .foregroundColor(Color.black.opacity(0.7))
-                            .font(.system(size: 22, weight: .bold))
-                            .multilineTextAlignment(.center)
-                            .frame(maxWidth: UIScreen.size.width)
-                            .padding(.horizontal, 32)
-                            .opacity(0.3)
-                            .padding(.top, 32)
-
+                    Text("gotta get some friends!")
+                        .foregroundColor(Color.black.opacity(0.7))
+                        .font(.system(size: 22, weight: .bold))
+                        .multilineTextAlignment(.center)
+                        .frame(maxWidth: UIScreen.size.width)
+                        .padding(.horizontal, 32)
+                        .opacity(0.3)
+                        .padding(.top, 32)
                 } else {
-//                    Text("Today")
-//                        .foregroundColor(.black)
-//                        .font(.system(size: 22, weight: .bold))
-//                        .padding(.leading, 20)
-//                        .padding(.top, 10)
                     ScrollView(showsIndicators: false) {
                         LazyVStack(spacing: 32) {
-                            ForEach(feedVM.feedPosts) { post in
-                                ZStack {
-                                    FeedPostRow(post: post)
-//                                        .onAppear {
-//                                            if post == feedVM.feedPosts.last {
-//                                                feedVM.fetchNextPage()
-//                                            }
-//                                        }
-                                        .padding(.horizontal)
-                                    Text("\(post.aura)")
-                                        .foregroundColor(.white)
-                                        .sfPro(type: post.aura <= 50 ? .regular : post.aura <= 125  ? .medium : post.aura <= 200 ? .semibold : .bold, size: post.aura <= 50 ? .h1Small : post.aura <= 125  ? .h1 : post.aura <= 200 ? .h1Big : .title)
-                                        .stroke(color: post.aura <= 50 ? .black : post.aura <= 125  ? .red : post.aura <= 200 ? Color("pink") : Color("primaryBackground"), width: 3)
-                                        .shadow(color: .black.opacity(0.5), radius: 4)
-                                        .rotationEffect(.degrees(16))
-                                        .padding(8)
-                                        .cornerRadius(8)
-                                        .position(x: UIScreen.main.bounds.width / (post.aura > 200 ? 1.2 :  1.14), y: 12)
+                            ForEach(sortedGroupKeys, id: \.self) { key in
+                                Section(header: sectionHeader(for: key)) {
+                                    ForEach(groupedFeedPosts[key] ?? []) { post in
+                                        ZStack {
+                                            FeedPostRow(post: post)
+                                                .padding(.horizontal)
+                                                .onAppear {
+                                                    if post == groupedFeedPosts[key]?.last {
+                                                        feedVM.fetchNextPage()
+                                                    }
+                                                }
+                                            Text("\(post.aura)")
+                                                .foregroundColor(.white)
+                                                .sfPro(type: post.aura <= 50 ? .regular : post.aura <= 125  ? .medium : post.aura <= 200 ? .semibold : .bold, size: post.aura <= 50 ? .h1Small : post.aura <= 125  ? .h1 : post.aura <= 200 ? .h1Big : .title)
+                                                .stroke(color: post.aura <= 50 ? .black : post.aura <= 125  ? .red : post.aura <= 200 ? Color("pink") : Color("primaryBackground"), width: 3)
+                                                .shadow(color: .black.opacity(0.5), radius: 4)
+                                                .rotationEffect(.degrees(16))
+                                                .padding(8)
+                                                .cornerRadius(8)
+                                                .position(x: UIScreen.main.bounds.width / (post.aura > 200 ? 1.2 :  1.14), y: 12)
+                                        }
+                                    }
                                 }
-                          
                             }
-                        }.padding(.top, 32)
+                        }
                     }
                 }
-              
             }
         }
+    }
+    
+    var groupedFeedPosts: [String: [FeedPost]] {
+        let calendar = Calendar.current
+        let now = Date()
+        
+        return Dictionary(grouping: feedVM.feedPosts) { post in
+            let components = calendar.dateComponents([.year, .month, .day, .hour, .minute, .second], from: post.timestamp, to: now)
+            
+            if let year = components.year, year > 0 {
+                return "Past"
+            }
+            
+            if let month = components.month, month > 0 {
+                return "Past"
+            }
+            
+            if let day = components.day, day > 0 {
+                if day == 1 {
+                    return "Yesterday"
+                } else if day < 7 {
+                    return "This Week"
+                } else {
+                    return "Past"
+                }
+            }
+            
+            // Everything within the last 24 hours is considered "Today"
+            return "Today"
+        }
+    }
+    
+    var sortedGroupKeys: [String] {
+        let order = ["Today", "Yesterday", "This Week", "Past"]
+        return order.filter { groupedFeedPosts.keys.contains($0) }
+    }
+    
+    func sectionHeader(for key: String) -> some View {
+        Text(key)
+            .foregroundColor(.black)
+            .sfPro(type: .bold, size: .h2)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.leading)
+            .padding(.top, 12)
     }
 }
 
@@ -64,47 +104,6 @@ struct ScrollOffsetPreferenceKey: PreferenceKey {
     static var defaultValue: CGFloat = 0
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
         value = nextValue()
-    }
-}
-
-struct FeedPostView: View {
-    let post: FeedPost
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                AsyncImage(url: URL(string: post.user.proPic)) { image in
-                    image.resizable()
-                } placeholder: {
-                    Color.gray
-                }
-                .frame(width: 50, height: 50)
-                .clipShape(Circle())
-                
-                VStack(alignment: .leading) {
-                    Text(post.user.username)
-                        .font(.headline)
-                    Text(post.question)
-                        .font(.subheadline)
-                }
-            }
-            
-            HStack {
-                Image(systemName: "person.fill")
-                    .foregroundColor(Color(post.votedByUser.color))
-                Text(post.votedByUser.username)
-                Image(systemName: post.votedByUser.gender == "Male" ? "person.fill" : "person.fill")
-                    .foregroundColor(.blue)
-            }
-            .font(.caption)
-            .padding(8)
-            .background(Color.gray.opacity(0.2))
-            .cornerRadius(20)
-        }
-        .padding()
-        .background(Color.white)
-        .cornerRadius(12)
-        .shadow(radius: 2)
     }
 }
 

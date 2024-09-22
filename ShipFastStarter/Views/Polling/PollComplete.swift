@@ -24,20 +24,21 @@ struct PollComplete: View {
              
                         Spacer()
                         ZStack {
-                            Text("+300")
+                            Text("+200")
                                 .sfPro(type: .black, size: .sticker)
                                 .frame(maxWidth: .infinity)
                                 .rotationEffect(.degrees(-12))
                                 .foregroundColor(.white)
-                                .stroke(color: .black, width: 6)
+                                .stroke(color: .primaryBackground, width: 6)
+                                .shadow(color: .primaryBackground, radius: 1, y: 3)
                             Text("aura")
                                 .sfPro(type: .black, size: .h1Big)
                                 .frame(maxWidth: .infinity)
                                 .rotationEffect(.degrees(-12))
                                 .foregroundColor(.white)
-                                .stroke(color: .red, width: 3)
+                                .stroke(color: .primaryBackground, width: 3)
                                 .offset(x: 32, y: 36)
-                                .shadow(color: .blue, radius: 1, y: 3)
+                                .shadow(color: .primaryBackground, radius: 1, y: 3)
                         }
                         .scaleEffect(auraScale)
                         .opacity(auraOpacity)
@@ -46,8 +47,35 @@ struct PollComplete: View {
                         Spacer()
                
                     }
-                    
-                    Text("aura\n finisher bonus!")
+                    HStack {
+                 
+                            Spacer()
+                            ZStack {
+                                Text("+200")
+                                    .sfPro(type: .black, size: .sticker)
+                                    .frame(maxWidth: .infinity)
+                                    .rotationEffect(.degrees(-12))
+                                    .foregroundColor(.breadYellow)
+                                    .stroke(color: .breadBrown, width: 6)
+                                    .shadow(color: .breadBrown, radius: 1, y: 3)
+                                Text("bread🍞")
+                                    .sfPro(type: .black, size: .h1Big)
+                                    .frame(maxWidth: .infinity)
+                                    .foregroundColor(.breadYellow)
+                                    .stroke(color: .breadBrown, width: 3)
+                                    .shadow(color: .breadBrown, radius: 1, y: 3)
+                                    .offset(x: 32, y: 48)
+                                    .rotationEffect(.degrees(-12))
+                            }
+                            .scaleEffect(auraScale)
+                            .opacity(auraOpacity)
+                            .animation(.spring(response: 0.5, dampingFraction: 0.6, blendDuration: 0.5), value: auraScale)
+                            .animation(.easeInOut(duration: 0.5), value: auraOpacity)
+                            Spacer()
+                   
+                        }
+                    Spacer()
+                    Text("aura + bread\n finisher bonus!")
                         .sfPro(type: .bold, size: .h1)
                         .multilineTextAlignment(.center)
                         .foregroundColor(.black)

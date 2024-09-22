@@ -38,15 +38,14 @@ struct User: Codable, Equatable, FBObject {
     var friendsStatus: String = "Add +"
     var friendRequests: [String: String]
     var dateJoined: String
-    
-    // New properties
     var relationshipStatus: String
     var mbti: String
     var movie: String
     var music: String
     var bio: String  // New bio property
+    var bread: Int  // New bread property
 
-    init(id: String, firstName: String, lastName: String, username: String, schoolId: String, color: String, aura: Int, godMode: Bool, birthday: String, grade: String, number: String, votedPolls: [String], lastPollFinished: Date?, friends: [String: String], invitedFriends: [String], ogBadge: Bool, gender: String, fcmToken: String, proPic: String, referral: Int = 0, crushId: String = "", friendRequests: [String: String], dateJoined: String, relationshipStatus: String, mbti: String, movie: String, music: String, bio: String) {
+    init(id: String, firstName: String, lastName: String, username: String, schoolId: String, color: String, aura: Int, godMode: Bool, birthday: String, grade: String, number: String, votedPolls: [String], lastPollFinished: Date?, friends: [String: String], invitedFriends: [String], ogBadge: Bool, gender: String, fcmToken: String, proPic: String, referral: Int = 0, crushId: String = "", friendRequests: [String: String], dateJoined: String, relationshipStatus: String, mbti: String, movie: String, music: String, bio: String, bread: Int = 0) {
         self.id = id
         self.firstName = firstName
         self.lastName = lastName
@@ -75,6 +74,7 @@ struct User: Codable, Equatable, FBObject {
         self.movie = movie
         self.music = music
         self.bio = bio
+        self.bread = bread
     }
 
     static var exUser = User(
@@ -105,7 +105,8 @@ struct User: Codable, Equatable, FBObject {
         mbti: "INTJ",
         movie: "whiplash",
         music: "the end",
-        bio: "a school to work on ur ideas"
+        bio: "a school to work on ur ideas",
+        bread: 100  // Add a default value for bread in the example user
     )
 
     
@@ -120,6 +121,7 @@ struct User: Codable, Equatable, FBObject {
         case id, firstName, lastName, username, schoolId, color, aura, godMode, birthday, grade, number, votedPolls, lastPollFinished, friends, invitedFriends, ogBadge, gender, fcmToken, proPic, referral, crushId, friendRequests, dateJoined
         // New coding keys
         case relationshipStatus, mbti, movie, music, bio
+        case bread
     }
 
     init(from decoder: Decoder) throws {
@@ -163,6 +165,7 @@ struct User: Codable, Equatable, FBObject {
         movie = try container.decodeIfPresent(String.self, forKey: .movie) ?? "whiplash"
         music = try container.decodeIfPresent(String.self, forKey: .music) ?? "the end"
         bio = try container.decodeIfPresent(String.self, forKey: .bio) ?? "a school to work on ur ideas"
+        bread = try container.decodeIfPresent(Int.self, forKey: .bread) ?? 0  // Decode bread with a default value of 0
     }
 
     func encodeToDictionary() -> [String: Any]? {

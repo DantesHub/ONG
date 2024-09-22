@@ -593,7 +593,6 @@ struct PollOptionView: View {
                             usr.id == option.userId
                         } {
                             await pollVM.answerPoll(user: user, option: option, optionUser: optionUser, totalVotes: Int(counter <= 100 ? 100 : counter))
-                            print("Answer poll completed", counter)
                             counter = 100
                             updateCounter(Int(counter))
                         }

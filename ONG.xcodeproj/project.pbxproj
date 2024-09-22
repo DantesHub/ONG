@@ -52,6 +52,8 @@
 		887C783C2C9E15EC00CEDC72 /* SettingsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 887C783B2C9E15EC00CEDC72 /* SettingsScreen.swift */; };
 		887C783F2C9E33F300CEDC72 /* FeedScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 887C783E2C9E33F300CEDC72 /* FeedScreen.swift */; };
 		887C78412C9E347500CEDC72 /* FeedViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 887C78402C9E347500CEDC72 /* FeedViewModel.swift */; };
+		887C78492CA0C7ED00CEDC72 /* BreadScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 887C78482CA0C7ED00CEDC72 /* BreadScreen.swift */; };
+		887C784B2CA0CA6400CEDC72 /* PollAnswerDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 887C784A2CA0CA6400CEDC72 /* PollAnswerDetailView.swift */; };
 		888FF3BA2C8679F10025EC1B /* ContactsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 888FF3B92C8679F10025EC1B /* ContactsScreen.swift */; };
 		888FF3BC2C867CD80025EC1B /* LocationScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 888FF3BB2C867CD80025EC1B /* LocationScreen.swift */; };
 		888FF3BE2C867CEF0025EC1B /* Onboarding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 888FF3BD2C867CEF0025EC1B /* Onboarding.swift */; };
@@ -140,6 +142,8 @@
 		887C783B2C9E15EC00CEDC72 /* SettingsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsScreen.swift; sourceTree = "<group>"; };
 		887C783E2C9E33F300CEDC72 /* FeedScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedScreen.swift; sourceTree = "<group>"; };
 		887C78402C9E347500CEDC72 /* FeedViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedViewModel.swift; sourceTree = "<group>"; };
+		887C78482CA0C7ED00CEDC72 /* BreadScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreadScreen.swift; sourceTree = "<group>"; };
+		887C784A2CA0CA6400CEDC72 /* PollAnswerDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PollAnswerDetailView.swift; sourceTree = "<group>"; };
 		888FF3B92C8679F10025EC1B /* ContactsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsScreen.swift; sourceTree = "<group>"; };
 		888FF3BB2C867CD80025EC1B /* LocationScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationScreen.swift; sourceTree = "<group>"; };
 		888FF3BD2C867CEF0025EC1B /* Onboarding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Onboarding.swift; sourceTree = "<group>"; };
@@ -235,6 +239,14 @@
 			path = Feed;
 			sourceTree = "<group>";
 		};
+		887C78472CA0C7D300CEDC72 /* Store */ = {
+			isa = PBXGroup;
+			children = (
+				887C78482CA0C7ED00CEDC72 /* BreadScreen.swift */,
+			);
+			path = Store;
+			sourceTree = "<group>";
+		};
 		888FF3C92C867E4A0025EC1B /* Polling */ = {
 			isa = PBXGroup;
 			children = (
@@ -242,6 +254,7 @@
 				884B24852C87E7BB00229F1E /* PollComplete.swift */,
 				8838DC3D2C8A5B7B00500C6E /* PollCooldownScreen.swift */,
 				887C78372C9CD1E400CEDC72 /* StartPollScreen.swift */,
+				887C784A2CA0CA6400CEDC72 /* PollAnswerDetailView.swift */,
 			);
 			path = Polling;
 			sourceTree = "<group>";
@@ -308,6 +321,7 @@
 		88B37D1D2C23FD78000A7D91 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				887C78472CA0C7D300CEDC72 /* Store */,
 				887C783D2C9E33EB00CEDC72 /* Feed */,
 				8838DC412C8A907700500C6E /* Inbox */,
 				884B24802C87E12B00229F1E /* Profile */,
@@ -547,7 +561,9 @@
 			files = (
 				8838DC402C8A8F7D00500C6E /* SplashScreen.swift in Sources */,
 				8838DC492C8AC9C100500C6E /* LastName.swift in Sources */,
+				887C784B2CA0CA6400CEDC72 /* PollAnswerDetailView.swift in Sources */,
 				888FF3BA2C8679F10025EC1B /* ContactsScreen.swift in Sources */,
+				887C78492CA0C7ED00CEDC72 /* BreadScreen.swift in Sources */,
 				884B247F2C87BECE00229F1E /* PollViewModel.swift in Sources */,
 				88B37D322C2406DA000A7D91 /* Constants.swift in Sources */,
 				888FF3C42C867DF50025EC1B /* NameScreen.swift in Sources */,

@@ -15,6 +15,7 @@ struct ProfileScreen: View {
     @EnvironmentObject var authVM: AuthViewModel
     @EnvironmentObject var profileVM: ProfileViewModel
     @EnvironmentObject var inboxVM: InboxViewModel
+    @EnvironmentObject var feedVM: FeedViewModel
 
     @State private var showingActionSheet = false
     @State private var showAboutScreen = false
@@ -34,6 +35,7 @@ struct ProfileScreen: View {
         ZStack {
             Color.white.edgesIgnoringSafeArea(.all)
             VStack {
+                InboxScreen().customToolbar
                 if profileVM.isVisitingUser {
                     HStack {
                         Image(systemName: "xmark.circle.fill")
@@ -46,210 +48,260 @@ struct ProfileScreen: View {
                                     profileVM.isVisitingUser = false
                                 }
                             }
+                            .foregroundColor(.black)
                         Spacer()
-                    }.padding()
+                    }.padding(.top)
+                    .padding(.horizontal)
                 }
                 // profile image
-                ZStack {
+                ScrollView(showsIndicators: false) {
+                    
                     ZStack {
-                        // Dotted line box
-                        if user.proPic.isEmpty {
-                            RoundedRectangle(cornerRadius: 16)
-                                .fill(.clear)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 16)
-                                        .stroke(Color.black.opacity(1), lineWidth: 4)
-                                        .padding(1)
-                                        .mask(RoundedRectangle(cornerRadius: 16))
-                                )
-                                .frame(width: 124, height: 124)
-                        } else {
-                            RoundedRectangle(cornerRadius: 16)
-                                .stroke(style: StrokeStyle(lineWidth: 2, dash: [7]))
-                                .foregroundColor(.black)
-                                .frame(width: 124, height: 124)
-                        }
-                        
-                        if profileVM.isVisitingUser && !isOriginalProfileScreen {
-                            if let url = URL(string: profileVM.visitedUser?.proPic ?? "") {
-                                CachedAsyncImage(url: url) { phase in
-                                    switch phase {
-                                    case .success(let image):
-                                        image
-                                            .resizable()
-                                            .scaledToFill()
-                                            .frame(width: 124, height: 124)
-                                            .clipShape(RoundedRectangle(cornerRadius: 8))
-                                    case .failure:
-                                        Image(systemName: "person.fill")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(width: 56, height: 56)
-                                            .clipShape(RoundedRectangle(cornerRadius: 8))
-                                    case .empty:
-                                        ProgressView()
-                                    @unknown default:
-                                        EmptyView()
-                                    }
-                                }
-                                .frame(width: 124, height: 124)
-                                .clipShape(RoundedRectangle(cornerRadius: 8))
-                            } else {
-                                Image(systemName: "person.fill")
-                                    .font(.system(size: 40))
-                                    .foregroundColor(.gray)
-                            }
-                        } else {
-                            if let img = profileVM.profileImage {
-                                Image(uiImage: img)
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fill)
+                        ZStack {
+                            // Dotted line box
+                            if user.proPic.isEmpty {
+                                RoundedRectangle(cornerRadius: 16)
+                                    .fill(.clear)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 16)
+                                            .stroke(Color.black.opacity(1), lineWidth: 4)
+                                            .padding(1)
+                                            .mask(RoundedRectangle(cornerRadius: 16))
+                                    )
                                     .frame(width: 124, height: 124)
-                                    .clipShape(RoundedRectangle(cornerRadius: 16))
                             } else {
-                                Image(systemName: "person.fill")
-                                    .resizable()
-                                    .scaledToFit()
+                                RoundedRectangle(cornerRadius: 16)
+                                    .stroke(style: StrokeStyle(lineWidth: 2, dash: [7]))
+                                    .foregroundColor(.black)
                                     .frame(width: 124, height: 124)
-                                    .clipShape(RoundedRectangle(cornerRadius: 16))
                             }
-                        }
-                        
-                   
-                        if user.proPic.isEmpty {
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(.clear)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .stroke(Color.black.opacity(1), lineWidth: 4)
-                                        .padding(1)
-                                        .mask(RoundedRectangle(cornerRadius: 16))
-                                )
-                                .frame(width: 124, height: 124)
-                        }
-                    }
-                    .onTapGesture {
-                        if !profileVM.isVisitingUser {
-                            withAnimation {
-                                Analytics.shared.log(event: "ProfileScreen: Tapped Image")
-                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                showingActionSheet = true
-                            }
-                        }
-                     
-                    }
-                    .primaryShadow()
-                    .rotationEffect(.degrees(-12))
-                    .shadow(color: .black.opacity(0.7), radius: 0, x: 3, y: 3)
-                    .padding(.bottom)
-                    .padding(.top, 32)
-                    VStack(spacing: -28) {
-                        Text("\(profileVM.isVisitingUser && !isOriginalProfileScreen ? user.friends.count : profileVM.friends.count)")
-                            .sfPro(type: .bold, size: .h1)
-                            .stroke(color: .black, width: 3)
-                        Text("friends")
-                            .sfPro(type: .bold, size: .h1)
-                            .stroke(color: .black, width: 3)
-                    }.foregroundColor(.white)
-                    .rotationEffect(.degrees(-16))
-                    .shadow(color: .black.opacity(0.7), radius: 0, x: 3, y: 3)
-                    .offset(x: -100, y: 65)
-                    .onTapGesture {
-                        if !profileVM.isVisitingUser {
-                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                            withAnimation {
-                                Analytics.shared.log(event: "ProfileScreen: Tapped Friends")
-                                profileVM.showFriendsScreen = true
-                            }
-                        }
-                    }
-                    VStack(spacing: -36) {
-                        Text(formatAura(profileVM.isVisitingUser ? user.aura : mainVM.currUser?.aura ?? 0))
-                            .sfPro(type: .bold, size: .h1Big)
-                            .stroke(color: .primaryBackground, width: 3)
-                        Text("aura") 
-                            .sfPro(type: .bold, size: .h1Big)
-                            .stroke(color: .primaryBackground, width: 3)
-                    }.foregroundColor(.white)
-                    .rotationEffect(.degrees(16))
-                    .shadow(color: .black.opacity(0.7), radius: 0, x: 3, y: 3)
-                    .offset(x: 100)
-                    .padding(.top, 24)
-                    .onTapGesture {
-                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                        withAnimation {
-                            Analytics.shared.log(event: "ProfileScreen: Tapped Aura")
-                            showAboutScreen = true
-                        }
-                    }
-                }
-                Text("\(user.firstName) \(user.lastName)")
-                    .sfPro(type: .bold, size: .h1)
-                    .foregroundColor(Color.black)
-                    .padding(.top)
-                Text("@\(user.username)")
-                    .sfPro(type: .medium, size: .h2)
-                    .foregroundColor(Color.black.opacity(0.4))
-                    .padding(.bottom, 12)
-                if profileVM.visitedUser != nil {
-                    HStack {
-                        SharedComponents.SecondaryButton(title: sentRequest ? "Sent 💌" : isFriends ? "friends ✅" : isFriendRequest ? "Accept +" : "add friend +" ) {
-                            Analytics.shared.log(event: profileVM.isFriend ? "ProfileScreen: Tapped Unfriend" : "ProfileScreen: Tapped Add Friend")
-                            mainVM.currUser?.friendRequests.removeValue(forKey: user.id)
-                            mainVM.currUser?.friends[user.id] = Date().toString(format: "yyyy-MM-dd HH:mm:ss")
-                            if let currUser = mainVM.currUser {
-                                if isFriendRequest {
-                                    Task {
-                                        await inboxVM.tappedAcceptFriendRequest(currUser: currUser, requestedUser: user)
+                            
+                            if profileVM.isVisitingUser && !isOriginalProfileScreen {
+                                if let url = URL(string: profileVM.visitedUser?.proPic ?? "") {
+                                    CachedAsyncImage(url: url) { phase in
+                                        switch phase {
+                                        case .success(let image):
+                                            image
+                                                .resizable()
+                                                .scaledToFill()
+                                                .frame(width: 124, height: 124)
+                                                .clipShape(RoundedRectangle(cornerRadius: 8))
+                                        case .failure:
+                                            Image(systemName: "person.fill")
+                                                .resizable()
+                                                .scaledToFit()
+                                                .frame(width: 56, height: 56)
+                                                .clipShape(RoundedRectangle(cornerRadius: 8))
+                                        case .empty:
+                                            ProgressView()
+                                        @unknown default:
+                                            EmptyView()
+                                        }
                                     }
-                                    if isFriendRequest {
-                                        isFriends = true
-                                    }
-                                    isFriendRequest = false
+                                    .frame(width: 124, height: 124)
+                                    .clipShape(RoundedRectangle(cornerRadius: 8))
                                 } else {
-                                    Task {
-                                        await profileVM.addFriends(currUser: currUser, users: [user])
-                                    }
-                                    sentRequest = true
+                                    Image(systemName: "person.fill")
+                                        .font(.system(size: 40))
+                                        .foregroundColor(.gray)
+                                }
+                            } else {
+                                if let img = profileVM.profileImage {
+                                    Image(uiImage: img)
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fill)
+                                        .frame(width: 124, height: 124)
+                                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                                } else {
+                                    Image(systemName: "person.fill")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 124, height: 124)
+                                        .clipShape(RoundedRectangle(cornerRadius: 16))
                                 }
                             }
+                            
+                            
+                            if user.proPic.isEmpty {
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(.clear)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .stroke(Color.black.opacity(1), lineWidth: 4)
+                                            .padding(1)
+                                            .mask(RoundedRectangle(cornerRadius: 16))
+                                    )
+                                    .frame(width: 124, height: 124)
+                            }
                         }
-                        SharedComponents.SecondaryButton(title: profileVM.isCrush ? "crush ❤️" : "mark as crush 😻") {
-                            Analytics.shared.log(event: profileVM.isFriend ? "ProfileScreen: Tapped Unmark crush" : "ProfileScreen: Tapped Mark Crush")
+                        .onTapGesture {
+                            if !profileVM.isVisitingUser {
+                                withAnimation {
+                                    Analytics.shared.log(event: "ProfileScreen: Tapped Image")
+                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                    showingActionSheet = true
+                                }
+                            }
+                            
                         }
-                    }.padding(.horizontal)
-                } else { // users own profile
-                    HStack {
-                        SharedComponents.SecondaryButton(title: "Edit Profile") {
-                            Analytics.shared.log(event: "ProfileScreen: Tapped Edit Profile")
-                            showEditProfile = true
+                        .primaryShadow()
+                        .rotationEffect(.degrees(-12))
+                        .shadow(color: .black.opacity(0.7), radius: 0, x: 3, y: 3)
+                        .padding(.bottom)
+                        .padding(.top, 32)
+                        if !profileVM.isVisitingUser {
+                            ZStack {
+                                Text("\(mainVM.currUser?.bread ?? 0)")
+                                    .sfPro(type: .bold, size: .h1)
+                                    .frame(maxWidth: .infinity)
+                                    .foregroundColor(.breadYellow)
+                                    .stroke(color: .breadBrown, width: 2)
+                                    .shadow(color: .breadBrown, radius: 1, y: 3)
+                                Text("bread")
+                                    .sfPro(type: .bold, size: .h1)
+                                    .frame(maxWidth: .infinity)
+                                    .foregroundColor(.breadYellow)
+                                    .stroke(color: .breadBrown, width: 1)
+                                    .shadow(color: .breadBrown, radius: 1, y: 3)
+                                    .offset(x: 0, y: 24)
+                            }
+                            .rotationEffect(.degrees(-8))
+                            
+                            .shadow(color: .breadBrown.opacity(1), radius: 0, x: 2, y: 3)
+                            .offset(x: -90, y: -32)
                         }
+                        VStack(spacing: -28) {
+                            Text("\(profileVM.isVisitingUser && !isOriginalProfileScreen ? user.friends.count : profileVM.friends.count)")
+                                .sfPro(type: .bold, size: .h1)
+                                .stroke(color: .black, width: 3)
+                            Text("homies")
+                                .sfPro(type: .bold, size: .h1)
+                                .stroke(color: .black, width: 3)
+                        }.foregroundColor(.white)
+                            .rotationEffect(.degrees(8))
+                            .shadow(color: .black.opacity(1), radius: 0, x: 3, y: 2)
+                            .offset(x: -60, y: 70)
+                            .onTapGesture {
+                                if !profileVM.isVisitingUser {
+                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                    withAnimation {
+                                        Analytics.shared.log(event: "ProfileScreen: Tapped Friends")
+                                        profileVM.showFriendsScreen = true
+                                    }
+                                }
+                            }
+                        VStack(spacing: -36) {
+                            Text(formatAura(profileVM.isVisitingUser ? user.aura : mainVM.currUser?.aura ?? 0))
+                                .sfPro(type: .bold, size: .h1Big)
+                                .stroke(color: .primaryBackground, width: 3)
+                            Text("aura")
+                                .sfPro(type: .bold, size: .h1Big)
+                                .stroke(color: .primaryBackground, width: 3)
+                        }.foregroundColor(.white)
+                            .rotationEffect(.degrees(16))
+                            .shadow(color: .primaryBackground.opacity(1), radius: 0, x: 3, y: 3)
+                            .offset(x: 100)
+                            .padding(.top, 24)
+                            .onTapGesture {
+                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                withAnimation {
+                                    Analytics.shared.log(event: "ProfileScreen: Tapped Aura")
+                                    showAboutScreen = true
+                                }
+                            }
+                    }
+                    Text("\(user.firstName) \(user.lastName)")
+                        .sfPro(type: .bold, size: .h1)
+                        .foregroundColor(Color.black)
+                        .padding(.top)
+                    Text("@\(user.username)")
+                        .sfPro(type: .medium, size: .h2)
+                        .foregroundColor(Color.black.opacity(0.4))
+                        .padding(.bottom, 12)
+                    if profileVM.visitedUser != nil {
+                        HStack {
+                            SharedComponents.SecondaryButton(title: sentRequest ? "Sent 💌" : isFriends ? "friends ✅" : isFriendRequest ? "Accept +" : "add friend +" ) {
+                                Analytics.shared.log(event: profileVM.isFriend ? "ProfileScreen: Tapped Unfriend" : "ProfileScreen: Tapped Add Friend")
+                                mainVM.currUser?.friendRequests.removeValue(forKey: user.id)
+                                mainVM.currUser?.friends[user.id] = Date().toString(format: "yyyy-MM-dd HH:mm:ss")
+                                if let currUser = mainVM.currUser {
+                                    if isFriendRequest {
+                                        Task {
+                                            await inboxVM.tappedAcceptFriendRequest(currUser: currUser, requestedUser: user)
+                                        }
+                                        if isFriendRequest {
+                                            isFriends = true
+                                        }
+                                        isFriendRequest = false
+                                    } else {
+                                        Task {
+                                            await profileVM.addFriends(currUser: currUser, users: [user])
+                                        }
+                                        sentRequest = true
+                                    }
+                                }
+                            }
+                            SharedComponents.SecondaryButton(title: profileVM.isCrush ? "crush ❤️" : "mark as crush 😻") {
+                                Analytics.shared.log(event: profileVM.isFriend ? "ProfileScreen: Tapped Unmark crush" : "ProfileScreen: Tapped Mark Crush")
+                            }
+                        }.padding(.horizontal)
+                    } else { // users own profile
+                        HStack {
+                            SharedComponents.SecondaryButton(title: "Edit Profile") {
+                                Analytics.shared.log(event: "ProfileScreen: Tapped Edit Profile")
+                                showEditProfile = true
+                            }
+                            
+                            SharedComponents.SecondaryButton(title: "Settings") {
+                                Analytics.shared.log(event: "ProfileScreen: Tapped Edit Settings")
+                                showSettings = true
+                            }
+                        }.padding(.horizontal)
                         
-                        SharedComponents.SecondaryButton(title: "Settings") {
-                            Analytics.shared.log(event: "ProfileScreen: Tapped Edit Settings")
-                            showSettings = true
+                    }
+                    
+                    SharedComponents.Divider().opacity(0.75)
+                        .padding(.top)
+                    
+                    // about section
+                    VStack(alignment: .leading, spacing: 16) {
+                        aboutSectionItem(icon: "quote.opening", text: profileVM.isVisitingUser ? user.bio : mainVM.currUser?.bio ?? "")
+                        aboutSectionItem(icon: "heart.fill", text: profileVM.isVisitingUser ? user.relationshipStatus : mainVM.currUser?.relationshipStatus ?? "")
+                        aboutSectionItem(icon: "movieclapper.fill", text: profileVM.isVisitingUser ? user.movie : mainVM.currUser?.movie ?? "")
+                        aboutSectionItem(icon: "brain.head.profile", text: profileVM.isVisitingUser ? user.mbti : mainVM.currUser?.mbti ?? "")
+                        aboutSectionItem(icon: "music.note", text: profileVM.isVisitingUser ? user.music : mainVM.currUser?.music ?? "")
+                    }
+                    .foregroundColor(.black)
+                    .padding()
+                    LazyVStack(spacing: 32) {
+                        ForEach(feedVM.userPosts) { post in
+                            ZStack {
+                                FeedPostRow(post: post)
+                                //                                        .onAppear {
+                                //                                            if post == feedVM.feedPosts.last {
+                                //                                                feedVM.fetchNextPage()
+                                //                                            }
+                                //                                        }
+                                    .padding(.horizontal)
+                                Text("\(post.aura)")
+                                    .foregroundColor(.white)
+                                    .sfPro(type: post.aura <= 50 ? .regular : post.aura <= 125  ? .medium : post.aura <= 200 ? .semibold : .bold, size: post.aura <= 50 ? .h1Small : post.aura <= 125  ? .h1 : post.aura <= 200 ? .h1Big : .title)
+                                    .stroke(color: post.aura <= 50 ? .black : post.aura <= 125  ? .red : post.aura <= 200 ? Color("pink") : Color("primaryBackground"), width: 3)
+                                    .shadow(color: .black.opacity(0.5), radius: 4)
+                                    .rotationEffect(.degrees(16))
+                                    .padding(8)
+                                    .cornerRadius(8)
+                                    .position(x: UIScreen.main.bounds.width / (post.aura > 200 ? 1.2 :  1.14), y: 12)
+                            }
+                            
                         }
-                    }.padding(.horizontal)
-                 
+                    }.padding(.top, 32)
+                    Spacer()
                 }
-              
-                SharedComponents.Divider().opacity(0.75)
-                    .padding(.top)
-                
-                // about section
-                VStack(alignment: .leading, spacing: 16) {
-                    aboutSectionItem(icon: "quote.opening", text: profileVM.isVisitingUser ? user.bio : mainVM.currUser?.bio ?? "")
-                    aboutSectionItem(icon: "heart.fill", text: profileVM.isVisitingUser ? user.relationshipStatus : mainVM.currUser?.relationshipStatus ?? "")
-                    aboutSectionItem(icon: "movieclapper.fill", text: profileVM.isVisitingUser ? user.movie : mainVM.currUser?.movie ?? "")
-                    aboutSectionItem(icon: "brain.head.profile", text: profileVM.isVisitingUser ? user.mbti : mainVM.currUser?.mbti ?? "")
-                    aboutSectionItem(icon: "music.note", text: profileVM.isVisitingUser ? user.music : mainVM.currUser?.music ?? "")
-                }
-                .foregroundColor(.black)
-                .padding()
-                Spacer()
             }
             // show highschool.
         }
+      
         .sheet(isPresented: $showSettings) {
             SettingsScreen(showSettings: $showSettings)
                 .environmentObject(mainVM)
@@ -333,6 +385,8 @@ struct ProfileScreen: View {
     private func updateUser() {
         if profileVM.isVisitingUser {
             if let visitedUser = profileVM.visitedUser {
+                feedVM.visitingUser = visitedUser
+                feedVM.processPollsForUserFeed()
                 self.user = visitedUser
                 if let currUser = mainVM.currUser {
                     if currUser.friendRequests.contains(where: { (k, v) -> Bool in
@@ -352,6 +406,9 @@ struct ProfileScreen: View {
             }
         } else {
             if let currentUser = mainVM.currUser {
+                feedVM.visitingUser = currentUser
+                feedVM.processPollsForUserFeed()
+
                 DispatchQueue.main.async {
                     self.user = currentUser
                 }
@@ -514,5 +571,6 @@ struct ImagePicker: UIViewControllerRepresentable {
     ProfileScreen()
         .environmentObject(MainViewModel())
         .environmentObject(AuthViewModel())
+        .environmentObject(FeedViewModel())
         .environmentObject(ProfileViewModel())
 }
