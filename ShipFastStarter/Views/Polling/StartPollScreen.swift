@@ -33,7 +33,9 @@ struct StartPollScreen: View {
                         Text("new polls are available")
                             .sfPro(type: .bold, size: .h1)
                             .foregroundColor(.white)
-                            .padding(.top, 16)                  
+                            .padding(.top, 16)
+                            .onTapGesture {
+                            }
                         
 
                         VStack(spacing: 16) {              
@@ -42,6 +44,7 @@ struct StartPollScreen: View {
                                 action: {
                                     UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                     withAnimation {
+                                        print("click start")
                                     }
                                 }
                             )

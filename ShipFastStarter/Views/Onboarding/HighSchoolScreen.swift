@@ -44,25 +44,33 @@ struct HighSchoolScreen: View {
 //                        mainVM.currUser = User.exUser
                         mainVM.currUser?.schoolId = "buildspace"
                         if let currUser = mainVM.currUser {
-                            Task {
-                                try 
-                                await FirebaseService.shared.updateField(collection: "users", documentId: currUser.id, field: "schoolId", value: "buildspace")
-                                await viewModel.checkHighSchoolLock(for: currUser, id: "buildspace")
-                                viewModel.updateNumStudents(user: currUser, for: "buildspace")
-                                if !viewModel.selectedHighschool.students.contains(currUser.id) {
-                                    await profileVM.fetchPeopleList(user: currUser)
-                                }
-                                
-                                if viewModel.isHighSchoolLocked {
-                                    withAnimation {
-                                        mainVM.onboardingScreen = .lockedHighschool
+                                Task {
+                                    do {
+                                        try await FirebaseService.shared.updateField(collection: "users", documentId: currUser.id, field: "schoolId", value: "buildspace")
+                                        await viewModel.checkHighSchoolLock(for: currUser, id: "buildspace")
+                                        viewModel.updateNumStudents(user: currUser, for: "buildspace")
+                                        if !viewModel.selectedHighschool.students.contains(currUser.id) {
+                                            await profileVM.fetchPeopleList(user: currUser)
+                                        }
+                                        
+                                        if viewModel.isHighSchoolLocked {
+                                            withAnimation {
+                                                mainVM.onboardingScreen = .lockedHighschool
+                                            }
+                                        } else {
+                                            withAnimation {
+                                                mainVM.onboardingScreen = .addFriends
+                                            }
+                                        }
+                                    } catch {
+                                        print(error.localizedDescription, "high school screen crashed app")
+                                        let bug = Bug(title: "Highschool Crash", description: error.localizedDescription, date: Date(), userId: currUser.id, highschoolId: "buildspace")
+                                        FirebaseService.shared.addDocument(bug, collection: "bugs") { str in
+                                            
+                                        }
                                     }
-                                } else {
-                                    withAnimation {
-                                        mainVM.onboardingScreen = .addFriends
-                                    }
                                 }
-                            }
+                           
                         }
                     }
                 }.environmentObject(mainVM)

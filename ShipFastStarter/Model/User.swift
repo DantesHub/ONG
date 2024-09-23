@@ -175,6 +175,7 @@ struct User: Codable, Equatable, FBObject {
             let data = try encoder.encode(self)
             return try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String: Any]
         } catch {
+            Analytics.shared.logCrash(error: error)
             print("Error encoding User to dictionary: \(error)")
             return nil
         }

@@ -58,7 +58,7 @@ struct InboxScreen: View {
     private var newVotesSection: some View {
         Group {
             if !inboxVM.newUsersWhoVoted.isEmpty {
-                Text("ppl who voted for u")
+                Text("New!")
                     .font(.system(size: 22, weight: .bold))
                     .padding(.leading, 20)
                     .foregroundColor(.black)

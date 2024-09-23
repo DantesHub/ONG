@@ -4,8 +4,8 @@ import Combine
 import SwiftUI
 import SuperwallKit
 import Mixpanel
-
-
+import FirebaseAnalytics
+import FirebaseCrashlytics
 
 final class Analytics: ObservableObject {
     static let shared = Analytics()
@@ -38,9 +38,10 @@ final class Analytics: ObservableObject {
         let eventInfo: [String: Any] = ["someKey": "someValue", "otherKey": 2]
         let eventInfoStringData = try! JSONSerialization.data(withJSONObject: eventInfo, options: [])
         guard let eventInfoString = String(data: eventInfoStringData, encoding: .utf8) else { return }
-    
+        
         let mixpanelParameters = parameters.compactMapValues { convertToMixpanelType($0) }
-
+        // Firebase Analytics logging
+        FirebaseAnalytics.Analytics.logEvent(event, parameters: parameters)
         // send the activity report
 //        Firebase.Analytics.logEvent(event, parameters: parameters)
 //        Amplitude.instance().logEvent(event, withEventProperties: parameters)
@@ -110,6 +111,18 @@ final class Analytics: ObservableObject {
         } else {
             return nil
         }
+    }
+
+    func logCrash(error: Error, additionalInfo: [String: Any]? = nil) {
+        Crashlytics.crashlytics().record(error: error)
+        
+        if let info = additionalInfo {
+            for (key, value) in info {
+                Crashlytics.crashlytics().setCustomValue(value, forKey: key)
+            }
+        }
+        
+        print("Crash reported to Firebase Crashlytics: \(error.localizedDescription)")
     }
 
 }

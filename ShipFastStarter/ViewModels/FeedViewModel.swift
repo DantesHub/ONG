@@ -46,7 +46,7 @@ class FeedViewModel: ObservableObject {
         let startIndex = currentPage * pageSize
         let endIndex = min(startIndex + pageSize, allPolls.count)
         
-        let newPosts = processPollsForFeed(polls: Array(allPolls[startIndex..<endIndex]))
+        let newPosts = processPollsForFeed(polls: Array(allPolls))
         
         // Remove duplicates before appending
         let uniqueNewPosts = newPosts.filter { newPost in

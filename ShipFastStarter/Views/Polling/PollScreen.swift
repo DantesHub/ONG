@@ -324,7 +324,9 @@ struct PollScreen: View {
             mainVM.currUser?.lastPollFinished = Date()
             if let user = mainVM.currUser {
                 UserDefaults.standard.setValue(0, forKey: Constants.currentIndex)
+                mainVM.currUser?.lastPollFinished = Date()
                 mainVM.currUser?.aura += 300
+                mainVM.currUser?.bread += 300
                 pollVM.completedPoll = true
                 pollVM.finishPoll(user: user)
                 Task {

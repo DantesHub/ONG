@@ -132,9 +132,10 @@ class PollViewModel: ObservableObject {
             
             self.allPolls = polls
             print(allPolls.count, "we yamaza")
+            self.pollSet = allPolls
+            self.pollSet.sort { $0.createdAt < $1.createdAt }
             self.pollSet = polls.filter { !$0.usersWhoVoted.contains(user.id) }
-            self.pollSet.sort { $0.createdAt > $1.createdAt }
-            
+         
             if pollSet.count < 8 {
                 await createPoll(user: user)
             } else {
@@ -607,12 +608,9 @@ class PollViewModel: ObservableObject {
         
         Task {
             do {
-                var updatedUser = user
-                updatedUser.lastPollFinished = Date()
-                updatedUser.aura += 300
                 try await FirebaseService.shared.updateDocument(
                     collection: "users",
-                    object: updatedUser
+                    object: user
                 )
             } catch {
                 print("Error updating user's last poll finished time: \(error.localizedDescription)")

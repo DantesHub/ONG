@@ -30,11 +30,7 @@ struct FeedScreen: View {
                                         ZStack {
                                             FeedPostRow(post: post)
                                                 .padding(.horizontal)
-                                                .onAppear {
-                                                    if post == groupedFeedPosts[key]?.last {
-                                                        feedVM.fetchNextPage()
-                                                    }
-                                                }
+                                                
                                             Text("\(post.aura)")
                                                 .foregroundColor(.white)
                                                 .sfPro(type: post.aura <= 50 ? .regular : post.aura <= 125  ? .medium : post.aura <= 200 ? .semibold : .bold, size: post.aura <= 50 ? .h1Small : post.aura <= 125  ? .h1 : post.aura <= 200 ? .h1Big : .title)

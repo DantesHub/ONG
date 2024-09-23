@@ -45,6 +45,7 @@ struct PollCooldownScreen: View {
                                     action: {
                                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                         withAnimation {
+//                                            fatalError("Crash was triggered")
                                             pollVM.isNewPollReady = false
                                             mainVM.currentPage = .poll
                                             Analytics.shared.log(event: "PollCooldown: Tapped Start")

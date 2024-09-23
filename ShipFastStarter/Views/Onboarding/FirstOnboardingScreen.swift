@@ -61,6 +61,8 @@ struct OnboardingScreen: View {
                 SharedComponents.PrimaryButton(title: "continue") {
                     mainVM.currUser = User.exUser
                     mainVM.onboardingScreen = .gender
+//                    fatalError("Crash was triggered")
+
                 }
                 .padding(.vertical, 48)
                 .padding(.horizontal, 24)
@@ -79,6 +81,11 @@ struct OnboardingScreen: View {
 
 #Preview {
     OnboardingScreen()
+        .environmentObject(MainViewModel())
+        .environmentObject(AuthViewModel())
+        .environmentObject(PollViewModel())
+        .environmentObject(ProfileViewModel())
+        .environmentObject(InboxViewModel())
 }
 
 struct StrokedText: ViewModifier {

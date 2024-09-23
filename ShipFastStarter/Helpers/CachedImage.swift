@@ -17,12 +17,12 @@ class ImageCache {
     
     func set(_ image: UIImage, forKey key: String) {
         cache.setObject(image, forKey: NSString(string: key))
-        print("Cached image for key: \(key)")
+//        print("Cached image for key: \(key)")
     }
     
     func remove(forKey key: String) {
         cache.removeObject(forKey: NSString(string: key))
-        print("Removed cached image for key: \(key)")
+//        print("Removed cached image for key: \(key)")
     }
     
     func preloadImages(urls: [URL]) async {

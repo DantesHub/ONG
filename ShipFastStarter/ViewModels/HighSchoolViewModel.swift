@@ -47,6 +47,11 @@ class HighSchoolViewModel: ObservableObject {
                 self.objectWillChange.send()
             }
         } catch {
+            let bug = Bug(title: "Highschool Crash Locked", description: error.localizedDescription, date: Date(), userId: user.id, highschoolId: "buildspace")
+            FirebaseService.shared.addDocument(bug, collection: "bugs") { str in
+                
+            }
+            
             print("Error checking high school lock: \(error.localizedDescription)")
         }
     }
