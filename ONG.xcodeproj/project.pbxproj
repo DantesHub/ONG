@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		880A21BB2CA2123D004F5E1C /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 880A21BA2CA2123D004F5E1C /* FirebaseAnalytics */; };
+		880A21BD2CA22737004F5E1C /* ShareHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 880A21BC2CA22737004F5E1C /* ShareHelper.swift */; };
+		881A09F62C963B5800D8A858 /* AboutScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 881A09F52C963B5800D8A858 /* AboutScreen.swift */; };
+		881A09F82C9641F000D8A858 /* FriendsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 881A09F72C9641F000D8A858 /* FriendsScreen.swift */; };
+		881A09FA2C96721600D8A858 /* AgeScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 881A09F92C96721600D8A858 /* AgeScreen.swift */; };
 		8838DC362C8921D400500C6E /* ShadowModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8838DC352C8921D400500C6E /* ShadowModifier.swift */; };
 		8838DC3A2C89228100500C6E /* SharedComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8838DC392C89228100500C6E /* SharedComponents.swift */; };
 		8838DC3E2C8A5B7B00500C6E /* PollCooldownScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8838DC3D2C8A5B7B00500C6E /* PollCooldownScreen.swift */; };
@@ -24,17 +29,35 @@
 		8838DC692C8F994B00500C6E /* ProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8838DC682C8F994B00500C6E /* ProfileViewModel.swift */; };
 		8838DC6B2C8F9AC400500C6E /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 8838DC6A2C8F9AC400500C6E /* FirebaseStorage */; };
 		8838DC6D2C8F9C1D00500C6E /* Image.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8838DC6C2C8F9C1D00500C6E /* Image.swift */; };
+		8838DC6F2C90043500500C6E /* PeopleScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8838DC6E2C90043500500C6E /* PeopleScreen.swift */; };
+		8838DC712C90F0B100500C6E /* CachedImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8838DC702C90F0B100500C6E /* CachedImage.swift */; };
+		8838DC742C911A9600500C6E /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8838DC732C911A9600500C6E /* String.swift */; };
+		8838DC762C923C0E00500C6E /* LockedHighschoolScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8838DC752C923C0E00500C6E /* LockedHighschoolScreen.swift */; };
+		8838DC782C9251BB00500C6E /* InviteFriendsModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8838DC772C9251BA00500C6E /* InviteFriendsModal.swift */; };
+		8838DC7A2C9293CC00500C6E /* UploadProfileScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8838DC792C9293CC00500C6E /* UploadProfileScreen.swift */; };
+		8838DC7C2C936B1900500C6E /* ImageUploadExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8838DC7B2C936B1900500C6E /* ImageUploadExtension.swift */; };
+		8838DC7E2C93ED7F00500C6E /* FriendRequests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8838DC7D2C93ED7F00500C6E /* FriendRequests.swift */; };
+		8838DC802C9550BB00500C6E /* DevTestingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8838DC7F2C9550BB00500C6E /* DevTestingView.swift */; };
 		884B24732C879A1900229F1E /* HighSchoolViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B24722C879A1900229F1E /* HighSchoolViewModel.swift */; };
 		884B24752C87B96E00229F1E /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B24742C87B96E00229F1E /* User.swift */; };
 		884B24772C87B97500229F1E /* Poll.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B24762C87B97500229F1E /* Poll.swift */; };
 		884B24792C87B97D00229F1E /* PollOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B24782C87B97D00229F1E /* PollOption.swift */; };
-		884B247B2C87B98500229F1E /* HighSchool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B247A2C87B98500229F1E /* HighSchool.swift */; };
+		884B247B2C87B98500229F1E /* Highschool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B247A2C87B98500229F1E /* Highschool.swift */; };
 		884B247D2C87B99D00229F1E /* VibeCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B247C2C87B99D00229F1E /* VibeCheck.swift */; };
 		884B247F2C87BECE00229F1E /* PollViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B247E2C87BECE00229F1E /* PollViewModel.swift */; };
 		884B24822C87E13B00229F1E /* ProfileScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B24812C87E13B00229F1E /* ProfileScreen.swift */; };
 		884B24842C87E44500229F1E /* PollScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B24832C87E44500229F1E /* PollScreen.swift */; };
 		884B24862C87E7BB00229F1E /* PollComplete.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B24852C87E7BB00229F1E /* PollComplete.swift */; };
 		884B24882C8803D300229F1E /* Question.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B24872C8803D300229F1E /* Question.swift */; };
+		887C78382C9CD1E400CEDC72 /* StartPollScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 887C78372C9CD1E400CEDC72 /* StartPollScreen.swift */; };
+		887C783A2C9D4D1200CEDC72 /* holdDown.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 887C78392C9D4D1200CEDC72 /* holdDown.mp3 */; };
+		887C783C2C9E15EC00CEDC72 /* SettingsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 887C783B2C9E15EC00CEDC72 /* SettingsScreen.swift */; };
+		887C783F2C9E33F300CEDC72 /* FeedScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 887C783E2C9E33F300CEDC72 /* FeedScreen.swift */; };
+		887C78412C9E347500CEDC72 /* FeedViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 887C78402C9E347500CEDC72 /* FeedViewModel.swift */; };
+		887C78492CA0C7ED00CEDC72 /* BreadScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 887C78482CA0C7ED00CEDC72 /* BreadScreen.swift */; };
+		887C784B2CA0CA6400CEDC72 /* PollAnswerDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 887C784A2CA0CA6400CEDC72 /* PollAnswerDetailView.swift */; };
+		887C784D2CA12A2100CEDC72 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 887C784C2CA12A2100CEDC72 /* FirebaseCrashlytics */; };
+		887C78502CA12B9400CEDC72 /* Bug.swift in Sources */ = {isa = PBXBuildFile; fileRef = 887C784F2CA12B9400CEDC72 /* Bug.swift */; };
 		888FF3BA2C8679F10025EC1B /* ContactsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 888FF3B92C8679F10025EC1B /* ContactsScreen.swift */; };
 		888FF3BC2C867CD80025EC1B /* LocationScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 888FF3BB2C867CD80025EC1B /* LocationScreen.swift */; };
 		888FF3BE2C867CEF0025EC1B /* Onboarding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 888FF3BD2C867CEF0025EC1B /* Onboarding.swift */; };
@@ -83,6 +106,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		880A21BC2CA22737004F5E1C /* ShareHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareHelper.swift; sourceTree = "<group>"; };
+		881A09F52C963B5800D8A858 /* AboutScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutScreen.swift; sourceTree = "<group>"; };
+		881A09F72C9641F000D8A858 /* FriendsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendsScreen.swift; sourceTree = "<group>"; };
+		881A09F92C96721600D8A858 /* AgeScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgeScreen.swift; sourceTree = "<group>"; };
 		8838DC352C8921D400500C6E /* ShadowModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShadowModifier.swift; sourceTree = "<group>"; };
 		8838DC392C89228100500C6E /* SharedComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedComponents.swift; sourceTree = "<group>"; };
 		8838DC3D2C8A5B7B00500C6E /* PollCooldownScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PollCooldownScreen.swift; sourceTree = "<group>"; };
@@ -98,17 +125,35 @@
 		8838DC582C8EA7CB00500C6E /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
 		8838DC682C8F994B00500C6E /* ProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewModel.swift; sourceTree = "<group>"; };
 		8838DC6C2C8F9C1D00500C6E /* Image.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Image.swift; sourceTree = "<group>"; };
+		8838DC6E2C90043500500C6E /* PeopleScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeopleScreen.swift; sourceTree = "<group>"; };
+		8838DC702C90F0B100500C6E /* CachedImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CachedImage.swift; sourceTree = "<group>"; };
+		8838DC732C911A9600500C6E /* String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
+		8838DC752C923C0E00500C6E /* LockedHighschoolScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockedHighschoolScreen.swift; sourceTree = "<group>"; };
+		8838DC772C9251BA00500C6E /* InviteFriendsModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InviteFriendsModal.swift; sourceTree = "<group>"; };
+		8838DC792C9293CC00500C6E /* UploadProfileScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadProfileScreen.swift; sourceTree = "<group>"; };
+		8838DC7B2C936B1900500C6E /* ImageUploadExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageUploadExtension.swift; sourceTree = "<group>"; };
+		8838DC7D2C93ED7F00500C6E /* FriendRequests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendRequests.swift; sourceTree = "<group>"; };
+		8838DC7F2C9550BB00500C6E /* DevTestingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevTestingView.swift; sourceTree = "<group>"; };
 		884B24722C879A1900229F1E /* HighSchoolViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighSchoolViewModel.swift; sourceTree = "<group>"; };
 		884B24742C87B96E00229F1E /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		884B24762C87B97500229F1E /* Poll.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Poll.swift; sourceTree = "<group>"; };
 		884B24782C87B97D00229F1E /* PollOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PollOption.swift; sourceTree = "<group>"; };
-		884B247A2C87B98500229F1E /* HighSchool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighSchool.swift; sourceTree = "<group>"; };
+		884B247A2C87B98500229F1E /* Highschool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Highschool.swift; sourceTree = "<group>"; };
 		884B247C2C87B99D00229F1E /* VibeCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VibeCheck.swift; sourceTree = "<group>"; };
 		884B247E2C87BECE00229F1E /* PollViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PollViewModel.swift; sourceTree = "<group>"; };
 		884B24812C87E13B00229F1E /* ProfileScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileScreen.swift; sourceTree = "<group>"; };
 		884B24832C87E44500229F1E /* PollScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PollScreen.swift; sourceTree = "<group>"; };
 		884B24852C87E7BB00229F1E /* PollComplete.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PollComplete.swift; sourceTree = "<group>"; };
 		884B24872C8803D300229F1E /* Question.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Question.swift; sourceTree = "<group>"; };
+		887C78372C9CD1E400CEDC72 /* StartPollScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartPollScreen.swift; sourceTree = "<group>"; };
+		887C78392C9D4D1200CEDC72 /* holdDown.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = holdDown.mp3; sourceTree = "<group>"; };
+		887C783B2C9E15EC00CEDC72 /* SettingsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsScreen.swift; sourceTree = "<group>"; };
+		887C783E2C9E33F300CEDC72 /* FeedScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedScreen.swift; sourceTree = "<group>"; };
+		887C78402C9E347500CEDC72 /* FeedViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedViewModel.swift; sourceTree = "<group>"; };
+		887C78482CA0C7ED00CEDC72 /* BreadScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreadScreen.swift; sourceTree = "<group>"; };
+		887C784A2CA0CA6400CEDC72 /* PollAnswerDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PollAnswerDetailView.swift; sourceTree = "<group>"; };
+		887C784E2CA12AEE00CEDC72 /* refactor-doc.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "refactor-doc.md"; sourceTree = "<group>"; };
+		887C784F2CA12B9400CEDC72 /* Bug.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bug.swift; sourceTree = "<group>"; };
 		888FF3B92C8679F10025EC1B /* ContactsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsScreen.swift; sourceTree = "<group>"; };
 		888FF3BB2C867CD80025EC1B /* LocationScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationScreen.swift; sourceTree = "<group>"; };
 		888FF3BD2C867CEF0025EC1B /* Onboarding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Onboarding.swift; sourceTree = "<group>"; };
@@ -160,8 +205,10 @@
 				88B37D3A2C240CAB000A7D91 /* RevenueCat in Frameworks */,
 				88C1E55C2C8692C900C9317E /* FirebaseAuth in Frameworks */,
 				88B37D302C24052B000A7D91 /* Mixpanel in Frameworks */,
+				880A21BB2CA2123D004F5E1C /* FirebaseAnalytics in Frameworks */,
 				88B37D2A2C24018B000A7D91 /* SuperwallKit in Frameworks */,
 				C45CF55A2C91C24700D58633 /* FacebookShare in Frameworks */,
+				887C784D2CA12A2100CEDC72 /* FirebaseCrashlytics in Frameworks */,
 				88B37D2D2C2404D5000A7D91 /* AppsFlyerLib in Frameworks */,
 				88C1E5602C8692C900C9317E /* FirebaseFirestore in Frameworks */,
 				C45CF5572C9166E900D58633 /* FirebaseDynamicLinks in Frameworks */,
@@ -192,8 +239,27 @@
 			isa = PBXGroup;
 			children = (
 				884B24812C87E13B00229F1E /* ProfileScreen.swift */,
+				8838DC7B2C936B1900500C6E /* ImageUploadExtension.swift */,
+				881A09F52C963B5800D8A858 /* AboutScreen.swift */,
+				881A09F72C9641F000D8A858 /* FriendsScreen.swift */,
 			);
 			path = Profile;
+			sourceTree = "<group>";
+		};
+		887C783D2C9E33EB00CEDC72 /* Feed */ = {
+			isa = PBXGroup;
+			children = (
+				887C783E2C9E33F300CEDC72 /* FeedScreen.swift */,
+			);
+			path = Feed;
+			sourceTree = "<group>";
+		};
+		887C78472CA0C7D300CEDC72 /* Store */ = {
+			isa = PBXGroup;
+			children = (
+				887C78482CA0C7ED00CEDC72 /* BreadScreen.swift */,
+			);
+			path = Store;
 			sourceTree = "<group>";
 		};
 		888FF3C92C867E4A0025EC1B /* Polling */ = {
@@ -202,6 +268,8 @@
 				884B24832C87E44500229F1E /* PollScreen.swift */,
 				884B24852C87E7BB00229F1E /* PollComplete.swift */,
 				8838DC3D2C8A5B7B00500C6E /* PollCooldownScreen.swift */,
+				887C78372C9CD1E400CEDC72 /* StartPollScreen.swift */,
+				887C784A2CA0CA6400CEDC72 /* PollAnswerDetailView.swift */,
 			);
 			path = Polling;
 			sourceTree = "<group>";
@@ -239,6 +307,7 @@
 				88B37D102C23FD60000A7D91 /* Item.swift */,
 				88B37D122C23FD60000A7D91 /* Assets.xcassets */,
 				88B37D142C23FD60000A7D91 /* Preview Content */,
+				887C784E2CA12AEE00CEDC72 /* refactor-doc.md */,
 			);
 			path = ShipFastStarter;
 			sourceTree = "<group>";
@@ -261,6 +330,7 @@
 				884B247E2C87BECE00229F1E /* PollViewModel.swift */,
 				8838DC4C2C8B864E00500C6E /* InboxViewModel.swift */,
 				8838DC682C8F994B00500C6E /* ProfileViewModel.swift */,
+				887C78402C9E347500CEDC72 /* FeedViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -268,6 +338,8 @@
 		88B37D1D2C23FD78000A7D91 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				887C78472CA0C7D300CEDC72 /* Store */,
+				887C783D2C9E33EB00CEDC72 /* Feed */,
 				8838DC412C8A907700500C6E /* Inbox */,
 				884B24802C87E12B00229F1E /* Profile */,
 				888FF3C92C867E4A0025EC1B /* Polling */,
@@ -275,6 +347,10 @@
 				88B37D262C23FFE9000A7D91 /* Home */,
 				88B37D252C23FFE5000A7D91 /* Onboarding */,
 				8838DC3F2C8A8F7D00500C6E /* SplashScreen.swift */,
+				8838DC772C9251BA00500C6E /* InviteFriendsModal.swift */,
+				8838DC7D2C93ED7F00500C6E /* FriendRequests.swift */,
+				8838DC7F2C9550BB00500C6E /* DevTestingView.swift */,
+				887C783B2C9E15EC00CEDC72 /* SettingsScreen.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -287,6 +363,8 @@
 				88B37D352C2407D0000A7D91 /* Services */,
 				88B37D312C2406DA000A7D91 /* Constants.swift */,
 				8838DC582C8EA7CB00500C6E /* NotificationManager.swift */,
+				8838DC702C90F0B100500C6E /* CachedImage.swift */,
+				880A21BC2CA22737004F5E1C /* ShareHelper.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -294,6 +372,7 @@
 		88B37D1F2C23FD83000A7D91 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				887C78392C9D4D1200CEDC72 /* holdDown.mp3 */,
 				88B37D212C23FD91000A7D91 /* Fonts */,
 				88B37D202C23FD8C000A7D91 /* Animations */,
 				88B37D432C240D77000A7D91 /* Colors.xcassets */,
@@ -322,9 +401,10 @@
 				884B24742C87B96E00229F1E /* User.swift */,
 				884B24762C87B97500229F1E /* Poll.swift */,
 				884B24782C87B97D00229F1E /* PollOption.swift */,
-				884B247A2C87B98500229F1E /* HighSchool.swift */,
+				884B247A2C87B98500229F1E /* Highschool.swift */,
 				884B247C2C87B99D00229F1E /* VibeCheck.swift */,
 				884B24872C8803D300229F1E /* Question.swift */,
+				887C784F2CA12B9400CEDC72 /* Bug.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -345,7 +425,11 @@
 				8838DC482C8AC9C100500C6E /* LastName.swift */,
 				8838DC4A2C8ACD5800500C6E /* UsernameScreen.swift */,
 				8838DC502C8D11EA00500C6E /* ColorScreen.swift */,
+				8838DC6E2C90043500500C6E /* PeopleScreen.swift */,
 				8838DC562C8E454A00500C6E /* NotificationScreen.swift */,
+				8838DC752C923C0E00500C6E /* LockedHighschoolScreen.swift */,
+				8838DC792C9293CC00500C6E /* UploadProfileScreen.swift */,
+				881A09F92C96721600D8A858 /* AgeScreen.swift */,
 			);
 			path = Onboarding;
 			sourceTree = "<group>";
@@ -397,6 +481,7 @@
 				88B37D4D2C241127000A7D91 /* Color.swift */,
 				8838DC442C8A944900500C6E /* Date.swift */,
 				8838DC6C2C8F9C1D00500C6E /* Image.swift */,
+				8838DC732C911A9600500C6E /* String.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -411,6 +496,7 @@
 				88B37D052C23FD60000A7D91 /* Sources */,
 				88B37D062C23FD60000A7D91 /* Frameworks */,
 				88B37D072C23FD60000A7D91 /* Resources */,
+				880A21B92CA20F7F004F5E1C /* Run Script */,
 			);
 			buildRules = (
 			);
@@ -429,6 +515,8 @@
 				8838DC6A2C8F9AC400500C6E /* FirebaseStorage */,
 				C45CF5562C9166E900D58633 /* FirebaseDynamicLinks */,
 				C45CF5592C91C24700D58633 /* FacebookShare */,
+				887C784C2CA12A2100CEDC72 /* FirebaseCrashlytics */,
+				880A21BA2CA2123D004F5E1C /* FirebaseAnalytics */,
 			);
 			productName = ShipFastStarter;
 			productReference = 88B37D092C23FD60000A7D91 /* ONG.app */;
@@ -480,6 +568,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				887C783A2C9D4D1200CEDC72 /* holdDown.mp3 in Resources */,
 				88B37D442C240D77000A7D91 /* Colors.xcassets in Resources */,
 				88C1E5732C876CF100C9317E /* GoogleService-Info.plist in Resources */,
 				88B37D162C23FD60000A7D91 /* Preview Assets.xcassets in Resources */,
@@ -490,6 +579,32 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		880A21B92CA20F7F004F5E1C /* Run Script */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}",
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${PRODUCT_NAME}",
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Info.plist\n",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/GoogleService-Info.plist",
+				"$(TARGET_BUILD_DIR)/$(EXECUTABLE_PATH)",
+			);
+			name = "Run Script";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n\"${BUILD_DIR%/Build/*}/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/run\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		88B37D052C23FD60000A7D91 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -497,24 +612,29 @@
 			files = (
 				8838DC402C8A8F7D00500C6E /* SplashScreen.swift in Sources */,
 				8838DC492C8AC9C100500C6E /* LastName.swift in Sources */,
+				887C784B2CA0CA6400CEDC72 /* PollAnswerDetailView.swift in Sources */,
 				888FF3BA2C8679F10025EC1B /* ContactsScreen.swift in Sources */,
+				887C78492CA0C7ED00CEDC72 /* BreadScreen.swift in Sources */,
 				884B247F2C87BECE00229F1E /* PollViewModel.swift in Sources */,
 				88B37D322C2406DA000A7D91 /* Constants.swift in Sources */,
 				888FF3C42C867DF50025EC1B /* NameScreen.swift in Sources */,
 				884B24822C87E13B00229F1E /* ProfileScreen.swift in Sources */,
-				884B247B2C87B98500229F1E /* HighSchool.swift in Sources */,
+				884B247B2C87B98500229F1E /* Highschool.swift in Sources */,
+				887C783C2C9E15EC00CEDC72 /* SettingsScreen.swift in Sources */,
 				8838DC3A2C89228100500C6E /* SharedComponents.swift in Sources */,
 				8838DC432C8A908400500C6E /* InboxScreen.swift in Sources */,
 				88B37D542C2411FC000A7D91 /* Extensions.swift in Sources */,
 				8838DC4B2C8ACD5800500C6E /* UsernameScreen.swift in Sources */,
 				8838DC592C8EA7CB00500C6E /* NotificationManager.swift in Sources */,
 				88B37D342C240761000A7D91 /* RCPurchaseController.swift in Sources */,
+				8838DC7A2C9293CC00500C6E /* UploadProfileScreen.swift in Sources */,
 				884B24862C87E7BB00229F1E /* PollComplete.swift in Sources */,
 				88B37D572C241321000A7D91 /* NetworkManger.swift in Sources */,
 				8838DC572C8E454A00500C6E /* NotificationScreen.swift in Sources */,
 				88B37D0F2C23FD60000A7D91 /* ContentView.swift in Sources */,
 				88C1E5682C86D86800C9317E /* HighSchoolScreen.swift in Sources */,
 				8838DC472C8ABCE400500C6E /* GradeScreen.swift in Sources */,
+				8838DC6F2C90043500500C6E /* PeopleScreen.swift in Sources */,
 				884B24732C879A1900229F1E /* HighSchoolViewModel.swift in Sources */,
 				8838DC452C8A944900500C6E /* Date.swift in Sources */,
 				88B37D522C2411A4000A7D91 /* Types.swift in Sources */,
@@ -524,34 +644,49 @@
 				8838DC362C8921D400500C6E /* ShadowModifier.swift in Sources */,
 				888FF3C62C867E0F0025EC1B /* NumberScreen.swift in Sources */,
 				88B37D482C2410BE000A7D91 /* UIDevice.swift in Sources */,
+				8838DC7C2C936B1900500C6E /* ImageUploadExtension.swift in Sources */,
 				8838DC692C8F994B00500C6E /* ProfileViewModel.swift in Sources */,
 				88B37D4E2C241127000A7D91 /* Color.swift in Sources */,
 				888FF3C22C867DC50025EC1B /* GenderScreen.swift in Sources */,
+				8838DC7E2C93ED7F00500C6E /* FriendRequests.swift in Sources */,
+				887C78502CA12B9400CEDC72 /* Bug.swift in Sources */,
 				884B24772C87B97500229F1E /* Poll.swift in Sources */,
 				88B37D4A2C2410EB000A7D91 /* Numbers.swift in Sources */,
 				888FF3BC2C867CD80025EC1B /* LocationScreen.swift in Sources */,
 				88C1E5642C86A6B300C9317E /* FirebaseService.swift in Sources */,
 				884B24792C87B97D00229F1E /* PollOption.swift in Sources */,
+				881A09F62C963B5800D8A858 /* AboutScreen.swift in Sources */,
 				88C1E56A2C86D95B00C9317E /* NetworkViewModel.swift in Sources */,
 				8838DC512C8D11EA00500C6E /* ColorScreen.swift in Sources */,
 				88B37D4C2C241110000A7D91 /* Array.swift in Sources */,
 				8838DC4D2C8B864E00500C6E /* InboxViewModel.swift in Sources */,
 				88B37D3E2C240CFF000A7D91 /* FirstOnboardingScreen.swift in Sources */,
+				880A21BD2CA22737004F5E1C /* ShareHelper.swift in Sources */,
 				8838DC3E2C8A5B7B00500C6E /* PollCooldownScreen.swift in Sources */,
+				8838DC742C911A9600500C6E /* String.swift in Sources */,
 				88B37D0D2C23FD60000A7D91 /* ShipFastStarterApp.swift in Sources */,
 				884B247D2C87B99D00229F1E /* VibeCheck.swift in Sources */,
+				881A09FA2C96721600D8A858 /* AgeScreen.swift in Sources */,
 				88B37D372C2407DF000A7D91 /* AnalyticsService.swift in Sources */,
+				881A09F82C9641F000D8A858 /* FriendsScreen.swift in Sources */,
 				884B24882C8803D300229F1E /* Question.swift in Sources */,
 				C4C38B712C984BEB003FDE11 /* SwiftUIView.swift in Sources */,
+				8838DC762C923C0E00500C6E /* LockedHighschoolScreen.swift in Sources */,
 				888FF3BE2C867CEF0025EC1B /* Onboarding.swift in Sources */,
 				88C1E5662C86A6C400C9317E /* AuthViewModel.swift in Sources */,
 				8838DC6D2C8F9C1D00500C6E /* Image.swift in Sources */,
+				8838DC802C9550BB00500C6E /* DevTestingView.swift in Sources */,
 				884B24842C87E44500229F1E /* PollScreen.swift in Sources */,
+				887C78412C9E347500CEDC72 /* FeedViewModel.swift in Sources */,
 				88B37D502C24118F000A7D91 /* API.swift in Sources */,
 				88B37D592C241355000A7D91 /* ResponseModel.swift in Sources */,
+				887C78382C9CD1E400CEDC72 /* StartPollScreen.swift in Sources */,
+				887C783F2C9E33F300CEDC72 /* FeedScreen.swift in Sources */,
 				888FF3C02C867DBC0025EC1B /* BirthdayScreen.swift in Sources */,
 				88B37D242C23FDF8000A7D91 /* MainViewModel.swift in Sources */,
+				8838DC782C9251BB00500C6E /* InviteFriendsModal.swift in Sources */,
 				884B24752C87B96E00229F1E /* User.swift in Sources */,
+				8838DC712C90F0B100500C6E /* CachedImage.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -684,7 +819,8 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = ONG.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 32;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "\"ShipFastStarter/Preview Content\"";
 				DEVELOPMENT_TEAM = VY92D2R4AT;
 				ENABLE_PREVIEWS = YES;
@@ -692,18 +828,21 @@
 				INFOPLIST_FILE = "ONG-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "";
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_NSCameraUsageDescription = "We need access to your camera to let you take profile pictures directly in the app";
 				INFOPLIST_KEY_NSContactsUsageDescription = "ONG needs access to your contacts to help you find mutuals. We'll only access the contacts you choose to interact with.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Gas needs your location to find nearby schools and connect you with friends. We care about your privacy and only use your location for this purpose.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "We'd like to access your photo library so you can choose existing photos for your pro pic. This allows you to personalize your profile with your favorite images.\"";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.3.1;
+				"OTHER_LDFLAGS[arch=*]" = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.ong.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -723,7 +862,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = ONG.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 32;
 				DEVELOPMENT_ASSET_PATHS = "\"ShipFastStarter/Preview Content\"";
 				DEVELOPMENT_TEAM = VY92D2R4AT;
 				ENABLE_PREVIEWS = YES;
@@ -731,18 +870,21 @@
 				INFOPLIST_FILE = "ONG-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "";
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_NSCameraUsageDescription = "We need access to your camera to let you take profile pictures directly in the app";
 				INFOPLIST_KEY_NSContactsUsageDescription = "ONG needs access to your contacts to help you find mutuals. We'll only access the contacts you choose to interact with.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Gas needs your location to find nearby schools and connect you with friends. We care about your privacy and only use your location for this purpose.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "We'd like to access your photo library so you can choose existing photos for your pro pic. This allows you to personalize your profile with your favorite images.\"";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.3.1;
+				"OTHER_LDFLAGS[arch=*]" = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.ong.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -830,6 +972,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		880A21BA2CA2123D004F5E1C /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 88C1E55A2C86925D00C9317E /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
 		8838DC4E2C8BD43B00500C6E /* FirebaseMessaging */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 88C1E55A2C86925D00C9317E /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
@@ -839,6 +986,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 88C1E55A2C86925D00C9317E /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseStorage;
+		};
+		887C784C2CA12A2100CEDC72 /* FirebaseCrashlytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 88C1E55A2C86925D00C9317E /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCrashlytics;
 		};
 		88B37D292C24018B000A7D91 /* SuperwallKit */ = {
 			isa = XCSwiftPackageProductDependency;

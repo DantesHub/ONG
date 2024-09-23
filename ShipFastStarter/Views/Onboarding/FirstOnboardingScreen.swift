@@ -11,12 +11,29 @@ import FacebookCore
 import FacebookShare
 
 struct OnboardingScreen: View {
+    @EnvironmentObject var authVM: AuthViewModel
     @EnvironmentObject var mainVM: MainViewModel
+    @EnvironmentObject var pollVM: PollViewModel
+    @EnvironmentObject var profileVM: ProfileViewModel
+    @EnvironmentObject var inboxVM: InboxViewModel
 
     var body: some View {
         ZStack {
             Color.primaryBackground.edgesIgnoringSafeArea(.all)
             VStack(alignment: .center) {
+                Text("login")
+                    .underline()
+                    .sfPro(type: .semibold, size: .h2)
+                    .foregroundColor(.white)
+                    .opacity(0.7)
+                    .onTapGesture {
+                        withAnimation {
+                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                            Analytics.shared.log(event: "FirstOnboarding: Tapped Login")
+                            authVM.tappedLogin = true
+                        }
+                    }
+                    .padding(.vertical)
                 Spacer()
                 HStack {
                     ZStack {
@@ -48,15 +65,20 @@ struct OnboardingScreen: View {
 
                 SharedComponents.PrimaryButton(title: "continue") {
                     mainVM.currUser = User.exUser
-                    mainVM.onboardingScreen = .birthday
-                    
-                    
+                    mainVM.onboardingScreen = .birthday                                    
                 }
                 .padding(.vertical, 48)
                 .padding(.horizontal, 24)
             }
         }.frame(maxWidth: .infinity, alignment: .center)
-       
+            .sheet(isPresented: $authVM.tappedLogin) {
+                NumberScreen()
+                    .environmentObject(mainVM)
+                    .environmentObject(authVM)
+                    .environmentObject(inboxVM)
+                    .environmentObject(profileVM)
+                    .environmentObject(pollVM)
+            }
     }
     
 //    func shareToInstagramStories(_ image: UIImage, link: String) {
@@ -201,6 +223,11 @@ struct OnboardingScreen: View {
 
 #Preview {
     OnboardingScreen()
+        .environmentObject(MainViewModel())
+        .environmentObject(AuthViewModel())
+        .environmentObject(PollViewModel())
+        .environmentObject(ProfileViewModel())
+        .environmentObject(InboxViewModel())
 }
 
 struct StrokedText: ViewModifier {
@@ -270,4 +297,19 @@ struct StrokeModifier: ViewModifier {
     }
 }
 
-
+extension View {
+    /// Adds a stroke to the view with a linear gradient.
+    func gradientStroke(colors: [Color], lineWidth: CGFloat) -> some View {
+        self.overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(
+                    LinearGradient(
+                        gradient: Gradient(colors: colors),
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: lineWidth
+                )
+        )
+    }
+}

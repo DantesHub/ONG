@@ -27,15 +27,25 @@ struct User: Codable, Equatable, FBObject {
     var number: String
     var votedPolls: [String]
     var lastPollFinished: Date?
-    var friends: [String]
+    var friends: [String: String]  // Changed to dictionary
     var invitedFriends: [String]
     var ogBadge: Bool
     var gender: String
     var fcmToken: String
-    var proPic: Bool
-    var referral: Int  // New property
+    var proPic: String
+    var referral: Int
+    var crushId: String
+    var friendsStatus: String = "Add +"
+    var friendRequests: [String: String]
+    var dateJoined: String
+    var relationshipStatus: String
+    var mbti: String
+    var movie: String
+    var music: String
+    var bio: String  // New bio property
+    var bread: Int  // New bread property
 
-    init(id: String, firstName: String, lastName: String, username: String, schoolId: String, color: String, aura: Int, godMode: Bool, birthday: String, grade: String, number: String, votedPolls: [String], lastPollFinished: Date?, friends: [String], invitedFriends: [String], ogBadge: Bool, gender: String, fcmToken: String, proPic: Bool = false, referral: Int = 0) {
+    init(id: String, firstName: String, lastName: String, username: String, schoolId: String, color: String, aura: Int, godMode: Bool, birthday: String, grade: String, number: String, votedPolls: [String], lastPollFinished: Date?, friends: [String: String], invitedFriends: [String], ogBadge: Bool, gender: String, fcmToken: String, proPic: String, referral: Int = 0, crushId: String = "", friendRequests: [String: String], dateJoined: String, relationshipStatus: String, mbti: String, movie: String, music: String, bio: String, bread: Int = 0) {
         self.id = id
         self.firstName = firstName
         self.lastName = lastName
@@ -56,6 +66,15 @@ struct User: Codable, Equatable, FBObject {
         self.fcmToken = fcmToken
         self.proPic = proPic
         self.referral = referral
+        self.crushId = crushId
+        self.friendRequests = friendRequests
+        self.dateJoined = dateJoined
+        self.relationshipStatus = relationshipStatus
+        self.mbti = mbti
+        self.movie = movie
+        self.music = music
+        self.bio = bio
+        self.bread = bread
     }
 
     static var exUser = User(
@@ -64,29 +83,45 @@ struct User: Codable, Equatable, FBObject {
         lastName: "Johnmo",
         username: "naveedjohnmo",
         schoolId: "123e4567-e89b-12d3-a456-426614174000",
-        color: "#FF0000",
+        color: "",
         aura: 100,
         godMode: false,
         birthday: "2000-01-01",
         grade: "11",
-        number: "1234567890",
+        number: "+12013333333",
         votedPolls: [],
         lastPollFinished: nil,
-        friends: [],
+        friends: [:],
         invitedFriends: [],
         ogBadge: true,
         gender: "Male",
         fcmToken: "",
-        proPic: false,
-        referral: 0
+        proPic: "https://firebasestorage.googleapis.com/v0/b/ongod-fce40.appspot.com/o/profileImages%2FOkl?alt=media&token=000ea88e-bce7-4167-b332-5df492744d68",
+        referral: 0,
+        crushId: "",
+        friendRequests: [:],
+        dateJoined: "2024-09-15",
+        relationshipStatus: "single af",
+        mbti: "INTJ",
+        movie: "whiplash",
+        music: "the end",
+        bio: "a school to work on ur ideas",
+        bread: 100  // Add a default value for bread in the example user
     )
+
+    
+    
+
 
     static func == (lhs: User, rhs: User) -> Bool {
         return lhs.id == rhs.id
     }
 
     enum CodingKeys: String, CodingKey {
-        case id, firstName, lastName, username, schoolId, color, aura, godMode, birthday, grade, number, votedPolls, lastPollFinished, friends, invitedFriends, ogBadge, gender, fcmToken, proPic, referral
+        case id, firstName, lastName, username, schoolId, color, aura, godMode, birthday, grade, number, votedPolls, lastPollFinished, friends, invitedFriends, ogBadge, gender, fcmToken, proPic, referral, crushId, friendRequests, dateJoined
+        // New coding keys
+        case relationshipStatus, mbti, movie, music, bio
+        case bread
     }
 
     init(from decoder: Decoder) throws {
@@ -104,13 +139,16 @@ struct User: Codable, Equatable, FBObject {
         grade = try container.decodeIfPresent(String.self, forKey: .grade) ?? "9"
         number = try container.decodeIfPresent(String.self, forKey: .number) ?? ""
         votedPolls = try container.decodeIfPresent([String].self, forKey: .votedPolls) ?? []
-        friends = try container.decodeIfPresent([String].self, forKey: .friends) ?? []
+        friends = try container.decodeIfPresent([String: String].self, forKey: .friends) ?? [:]  // Changed to dictionary
         invitedFriends = try container.decodeIfPresent([String].self, forKey: .invitedFriends) ?? []
         ogBadge = try container.decodeIfPresent(Bool.self, forKey: .ogBadge) ?? false
         gender = try container.decodeIfPresent(String.self, forKey: .gender) ?? "Unspecified"
         fcmToken = try container.decodeIfPresent(String.self, forKey: .fcmToken) ?? ""
-        proPic = try container.decodeIfPresent(Bool.self, forKey: .proPic) ?? false
-        referral = try container.decodeIfPresent(Int.self, forKey: .referral) ?? 0  // New property
+        proPic = try container.decodeIfPresent(String.self, forKey: .proPic) ?? ""
+        referral = try container.decodeIfPresent(Int.self, forKey: .referral) ?? 0
+        crushId = try container.decodeIfPresent(String.self, forKey: .crushId) ?? ""
+        friendRequests = try container.decodeIfPresent([String: String].self, forKey: .friendRequests) ?? ["shiva":"shiva2"]  // Changed to dictionary
+        dateJoined = try container.decodeIfPresent(String.self, forKey: .dateJoined) ?? Date().toString(format: "yyyy-MM-dd")
         // Custom decoding for lastPollFinished
         if let lastPollFinishedTimestamp = try? container.decode(Double.self, forKey: .lastPollFinished) {
             lastPollFinished = Date(timeIntervalSince1970: lastPollFinishedTimestamp)
@@ -120,6 +158,14 @@ struct User: Codable, Equatable, FBObject {
         } else {
             lastPollFinished = nil
         }
+        
+        // New property decoding (now required)
+        relationshipStatus = try container.decodeIfPresent(String.self, forKey: .relationshipStatus) ?? "single af"
+        mbti = try container.decodeIfPresent(String.self, forKey: .mbti) ?? "INTJ"
+        movie = try container.decodeIfPresent(String.self, forKey: .movie) ?? "whiplash"
+        music = try container.decodeIfPresent(String.self, forKey: .music) ?? "the end"
+        bio = try container.decodeIfPresent(String.self, forKey: .bio) ?? "a school to work on ur ideas"
+        bread = try container.decodeIfPresent(Int.self, forKey: .bread) ?? 0  // Decode bread with a default value of 0
     }
 
     func encodeToDictionary() -> [String: Any]? {
@@ -129,6 +175,7 @@ struct User: Codable, Equatable, FBObject {
             let data = try encoder.encode(self)
             return try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String: Any]
         } catch {
+            Analytics.shared.logCrash(error: error)
             print("Error encoding User to dictionary: \(error)")
             return nil
         }

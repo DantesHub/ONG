@@ -15,7 +15,14 @@ class AuthViewModel: ObservableObject {
     @Published var isVerificationCodeSent = false
     @Published var isVerified = false
     @Published var errorString = ""
+    @Published var verificationError: String?
+    @Published var tappedLogin: Bool = false
+
     func signInWithPhoneNumber(phoneNumber: String, completion: @escaping (Result<Void, Error>) -> Void) {
+        if let _ = Auth.auth().currentUser  {
+            print("No authenticated user")
+        }
+        
         FirebaseService.shared.signUpWithPhoneNumber(phoneNumber: phoneNumber) { result in
             DispatchQueue.main.async {
                 switch result {
@@ -26,7 +33,7 @@ class AuthViewModel: ObservableObject {
                     completion(.success(()))
                 case .failure(let error):
                     self.signInError = error
-                    print("Error signing in with phone number: \(error.localizedDescription)")
+                    print("Error signing in with phone number: \(error.localizedDescription) \(phoneNumber)")
                     completion(.failure(error))
                 }
             }
@@ -49,48 +56,91 @@ class AuthViewModel: ObservableObject {
     
     @MainActor
     func verifyCode(verificationCode: String, completion: @escaping (Result<AuthDataResult, Error>) -> Void) {
-        if let verfId = verificationID {
-            let credential = PhoneAuthProvider.provider().credential(
-                withVerificationID: verfId,
-                verificationCode: verificationCode
-            )
-            
-            Auth.auth().signIn(with: credential) { authResult, error in
-                if let error = error {
-                    print("Verification error: \(error.localizedDescription)")
-                    if let authError = error as? AuthErrorCode {
-                        print("Firebase Auth Error Code: \(authError.code.rawValue)")
-                        print("Firebase Auth Error Message: \(authError.localizedDescription)")
-                    }
-                    completion(.failure(error))
-                    return
-                }
-                
-                guard let authResult = authResult else {
-                    let error = NSError(domain: "FirebaseService", code: 0, userInfo: [NSLocalizedDescriptionKey: "Auth result is nil"])
-                    completion(.failure(error))
-                    return
-                }
-
-                completion(.success(authResult))
-            }
+        guard let verfId = verificationID else {
+            self.verificationError = "Verification ID is missing. Please request a new code."
+            completion(.failure(NSError(domain: "AuthError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Verification ID is missing"])))
+            return
         }
-       
+
+        let credential = PhoneAuthProvider.provider().credential(
+            withVerificationID: verfId,
+            verificationCode: verificationCode
+        )
         
-       
+        Auth.auth().signIn(with: credential) { authResult, error in
+            if let error = error as? AuthErrorCode {
+                switch error.code {
+                case .invalidVerificationCode, .invalidVerificationID:
+                    self.verificationError = "Invalid verification code. Please try again."
+                    self.resetVerificationProcess()
+                case .sessionExpired:
+                    self.verificationError = "Verification session has expired. Please request a new code."
+                    self.resetVerificationProcess()
+                default:
+                    self.verificationError = "An error occurred: \(error.localizedDescription)"
+                }
+                completion(.failure(error))
+                return
+            }
+            
+            guard let authResult = authResult else {
+                self.verificationError = "Authentication failed. Please try again."
+                completion(.failure(NSError(domain: "AuthError", code: 1, userInfo: [NSLocalizedDescriptionKey: "Authentication result is nil"])))
+                return
+            }
+
+            self.verificationError = nil
+         
+            completion(.success(authResult))
+        }
     }
-    
+
+    private func resetVerificationProcess() {
+        self.verificationID = nil
+        self.isVerificationCodeSent = false
+    }
+
     func resendVerificationCode() {
         guard let phoneNumber = UserDefaults.standard.string(forKey: "userNumber") else {
-               print("No phone number available to resend code")
-               return
-           }
-           
-           // Reset relevant states
-           self.isVerificationCodeSent = false
-           self.verificationID = nil
-           self.signInError = nil
-           
-  
-       }
+            print("No phone number available to resend code")
+            return
+        }
+        
+        // Reset relevant states
+        self.resetVerificationProcess()
+        
+        // Resend the verification code
+        self.signInWithPhoneNumber(phoneNumber: phoneNumber) { result in
+            switch result {
+            case .success:
+                print("Verification code resent successfully")
+            case .failure(let error):
+                print("Error resending verification code: \(error.localizedDescription)")
+                self.verificationError = "Failed to resend code. Please try again."
+            }
+        }
+    }
+    
+    func updateReferralCount() {
+        FirebaseService.getUser { result in
+            switch result {
+                
+            case .failure(let error):
+                if let referrerUsername = UserDefaults.standard.string(forKey: "referrerUsername") {
+                    FirebaseService.shared.incrementReferralCount(forUsername: referrerUsername) { result in
+                        switch result {
+                        case .success():
+                            print("Referral count incremented successfully.")
+                        case .failure(let error):
+                            print("Failed to increment referral count: \(error.localizedDescription)")
+                        }
+                    }
+                }
+            case .success(let user):
+                UserDefaults.standard.set("", forKey: "referrerUsername")
+                
+                print(#function)
+            }
+        }
+    }
 }

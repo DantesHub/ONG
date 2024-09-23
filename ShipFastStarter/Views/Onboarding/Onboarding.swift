@@ -13,9 +13,12 @@ struct OnboardingView: View {
     @EnvironmentObject var mainVM: MainViewModel
     @EnvironmentObject var authVM: AuthViewModel
     @EnvironmentObject var pollVM: AuthViewModel
+    @EnvironmentObject var profileVM: ProfileViewModel
+    @EnvironmentObject var inboxVM: InboxViewModel
+    @EnvironmentObject var highschoolVM: HighSchoolViewModel
     @State private var currentProgressIndex: Int = 0
     
-    let totalSteps = 8
+    let totalSteps = 10
     
     var body: some View {
        ZStack {
@@ -27,12 +30,12 @@ struct OnboardingView: View {
             VStack {
                 if mainVM.onboardingScreen != .first  {
                     HStack(alignment: .center) {
-                        if  mainVM.onboardingScreen != .birthday {
+                        if  mainVM.onboardingScreen != .birthday && mainVM.onboardingScreen != .uploadProfile {
                             Image(systemName: "arrow.left")
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
                                 .frame(width: 24)
-                                .foregroundColor(Color.primaryForeground)
+                                .foregroundColor(mainVM.onboardingScreen == .color ? .black : Color.primaryForeground)
                                 .onTapGesture {
                                     Analytics.shared.log(event: "Onboarding: tapped Back")
                                     withAnimation {
@@ -54,17 +57,14 @@ struct OnboardingView: View {
                     }.padding(.top)
                     .padding(.horizontal, 8)                  
                 }
-
+                
                 switch mainVM.onboardingScreen {
                     case .first: OnboardingScreen()
                     case .age: BirthdayScreen()
                     case .gender: GenderScreen()
                     case .birthday: BirthdayScreen()
                     case .name: NameScreen()
-                    case .number: 
-                        NumberScreen()
-                        .environmentObject(authVM)
-                        .environmentObject(mainVM)
+                    case .number: NumberScreen()
                     case .contacts: ContactsScreen()
                     case .location: LocationScreen()
                     case .highschool: HighSchoolScreen()
@@ -72,6 +72,10 @@ struct OnboardingView: View {
                     case .lastName: LastNameScreen()
                     case .username: UsernameScreen()
                     case .color: ColorScreen()
+                    case .uploadProfile: UploadProfileScreen()
+                    case .notification: NotificationScreen() 
+                    case .addFriends: PeopleScreen()
+                    case .lockedHighschool: LockedHighschoolScreen()
                 }
             }
        }.onChange(of: mainVM.onboardingScreen) { newValue in
@@ -86,32 +90,46 @@ struct OnboardingView: View {
             case .age:
                 mainVM.onboardingScreen = .first
             case .gender:
-                mainVM.onboardingScreen = .gender
+                mainVM.onboardingScreen = .first
             case .birthday:
                 mainVM.onboardingScreen = .gender
             case .name:
-                mainVM.onboardingScreen = .birthday
+                mainVM.onboardingScreen = .grade
             case .number:
-                mainVM.onboardingScreen = .name
+                if authVM.isVerificationCodeSent {
+                    authVM.isVerificationCodeSent = false
+                } else {
+                    mainVM.onboardingScreen = .username
+                }
             case .contacts:
                 mainVM.onboardingScreen = .number
             case .location:
-                mainVM.onboardingScreen = .contacts
-            case .grade:
-                mainVM.onboardingScreen = .birthday
-            case .lastName:
-                mainVM.onboardingScreen = .birthday
-            case .highschool:
-                mainVM.onboardingScreen = .lastName
-            case .username:
-                mainVM.onboardingScreen = .highschool
-            case .color:
                 mainVM.onboardingScreen = .gender
+            case .grade:
+                mainVM.onboardingScreen = .gender
+            case .lastName:
+                mainVM.onboardingScreen = .grade
+            case .highschool:
+                mainVM.onboardingScreen = .notification
+            case .username:
+                mainVM.onboardingScreen = .lastName
+            case .color:
+                mainVM.onboardingScreen = .highschool
+            case .uploadProfile:
+                mainVM.onboardingScreen = .username
+            case .notification:
+                mainVM.onboardingScreen = .uploadProfile
+            case .addFriends:
+                mainVM.onboardingScreen = .highschool
+            case .lockedHighschool:
+                mainVM.onboardingScreen = .highschool
         }
     }
 
     func updateProgressIndex(for screen: OnboardingScreenType) {
-        let screenOrder: [OnboardingScreenType] = [.first, .birthday, .location, .grade, .name, .lastName, .username]
+//        let screenOrder: [OnboardingScreenType] = [.first, .birthday, .location, .grade, .name, .lastName, .username]
+//        .location,
+        let screenOrder: [OnboardingScreenType] = [.first, .birthday,  .gender, .grade, .name,  .lastName, .username, .number, .uploadProfile, .notification, .highschool, .lockedHighschool, .addFriends, .notification, .color]
         if let index = screenOrder.firstIndex(of: screen) {
             currentProgressIndex = min(index, totalSteps)
         }
@@ -132,6 +150,10 @@ enum OnboardingScreenType {
     case lastName
     case username
     case color
+    case uploadProfile
+    case notification
+    case addFriends
+    case lockedHighschool
 }
 
 struct CustomProgressViewStyle: ProgressViewStyle {

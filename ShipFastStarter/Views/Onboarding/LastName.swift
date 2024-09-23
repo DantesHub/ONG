@@ -26,7 +26,7 @@ struct LastNameScreen: View {
                     .multilineTextAlignment(.center)
                     .padding(.horizontal)
                 
-                Text(lastName.isEmpty ? "Molina" : lastName)
+                Text(lastName.isEmpty ? "Molina" : lastName.lowercased())
                     .sfPro(type: .bold, size: .h1Big)
                     .foregroundColor(lastName.isEmpty ? .gray : .white)
                     .padding(.vertical, 16)
@@ -47,7 +47,7 @@ struct LastNameScreen: View {
                 SharedComponents.PrimaryButton(
                     title: "Continue",
                     action: {
-                        mainVM.currUser?.lastName = lastName
+                        mainVM.currUser?.lastName = lastName.lowercased()
                         Analytics.shared.log(event: "NameScreen: Tapped Continue")
                         if StringValidator.isValid(lastName) {
                             mainVM.onboardingScreen = .username // Assuming .birthday is the next screen

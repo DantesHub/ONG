@@ -9,32 +9,155 @@ import Foundation
 import SwiftUI
 
 struct HighSchoolScreen: View {
-    @StateObject private var viewModel = HighSchoolViewModel()
+    @EnvironmentObject var mainVM: MainViewModel
+    @EnvironmentObject var viewModel: HighSchoolViewModel
+    @EnvironmentObject var profileVM: ProfileViewModel
     @FocusState private var isSearchFocused: Bool
     
     var body: some View {
-        NavigationView {
+        ZStack {
+            Color.primaryBackground.edgesIgnoringSafeArea(.all)
             VStack {
-                SearchBar(text: $viewModel.searchQuery)
-                    .focused($isSearchFocused)
-                
-                List(viewModel.schools) { school in
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(school.name)
-                            .font(.headline)
-                        Text("\(school.city), \(school.state)")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
+//                SearchBar(text: $viewModel.searchQuery)
+//                    .focused($isSearchFocused)
+                Text("pick your highschool")
+                    .sfPro(type: .bold, size: .h1)
+                    .foregroundColor(.white)
+                    .padding()
+                    .padding(.top, 32)
+//                Text("keep this a secret 🤫")
+//                    .sfPro(type: .medium, size: .h2)
+//                    .foregroundColor(.white)
+//                List(viewModel.schools) { school in
+//                    VStack(alignment: .leading, spacing: 4) {
+//                        Text(school.name)
+//                            .font(.headline)
+//                        Text("\(school.city), \(school.state)")
+//                            .font(.subheadline)
+//                            .foregroundColor(.secondary)
+//                    }
+//                    .padding(.vertical, 8)
+//                }
+//                .listStyle(PlainListStyle())
+                HighschoolButton(title: "Buildspace", totalNum: 4) {
+                    withAnimation {
+//                        mainVM.currUser = User.exUser
+                        mainVM.currUser?.schoolId = "buildspace"
+                        if let currUser = mainVM.currUser {
+                                Task {
+                                    do {
+                                        try await FirebaseService.shared.updateField(collection: "users", documentId: currUser.id, field: "schoolId", value: "buildspace")
+                                        await viewModel.checkHighSchoolLock(for: currUser, id: "buildspace")
+                                        viewModel.updateNumStudents(user: currUser, for: "buildspace")
+                                        if !viewModel.selectedHighschool.students.contains(currUser.id) {
+                                            await profileVM.fetchPeopleList(user: currUser)
+                                        }
+                                        
+                                        if viewModel.isHighSchoolLocked {
+                                            withAnimation {
+                                                mainVM.onboardingScreen = .lockedHighschool
+                                            }
+                                        } else {
+                                            withAnimation {
+                                                mainVM.onboardingScreen = .addFriends
+                                            }
+                                        }
+                                    } catch {
+                                        print(error.localizedDescription, "high school screen crashed app")
+                                        let bug = Bug(title: "Highschool Crash", description: error.localizedDescription, date: Date(), userId: currUser.id, highschoolId: "buildspace")
+                                        FirebaseService.shared.addDocument(bug, collection: "bugs") { str in
+                                            
+                                        }
+                                    }
+                                }
+                           
+                        }
                     }
-                    .padding(.vertical, 8)
+                }.environmentObject(mainVM)
+                
+                HighschoolButton(title: "Test Highschool", totalNum: viewModel.totalKids) {
+                    withAnimation {
+                        mainVM.currUser?.schoolId = "123e4567-e89b-12d3-a456-426614174000"
+                        if let currUser = mainVM.currUser {
+                            Task {
+                                await profileVM.fetchPeopleList(user: currUser)
+                                viewModel.updateNumStudents(user: currUser, for: "123e4567-e89b-12d3-a456-426614174000")
+
+                                await viewModel.checkHighSchoolLock(for: currUser, id: "123e4567-e89b-12d3-a456-426614174000")
+                            }
+                        }   
+                        
+                        mainVM.onboardingScreen = .addFriends
+                    }
                 }
-                .listStyle(PlainListStyle())
+                .environmentObject(mainVM)
+                .padding(.top)
+                Spacer()
             }
-            .navigationTitle("High School Search")
         }
         .onAppear {
             isSearchFocused = true
+                        
         }
+    }
+}
+
+struct HighschoolButton: View {
+    @EnvironmentObject var mainVM: MainViewModel
+    let title: String
+    let totalNum: Int
+    let action: () -> Void
+    @State private var isPressed = false
+
+    var body: some View {
+        GeometryReader { geometry in
+                  ZStack {
+                      RoundedRectangle(cornerRadius: 16)
+                          .fill(Color.white)
+                          .overlay(
+                              RoundedRectangle(cornerRadius: 16)
+                                .stroke(Color.black.opacity(1), lineWidth: 5)
+                                  .padding(1)
+                                  .mask(RoundedRectangle(cornerRadius: 16))
+                          )
+                      
+                      HStack {
+                          Image(title == "Buildspace" ? "bsLogo" : "scLogo")
+                              .resizable()
+                              .aspectRatio(contentMode: .fit)
+                              .frame(width: 80, height: 80)
+                          VStack(alignment: .leading) {
+                              Text(title)
+                                  .foregroundColor(.black)
+                                  .sfPro(type: .bold, size: .h2)
+//                              Text("\(totalNum) students")
+//                                  .foregroundColor(.black.opacity(0.5))
+//                                  .sfPro(type: .bold, size: .h3p1)
+                          }
+                       
+                          Spacer()
+                      }
+                      .padding(.horizontal, 32)
+                  }
+                  .frame(height: 132)
+//                  .scaleEffect(isPressed ? 0.95 : 1)
+                  .onTapGesture {
+                      withAnimation {
+                          UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                          isPressed = true
+                          DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                              isPressed = false
+                          }
+                          action()
+                      }
+                  }
+              }
+              .frame(height: 132)
+              .padding(.horizontal)
+              .drawingGroup()
+              .offset(y: isPressed ? 2 : 0)
+              .shadow(color: Color.black, radius: 0, x: 0, y: isPressed ? 1.5 : 6)
+              .animation(.easeOut(duration: 0.2), value: isPressed)
     }
 }
 
@@ -74,5 +197,6 @@ struct SearchBar: View {
 struct HighSchoolScreen_Previews: PreviewProvider {
     static var previews: some View {
         HighSchoolScreen()
+            .environmentObject(MainViewModel())
     }
 }

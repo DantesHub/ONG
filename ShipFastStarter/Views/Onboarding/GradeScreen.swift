@@ -10,8 +10,9 @@ import SwiftUI
 struct GradeScreen: View {
     @EnvironmentObject var mainVM: MainViewModel
     @State private var selectedGrade: String = "9"
-    let grades = ["freshmen 🙈", "sophomore 🤔 ", "junior 😇", "senior 👑 "]
-    
+    let grades = ["freshmen 🙈", "sophomore 🤔", "junior 😇", "senior 👑"]
+    let bsGrades = ["SF1 🙈", "SF2 🤔", "BS Team 😇", "Friends of BS 👑"]
+
     var body: some View {
         ZStack {
             Color.primaryBackground.edgesIgnoringSafeArea(.all)
@@ -26,7 +27,7 @@ struct GradeScreen: View {
                 
                 
                 VStack(spacing: 24) {
-                    ForEach(grades, id: \.self) { grade in
+                    ForEach(bsGrades, id: \.self) { grade in
                         SharedComponents.PrimaryButton(
                             title: "\(grade)",
                             isOption: true,

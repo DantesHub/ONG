@@ -8,12 +8,12 @@
 import Foundation
 
 class MainViewModel: ObservableObject {
-    @Published var currentPage: Page = .home//.onboarding
+    @Published var currentPage: Page = .splash
     @Published var onboardingScreen: OnboardingScreenType = .first
     @Published var isPro = false
     @Published var showHalfOff = false 
     @Published var onboardingProgress: Double = 0.0
-    @Published var currUser: User?
+    @Published var currUser: User? 
     
     init() {
         
@@ -24,7 +24,7 @@ class MainViewModel: ObservableObject {
             do {
                 let users: [User] = try await FirebaseService.getFilteredDocuments(collection: "users", filterField: "number", filterValue: number)
                 if let user = users.first {
-                    DispatchQueue.main.async {
+                    await MainActor.run {
                         self.currUser = user
                         print("successfully fetched user", user.id, user.firstName)
                     }
@@ -35,7 +35,9 @@ class MainViewModel: ObservableObject {
                 print("Error fetching user: \(error.localizedDescription)")
             }
         } else {
-            self.currUser = User.exUser
+            await MainActor.run {
+                self.currUser = User.exUser
+            }
         }
     }
     
@@ -59,6 +61,12 @@ class MainViewModel: ObservableObject {
     func addVotedPoll(_ pollId: String) {
         self.currUser?.votedPolls.append(pollId)
     }
+    
+    func updateCurrentUser(_ updatedUser: User) {
+        DispatchQueue.main.async {
+            self.currUser = updatedUser
+        }
+    }
 }
 
 enum Page: String {
@@ -68,4 +76,7 @@ enum Page: String {
     case cooldown = "Cooldown"
     case inbox = "Inbox"
     case profile = "Profile"
+    case feed = "Feed"
+    case splash = "Splash"
+    case friendRequests = "FriendRequests"
 }

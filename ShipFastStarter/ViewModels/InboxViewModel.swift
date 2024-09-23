@@ -9,6 +9,14 @@ import Foundation
 import FirebaseFirestore
 import SwiftUI
 
+struct FriendRequest: Identifiable {
+    let id: String
+    var user: User
+    let time: Date
+    
+    static var exRequest = FriendRequest(id: UUID().uuidString, user: User.exUser, time: Date())
+}
+
 @MainActor
 class InboxViewModel: ObservableObject {
     @Published var tappedNotification: Bool = false
@@ -20,7 +28,8 @@ class InboxViewModel: ObservableObject {
     @Published var oldUsersWhoVoted: [InboxItem] = []
     @Published var newUsersWhoVoted: [InboxItem] = []
     @Published var currentFourOptions: [PollOption] = []
-    
+    @Published var friendRequests: [FriendRequest] = []
+
     func tappedNotificationRow() {
         if let option = selectedPollOption, let poll = selectedPoll {
             currentFourOptions = [option]
@@ -41,6 +50,34 @@ class InboxViewModel: ObservableObject {
             }
         }
 
+    }
+    
+    func fetchFriendRequests(for user: User) async {
+        friendRequests = []
+        do {
+            for friendRequest in user.friendRequests {
+                // fetch friend
+                if friendRequests.contains(where: { $0.user.id == friendRequest.key }) {
+                    continue
+                }
+                let friendArray: [User] = try await FirebaseService.shared.fetchDocuments(collection: "users", whereField: "id", isEqualTo: friendRequest.key)
+                // why is that it only works the second time ?
+                if let friend = friendArray.first {
+                    print(friend.firstName, "ik")
+                    let timeStamp = Date.fromString((user.friendRequests[friend.id] ?? "")) ?? Date()
+                    let request = FriendRequest(id: UUID().uuidString, user: friend, time: timeStamp)
+                    if !friendRequests.contains(where: { req in
+                        req.user.id == request.user.id
+                    }) {
+                        friendRequests.append(request)
+                        print(friendRequests.count, user.friendRequests.count, "gyamazawa")
+                    }
+                }
+                // request
+            }
+        } catch {
+            print(error.localizedDescription)
+        }
     }
     
     @MainActor
@@ -66,7 +103,15 @@ class InboxViewModel: ObservableObject {
                                     if let dateStr = voteInfo["date"],
                                        let numVotes = voteInfo["numVotes"],
                                        let date = ISO8601DateFormatter().date(from: dateStr) {
-                                        print(dateStr, "facetime", date, Date())
+                                        var notificationStatus = false
+                                        let viewdIds = UserDefaults.standard.array(forKey: Constants.viewedNotificationIds) as? [String] ?? []
+                                        if viewdIds.contains(where: { id in
+                                            id == poll.id
+                                        }) {
+                                            notificationStatus = true
+                                        } else {
+                                            notificationStatus = voteInfo["viewedNotification"] == "false"
+                                        }
                                         let newInboxItem = InboxItem(
                                             id: UUID().uuidString,
                                             userId: voterId,
@@ -75,10 +120,10 @@ class InboxViewModel: ObservableObject {
                                             time: date,
                                             gender: usr.gender,
                                             grade: usr.grade,
-                                            backgroundColor: Color(hex: usr.color),
+                                            backgroundColor: Color(usr.color),
                                             accompanyingPoll: poll,
                                             pollOption: option,
-                                            isNew: voteInfo["viewedNotification"] == "false"
+                                            isNew: notificationStatus
                                         )
                                         if voteInfo["viewedNotification"] == "false" {
                                             newVotes.append(newInboxItem)
@@ -114,6 +159,8 @@ class InboxViewModel: ObservableObject {
         } catch {
             print("Error fetching notifications: \(error.localizedDescription)")
         }
+        
+        await fetchFriendRequests(for: user)
     }
     
     func updateViewStatus() async {
@@ -183,52 +230,39 @@ class InboxViewModel: ObservableObject {
     }
 
     
-   func formatRelativeTime(from date: Date) -> String {
-        let now = Date()
-        let calendar = Calendar.current
-        let components = calendar.dateComponents([.year, .month, .day, .hour, .minute, .second], from: date, to: now)
-        
-        if let year = components.year, year > 0 {
-            return year == 1 ? "1 year ago" : "\(year) years ago"
-        }
-        
-        if let month = components.month, month > 0 {
-            return month == 1 ? "1 month ago" : "\(month) months ago"
-        }
-        
-        if let day = components.day, day > 0 {
-            if day == 1 {
-                return "yesterday"
-            } else if day < 7 {
-                return "\(day)d ago"
-            } else {
-                let weeks = day / 7
-                return weeks == 1 ? "1 week ago" : "\(weeks) weeks ago"
-            }
-        }
-        
-        if let hour = components.hour, hour > 0 {
-            if hour == 1 {
-                
-            }
-            if hour < 24 {
-                return "\(hour)h ago"
-            }
 
+            
+    //MARK: - Friend requests
+    func tappedAcceptFriendRequest(currUser: User, requestedUser: User) async {
+ 
+        var updatedRequestedUser = requestedUser
+        updatedRequestedUser.friends[currUser.id] = Date().toString()
+        friendRequests.removeAll { req in
+            req.user.id == requestedUser.id
         }
-        
-        if let minute = components.minute, minute > 0 {
-            if minute < 60 {
-                return "\(minute)m ago"
-            }
+        var fieldsToUpdate = ["friendRequests": currUser.friendRequests, "friends": currUser.friends]
+        do {
+//            try await FirebaseService.shared.updateDocument(collection: "users", object: currUser)
+            try await FirebaseService.shared.updateFields(collection: "users", documentId: currUser.id, fields: fieldsToUpdate)
+            try await FirebaseService.shared.updateField(collection: "users", documentId: updatedRequestedUser.id, field: "friends", value: updatedRequestedUser.friends)
+        } catch {
+            print(error.localizedDescription)
         }
-        
-        if let second = components.second, second > 0 {
-            if second < 60 {
-                return "just now"
-            }
+    }
+    
+    func tappedDeclineFriendRequest(currUser: User, requestedUser: User) async {
+        var updatedRequestedUser = requestedUser
+        updatedRequestedUser.friends.removeValue(forKey: currUser.id)
+
+        friendRequests.removeAll { req in
+            req.user.id == requestedUser.id
         }
-        
-        return "just now"
+        // update in firebase
+        do {
+            try await FirebaseService.shared.updateField(collection: "users", documentId: currUser.id, field: "friendRequests", value: currUser.friendRequests)
+            try await FirebaseService.shared.updateField(collection: "users", documentId: updatedRequestedUser.id, field: "friends", value: updatedRequestedUser.friends)
+        } catch {
+            print(error.localizedDescription)
+        }
     }
 }

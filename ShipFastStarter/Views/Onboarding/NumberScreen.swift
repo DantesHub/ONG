@@ -11,6 +11,8 @@ struct NumberScreen: View {
     @EnvironmentObject var authVM: AuthViewModel
     @EnvironmentObject var mainVM: MainViewModel
     @EnvironmentObject var pollVM: PollViewModel
+    @EnvironmentObject var profileVM: ProfileViewModel
+    @EnvironmentObject var inboxVM: InboxViewModel
     @State private var phoneNumber = ""
     @State private var verificationCode = ""
     @FocusState private var isPhoneNumberFocused: Bool
@@ -25,7 +27,7 @@ struct NumberScreen: View {
             
             VStack(spacing: 24) {
                 Spacer()
-                
+        
                 Text(authVM.isVerificationCodeSent ? "Enter verification\ncode" : "What's your phone\nnumber?")
                     .sfPro(type: .bold, size: .h1)
                     .foregroundColor(.white)
@@ -80,6 +82,7 @@ struct NumberScreen: View {
                         Text(authVM.errorString)
                             .sfPro(type: .semibold, size: .p2)
                             .foregroundColor(.red)
+                            .multilineTextAlignment(.center)
                     }
                     
                     HStack(spacing: 4) {
@@ -98,28 +101,62 @@ struct NumberScreen: View {
                                     Analytics.shared.log(event: "NumberScreen: Tapped Resend")
                                     authVM.resendVerificationCode()
                                     sendVerificationCode()
-                                    
                                 }
                             }
                     }
                 }
                 
                 Spacer()
-                
+                 
                 SharedComponents.PrimaryButton(
                     title: authVM.isVerificationCodeSent ? "Verify" : "Next",
                     action: {
                         if !authVM.isVerificationCodeSent {
+//                            verificationCode = "333333"
+//                            verifyCode()
+//                            mainVM.currUser?.fcmToken = UserDefaults.standard.string(forKey: "fcmToken") ?? ""
+//                            let formattedNumber = "+1\(phoneNumber)"
+//                            if var user = mainVM.currUser {
+//                                mainVM.currUser?.number = formattedNumber
+//                                user.number = formattedNumber
+//                            }
+                            //                            UserDefaults.standard.setValue(formattedNumber, forKey: "userNumber")
+
+//                            UserDefaults.standard.setValue(true, forKey: "finishedOnboarding")
+//                            if authVM.tappedLogin {
+//                                Task {
+//                                    isLoading = true
+//                                    await mainVM.fetchUser()
+//                                    if let user = mainVM.currUser, user.username != "naveedjohnmo" {
+//                                        async let notifications = inboxVM.fetchNotifications(for: user)
+//                                        async let peopleList = profileVM.fetchPeopleList(user: user)
+//                                        async let profilePic = profileVM.fetchUserProfilePicture(user: user)
+//                                        _ = await (notifications, peopleList, profilePic)
+//                                        await pollVM.fetchPolls(for: user)
+//                                        pollVM.entireSchool = profileVM.peopleList
+//                                        mainVM.currentPage = .poll
+//                                        authVM.tappedLogin = false
+//                                        let fcmToken = UserDefaults.standard.string(forKey: "fcmToken") ?? ""
+//                                        do {
+//                                            try await FirebaseService.shared.updateField(collection: "users", documentId: user.id, field: "fcmToken", value: fcmToken)
+//                                        } catch {
+//                                            print(error.localizedDescription)
+//                                        }
+//                                        isLoading = false
+//                                    }
+//                                }
+//                            }
                             sendVerificationCode()
                         } else {
                             verifyCode()
+                        
                         }
                     }
                 )
                 .padding(.horizontal, 24)
                 .padding(.bottom, 32)
                 .disabled(authVM.isVerificationCodeSent ? verificationCode.count != 6 : phoneNumber.count != 10)
-                .opacity(!authVM.isVerificationCodeSent && phoneNumber.count != 10 ? 0.5 : 1)
+                .opacity((!authVM.isVerificationCodeSent && phoneNumber.count != 10) || (authVM.isVerificationCodeSent && verificationCode.count != 6) ? 0.5 : 1)
             }
             .overlay(
                 Group {
@@ -152,6 +189,9 @@ struct NumberScreen: View {
         }
         .onAppear {
             isPhoneNumberFocused = true
+        }
+        .onDisappear {
+            authVM.isVerificationCodeSent = false
         }
     }
     
@@ -191,50 +231,58 @@ struct NumberScreen: View {
                     isVerifying = false
                     switch result {
                     case .success(let authResult):
-                        
-                        FirebaseService.getUser { result in
-                            switch result {
-                                
-                            case .failure(let error):
-                                if let referrerUsername = UserDefaults.standard.string(forKey: "referrerUsername") {
-                                    FirebaseService.shared.incrementReferralCount(forUsername: referrerUsername) { result in
-                                        switch result {
-                                        case .success():
-                                            print("Referral count incremented successfully.")
-                                        case .failure(let error):
-                                            print("Failed to increment referral count: \(error.localizedDescription)")
-                                        }
-                                    }
-                                }
-                            case .success(let user):
-                                UserDefaults.standard.set("", forKey: "referrerUsername")
-
-                                print(#function)
-                            }
-                            
+                        if authVM.tappedLogin {
+                            loginUser()
+                        } else {
+                            authVM.updateReferralCount()
                             FirebaseService.shared.addDocument(user, collection: "users") { str in
+                                UserDefaults.standard.setValue(user.id, forKey: Constants.userId)
                                 authVM.signInSuccessful = true
                                 authVM.isVerified = true
-                                Task {
-                                    if let user = mainVM.currUser {
-                                        await pollVM.fetchPolls(for: user)
-                                    }
-                                }
                                 withAnimation {
-                                    mainVM.onboardingScreen = .gender
+                                    mainVM.onboardingScreen = .uploadProfile
                                 }
+                                
                                 print("Successfully verified and signed in: \(authResult.user.uid)")
-        
                             }
                         }
-                        
-                        
                     case .failure(let error):
                         authVM.errorString = error.localizedDescription
                         showError = true
                         print("Error verifying code: \(error.localizedDescription)")
                     }
                 }
+            }
+        }
+    }
+    
+    func loginUser() {
+        Task {
+            isLoading = true
+            UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+                if let error = error {
+                    print("Error requesting notification authorization: \(error)")
+                } else {
+                    print("Notification authorization granted: \(granted)")
+                }
+            }
+            await mainVM.fetchUser()
+            UserDefaults.standard.setValue(true, forKey: "finishedOnboarding")
+            if let user = mainVM.currUser, user.username != "naveedjohnmo" {
+                async let notifications = inboxVM.fetchNotifications(for: user)
+                async let peopleList = profileVM.fetchPeopleList(user: user)
+                async let profilePic = profileVM.fetchUserProfilePicture(user: user)
+                _ = await (notifications, peopleList, profilePic)
+                let fcmToken = UserDefaults.standard.string(forKey: "fcmToken") ?? ""
+                do {
+                    try await FirebaseService.shared.updateField(collection: "users", documentId: user.id, field: "fcmToken", value: fcmToken)
+                } catch {
+                    print(error.localizedDescription)
+                }
+                pollVM.entireSchool = profileVM.peopleList
+                isLoading = false
+                mainVM.currentPage = .poll
+                authVM.tappedLogin = false
             }
         }
     }

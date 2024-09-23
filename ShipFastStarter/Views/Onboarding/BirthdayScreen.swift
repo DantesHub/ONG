@@ -6,12 +6,14 @@
 //
 
 import SwiftUI
+import UIKit
 
 struct BirthdayScreen: View {
 
     @EnvironmentObject var mainVM: MainViewModel
     @State private var birthdate = Date()
     @State private var yearsOld = 0
+    
     var body: some View {
         ZStack {
             Color.primaryBackground.edgesIgnoringSafeArea(.all)
@@ -19,11 +21,12 @@ struct BirthdayScreen: View {
             VStack(spacing: 24) {
                 Spacer()
                 
-                Text("How old are you?")
+                Text("what's ur age?")
                     .sfPro(type: .bold, size: .h1)
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
                 Spacer()
+                
                 DatePicker("", selection: $birthdate, displayedComponents: .date)
                     .datePickerStyle(WheelDatePickerStyle())
                     .labelsHidden()
@@ -31,8 +34,6 @@ struct BirthdayScreen: View {
                     .cornerRadius(16)
                     .stroke(color: .black, width: 3)
                     .padding(.horizontal)
-//                    .primaryShadow()
-
                 Spacer()
 
                 Text("you are \(calculateAge()) years old")
@@ -40,11 +41,9 @@ struct BirthdayScreen: View {
                     .foregroundColor(.white)
                     .padding()
                 
-                
                 SharedComponents.PrimaryButton(
                     title: "Continue",
                     action: {
-                        // Handle continue action
                         mainVM.currUser?.birthday = birthdate.toString()
                         print("Selected birthday: \(formattedDate)")
                         Analytics.shared.log(event: "BirthdayScreen: Tapped Continue")
@@ -54,8 +53,15 @@ struct BirthdayScreen: View {
                 .padding(.horizontal, 24)
                 .padding(.bottom, 32)
             }
+        }.onAppear {
+//            if let transparentView = datePicker.subviews.first {
+//                for subview in transparentView.subviews {
+//                    print(String(describing: subview)) // Log subview hierarchy
+//                }
+//            }
         }
     }
+    
     private func calculateAge() -> Int {
         let calendar = Calendar.current
         let ageComponents = calendar.dateComponents([.year], from: birthdate, to: Date())
@@ -69,14 +75,11 @@ struct BirthdayScreen: View {
     }
 }
 
-struct BirthdayScreen_Previews: PreviewProvider {
-    static var previews: some View {
-        BirthdayScreen()
-    }
-}
+
 
 #Preview {
     BirthdayScreen()
+        .environmentObject(MainViewModel())
 }
 
 

@@ -8,7 +8,7 @@
 import SwiftData
 import Foundation
 
-struct HighSchool: Codable, Equatable, Identifiable, FBObject {
+struct Highschool: Codable, Equatable, Identifiable, FBObject {
     let id: String
     var name: String
     var location: String
@@ -33,7 +33,7 @@ struct HighSchool: Codable, Equatable, Identifiable, FBObject {
         self.county = county
     }
 
-    static var exHighSchool = HighSchool(
+    static var exHighSchool = Highschool(
         id: "highschoolId",
         name: "buildspace",
         location: "Example City, State",
@@ -46,7 +46,7 @@ struct HighSchool: Codable, Equatable, Identifiable, FBObject {
         county: "Example County"
     )
 
-    static func == (lhs: HighSchool, rhs: HighSchool) -> Bool {
+    static func == (lhs: Highschool, rhs: Highschool) -> Bool {
         return lhs.id == rhs.id
     }
 

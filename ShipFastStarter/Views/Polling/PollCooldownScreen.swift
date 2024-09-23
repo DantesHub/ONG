@@ -12,9 +12,18 @@ import FacebookShare
 struct PollCooldownScreen: View {
     @Environment(\.presentationMode) var presentationMode
     @EnvironmentObject var pollVM: PollViewModel
+    @EnvironmentObject var profileVM: ProfileViewModel
     @EnvironmentObject var mainVM: MainViewModel
     @State private var timer: Timer?
-
+    @State private var showShareSheet = false
+    
+    let columns = [
+        GridItem(.flexible(), spacing: -24),
+        GridItem(.flexible(), spacing: -24),
+        GridItem(.flexible(), spacing: -24),
+        GridItem(.flexible(), spacing: -24)
+    ]
+    
     var body: some View {
         Group {
             if pollVM.completedPoll {
@@ -24,54 +33,81 @@ struct PollCooldownScreen: View {
                 ZStack {
                     Color.primaryBackground.ignoresSafeArea()
                     VStack(spacing: 0) {
-                        Text("new polls in")
-                            .sfPro(type: .bold, size: .h1)
-                            .foregroundColor(.white)
-                        Text("\(pollVM.timeRemainingString())")
-                            .sfPro(type: .bold, size: .title)
-                            .foregroundColor(.white)
-                            .multilineTextAlignment(.center)
-                        
-                            Text("--- or ---")
-                                .sfPro(type: .semibold, size: .h2)
-                                .foregroundColor(.white.opacity(0.5))
-                                .padding(.vertical, 32)
+                        if pollVM.isNewPollReady && pollVM.cooldownEndTime == nil {
+                            Text("new polls are\navailable!")
+                                .sfPro(type: .bold, size: .h1)
+                                .foregroundColor(.white)
+                                .padding(.top, 16)
+                                .multilineTextAlignment(.center)
+                            
+                            Spacer()
+                            VStack(spacing: 16) {
+                                SharedComponents.PrimaryButton(
+                                    title: "Start",
+                                    action: {
+                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                        withAnimation {
+//                                            fatalError("Crash was triggered")
+                                            pollVM.isNewPollReady = false
+                                            mainVM.currentPage = .poll
+                                            Analytics.shared.log(event: "PollCooldown: Tapped Start")
+                                        }
+                                    }
+                                )
+                            }
+                            .padding(.horizontal, 24)
+                        } else {
+                            Text("new polls in")
+                                .sfPro(type: .bold, size: .h1)
+                                .foregroundColor(.white)
+                                .padding(.top, 16)
+                            Text("\(pollVM.timeRemainingString())")
+                                .sfPro(type: .bold, size: .title)
+                                .foregroundColor(.white)
+                                .multilineTextAlignment(.center)
+                            
+                                Text("--- or ---")
+                                    .sfPro(type: .semibold, size: .h2)
+                                    .foregroundColor(.white.opacity(0.5))
+                                    .padding(.vertical, 32)
+                            VStack(spacing: 16) {
+                                Text("skip the wait!")
+                                    .sfPro(type: .semibold, size: .h2)
+                                    .foregroundColor(.white)
+                                SharedComponents.PrimaryButton(
+                                    title: "Invite a friend",
+                                    action: {
+                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                        withAnimation {
+                                            showShareSheet = true
+                                             createDynamicLink(username: mainVM.currUser?.username ?? "") { url in
+                                                guard let url = url else { return }
+                                                let image = UIImage(named: "AppIcon")
+                                                let content = "I'm inviting you to download and install the ong app"
+                                                
+                                                let activityVC = UIActivityViewController(activityItems: [ url, TestView().snapshot(), content], applicationActivities: nil)
+                                                
+                                                activityVC.setValue("ONG", forKey: "subject")
+                                                
+                                                UIApplication.shared.windows.first?.rootViewController?.present(activityVC, animated: true, completion: nil)                                                
+                                            }
+                                        }
+                                    }
+                                )
+                            }
+                            .padding(.horizontal, 24)
+                        }
+                   
                         
 
-                        VStack(spacing: 16) {
-                            Text("skip the wait!")
+                  
+                        Spacer()
+
+                        VStack {
+                            Text("aura leaders (today)")
                                 .sfPro(type: .semibold, size: .h2)
                                 .foregroundColor(.white)
-                            SharedComponents.PrimaryButton(
-                                title: "Invite a friend",
-                                action: {
-                                    createDynamicLink(username: mainVM.currUser?.username ?? "") { url in
-                                        guard let url = url else { return }
-                                        let image = UIImage(named: "AppIcon")
-                                        let content = "I'm inviting you to download and install the ong app"
-                                        
-                                        let activityVC = UIActivityViewController(activityItems: [ url, TestView().snapshot(), content], applicationActivities: nil)
-                                        
-                                        activityVC.setValue("ONG", forKey: "subject")
-                                        
-                                        UIApplication.shared.windows.first?.rootViewController?.present(activityVC, animated: true, completion: nil)
-                                        
-                                    }
-                                }
-                            )
-                            TestView()
-                            SharedComponents.PrimaryButton(
-                                title: "share on facebook",
-                                action: {
-                                     createDynamicLink(username: mainVM.currUser?.username ?? "") { url in
-                                        guard let url = url else { return }
-                                        
-                                        let content = "I'm inviting you to download and install the ong app"
-                                        shareToFacebook(quote: content, url: url)
-                                     
-                                    }
-                                }
-                            )
+                                
                             SharedComponents.PrimaryButton(
                                 title: "share on instagram",
                                 action: {
@@ -82,22 +118,77 @@ struct PollCooldownScreen: View {
 //                                         let image = TestView().snapshot()
 //                                         let image = UIImage(named: "temp")
                                          shareToInstagramStories(TestView().snapshot())
-                                       
-                                    }
+                                     }     
                                 }
                             )
+                            .padding(.top, 32)
+
+                            LazyVGrid(columns: columns, spacing: 24) {
+                                ForEach(profileVM.topEight.prefix(8), id: \.id) { user in
+                                    ZStack {
+                                        if let url = URL(string: user.proPic), !user.proPic.isEmpty {
+                                            CachedAsyncImage(url: url) { phase in
+                                                switch phase {
+                                                case .success(let image):
+                                                    image
+                                                        .resizable()
+                                                        .scaledToFill()
+                                                        .frame(width: 64, height: 64)
+                                                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                                                case .failure:
+                                                    Image(systemName: "person.fill")
+                                                        .resizable()
+                                                        .scaledToFit()
+                                                        .frame(width: 56, height: 56)
+                                                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                                                case .empty:
+                                                    ProgressView()
+                                                @unknown default:
+                                                    EmptyView()
+                                                }
+                                            }
+                                            .frame(width: 64, height: 64)
+                                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                                        } else {
+                                            Image(systemName: "person.fill")
+                                                .font(.system(size: 40))
+                                                .foregroundColor(.gray)
+                                        }
+                                  
+                                        RoundedRectangle(cornerRadius: 16)
+                                            .fill(.clear)
+                                            .overlay(
+                                                RoundedRectangle(cornerRadius: 16)
+                                                    .stroke(Color.black.opacity(1), lineWidth: 4)
+                                                    .padding(1)
+                                                    .mask(RoundedRectangle(cornerRadius: 16))
+                                            )
+                                    }
+                                    .frame(width: 64, height: 64)
+                                    .cornerRadius(16)
+                                    .primaryShadow()
+                                    .rotationEffect(.degrees(-8))
+                                    .onTapGesture {
+                                        Analytics.shared.log(event: "PollCooldown: leaderboard tapped profile")
+                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                        withAnimation {
+                                            profileVM.visitedUser = user
+                                            profileVM.isVisitingUser = true
+                                        }
+                                    }
+                                }
+                            }
+                            .padding(.vertical)
                         }
-                        .padding(.horizontal, 24)
                         
-                        // HStack(spacing: 24) {
-                        //     ForEach(["🔥", "😂", "😍", "👀", "💯"], id: \.self) { emoji in
-                        //         Text(emoji)
-                        //             .font(.system(size: 40))
-                        //     }
-                        // }
-                        // .padding(.bottom, 32)
+                        Spacer()
+                        Spacer()
                     }
-                    .padding(.top, 64)
+                    .padding(.top, 42)
+                }  .sheet(isPresented: $showShareSheet) {
+                    InviteFriendsModal()
+                        .presentationDetents([.height(300)])
+                        .presentationDragIndicator(.visible)
                 }
             }
        
@@ -207,6 +298,9 @@ struct PollCooldownScreen_Previews: PreviewProvider {
     static var previews: some View {
         PollCooldownScreen()
             .environmentObject(PollViewModel())
+            .environmentObject(MainViewModel())
+            .environmentObject(ProfileViewModel())
+
     }
 }
 

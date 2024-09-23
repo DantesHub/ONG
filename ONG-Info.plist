@@ -35,6 +35,21 @@
 	<string>We&apos;d like to access your photo library so you can choose existing photos for your pro pic. This allows you to personalize your profile with your favorite images.&quot;</string>
 	<key>NSCameraUsageDescription</key>
 	<string>We need access to your camera to let you take profile pictures directly in the app</string>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>io.background.task.1</string>
+	</array>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>app-1-403676286516-ios-2038c1f12688aeee588461</string>
+			</array>
+		</dict>
+	</array>
 	<key>FirebaseAppDelegateProxyEnabled</key>
 	<false/>
 	<key>NSLocationDefaultAccuracyReduced</key>

@@ -31,12 +31,11 @@ struct LocationScreen: View {
     
     var body: some View {
         VStack {
-            Spacer()
-            
             Text("how it works")
                 .sfPro(type: .bold, size: .h1)
                 .foregroundColor(.white)
                 .multilineTextAlignment(.center)
+                .padding(.top, 56)
             Spacer()
             VStack(alignment: .leading, spacing: 24){
                 Text("1.  join your school 🏫")
@@ -79,8 +78,8 @@ struct LocationScreen: View {
                 // Handle denied or restricted access
                 print("Location access denied or restricted")
                 // You might want to show an alert or navigate to a different screen
-                DispatchQueue.main.async {
-                    mainVM.onboardingScreen = .grade // Navigate to the next screen even if denied
+                withAnimation {
+                    mainVM.onboardingScreen = .name // Navigate to the next screen even if denied
                 }
             }
         }
@@ -90,14 +89,14 @@ struct LocationScreen: View {
         switch locationManager.accuracyAuthorization {
         case .fullAccuracy:
             print("Full accuracy granted")
-            DispatchQueue.main.async {
-                mainVM.onboardingScreen = .grade // Navigate to the next screen
+           withAnimation {
+                mainVM.onboardingScreen = .name // Navigate to the next screen
             }
         case .reducedAccuracy:
             locationManager.requestTemporaryFullAccuracyAuthorization(purposeKey: "FindNearbySchools")
             // You might want to wait for the result of this request before navigating
-            DispatchQueue.main.async {
-                mainVM.onboardingScreen = .grade // Navigate to the next screen
+            withAnimation {
+                mainVM.onboardingScreen = .name // Navigate to the next screen
             }
         case .none:
             print("Accuracy authorization not determined")
