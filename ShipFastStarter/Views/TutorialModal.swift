@@ -10,9 +10,9 @@ import SwiftUI
 
 struct TutorialModal: View {
     @Binding var isPresented: Bool
-    @State private var currentSlide: Int = 1
-    @State private var totalSlides: Int = 3 // Adjust this based on the number of tutorial slides
-    @State private var isFeed = false
+    @State private var currentSlide: Int = 0
+    @State private var totalSlides: Int = 5 // Adjust this based on the number of tutorial slides
+    var isFeed = false
     
     
     var body: some View {
@@ -33,8 +33,6 @@ struct TutorialModal: View {
                 
                 // Tutorial content
                 if isFeed {
-                    
-                } else {
                     Group {
                         switch currentSlide {
                         case 0:
@@ -45,9 +43,26 @@ struct TutorialModal: View {
                             EmptyView()
                         }
                     }
+                } else {
+                    Group {
+                        switch currentSlide {
+                        case 0:
+                            onboardingSlideOne
+                        case 1:
+                            onboardingSlideTwo
+                        case 2:
+                            onboardingSlideThree
+                        case 3:
+                            onboardingSlideFour
+                        case 4:
+                            onboardingSlideFive
+                        default:
+                            EmptyView()
+                        }
+                    }
 
                 }
-                
+               
                 
                 // Navigation buttons
                 HStack {
@@ -58,13 +73,18 @@ struct TutorialModal: View {
 //                        }
 //                    }
 //                    
-                    SharedComponents.PrimaryButton(title: currentSlide == totalSlides - 1 ? isFeed ? "see feed" : "Finish" : "next", isTutorial: true) {
+                    SharedComponents.PrimaryButton(title: currentSlide == totalSlides - 1 ? isFeed ? "see feed" : isFeed ? "see ur feed" : "Finish" : "next", isTutorial: true) {
                         if currentSlide < totalSlides - 1 {
                             currentSlide += 1
                             Analytics.shared.log(event: "TutorialModal: Tapped Next")
                         } else {
-                            isPresented = false
+                            if isFeed {
+                                UserDefaults.standard.setValue(true, forKey: Constants.finishedFeedTutorial)
+                            } else {
+                                UserDefaults.standard.setValue(true, forKey: Constants.finishedPollTutorial)
+                            }
                             Analytics.shared.log(event: "TutorialModal: Finished Tutorial")
+                            isPresented.toggle()
                         }
                     }
                 }
@@ -73,7 +93,225 @@ struct TutorialModal: View {
             .padding(.horizontal, 32)
         }
         .presentationDetents([.height(450)])
+        .onAppear {
+            if isFeed {
+                totalSlides = 2
+            } else {
+                totalSlides = 5
+            }
+        }
     }
+    
+    var onboardingSlideOne: some View {
+        VStack(alignment: .center, spacing: 24) {
+            Spacer()
+            Text("welcome to your\nfirst poll.")
+                .multilineTextAlignment(.center)
+                .sfPro(type: .bold, size: .h1)
+                .foregroundColor(.black)
+            Text("let's go over a few key things\nso you have a good idea\nwhat's going on.")
+                .sfPro(type: .medium, size: .h3p1)
+                .foregroundColor(.black.opacity(0.5))
+                .multilineTextAlignment(.center)
+            Spacer()
+        }
+    }
+    
+    var onboardingSlideTwo: some View {
+        VStack(alignment: .leading, spacing: 20) {
+            HStack(spacing: 24) {
+                ZStack {
+                    Circle()
+                        .fill(Color.white)
+                        .stroke(Color(.black), lineWidth: 2)
+                        .padding(3)
+                    Text("1")
+                        .font(.system(size: 16))
+                        .foregroundColor(.black)
+                }
+                .frame(width: 40, height: 40)
+                .drawingGroup()
+                .shadow(color: Color.black, radius: 0, x: 0, y: 3)
+                .rotationEffect(.degrees(-12))
+                Text("polls are created to spread positivity + good vibes")
+                    .multilineTextAlignment(.leading)
+                    .sfPro(type: .bold, size: .h3p1)
+                    .foregroundColor(.black)
+            }
+            HStack(spacing: 24) {
+                ZStack {
+                    Circle()
+                        .fill(Color.white)
+                        .stroke(Color(.black), lineWidth: 2)
+                        .padding(3)
+                    Text("2")
+                        .font(.system(size: 16))
+                        .foregroundColor(.black)
+
+                }
+                .frame(width: 40, height: 40)
+                .drawingGroup()
+                .shadow(color: Color.black, radius: 0, x: 0, y: 3)
+                .rotationEffect(.degrees(-12))
+                Text("the options are populated randomly ")
+                    .multilineTextAlignment(.leading)
+                    .sfPro(type: .bold, size: .h3p1)
+                    .foregroundColor(.black)
+            }
+            HStack(spacing: 24) {
+                ZStack {
+                    Circle()
+                        .fill(Color.white)
+                        .stroke(Color(.black), lineWidth: 2)
+                        .padding(3)
+                    Text("3")
+                        .font(.system(size: 16))
+                        .foregroundColor(.black)
+
+                }
+                .frame(width: 40, height: 40)
+                .drawingGroup()
+                .shadow(color: Color.black, radius: 0, x: 0, y: 3)
+                .rotationEffect(.degrees(-12))
+                Text("you earn 🍞 bread and \n🔮 aura for finishing polls!")
+                    .multilineTextAlignment(.leading)
+                    .sfPro(type: .bold, size: .h3p1)
+                    .foregroundColor(.black)
+            }
+            HStack(spacing: 24) {
+                ZStack {
+                    Circle()
+                        .fill(Color.white)
+                        .stroke(Color(.black), lineWidth: 2)
+                        .padding(3)
+                    Text("4")
+                        .font(.system(size: 16))
+                        .foregroundColor(.black)
+
+                }
+                .frame(width: 40, height: 40)
+                .drawingGroup()
+                .shadow(color: Color.black, radius: 0, x: 0, y: 3)
+                .rotationEffect(.degrees(-12))
+                Text("answers are anonymous")
+                    .multilineTextAlignment(.leading)
+                    .sfPro(type: .bold, size: .h3p1)
+                    .foregroundColor(.black)
+            }.padding(.bottom)
+            
+        }
+    }
+    
+     
+    var onboardingSlideFour: some View {
+        VStack(alignment: .center, spacing: 20) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(Color.white)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16)
+                            .stroke(Color.black.opacity(1), lineWidth: 5)
+                            .padding(1)
+                            .mask(RoundedRectangle(cornerRadius: 16))
+                    )
+                Image(systemName: "forward.fill")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 42, height: 42)
+                    .foregroundColor(Color.black)
+            }.frame(width: 72, height: 72)
+                .primaryShadow()
+                .rotationEffect(.degrees(-16))
+                .padding(.bottom)
+            Text("skip")
+                .multilineTextAlignment(.center)
+                .sfPro(type: .bold, size: .h1)
+                .foregroundColor(.black)
+            Text("don't want to answer a question? just hit skip to go to the next question. can't go back to it tho!")
+                .sfPro(type: .medium, size: .h3p1)
+                .foregroundColor(.black.opacity(0.5))
+                .multilineTextAlignment(.center)
+        }
+    }
+
+    
+    var onboardingSlideThree: some View {
+        VStack(alignment: .center, spacing: 20) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(Color.white)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16)
+                            .stroke(Color.black.opacity(1), lineWidth: 5)
+                            .padding(1)
+                            .mask(RoundedRectangle(cornerRadius: 16))
+                    )
+                Image(systemName: "shuffle")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 42, height: 42)
+                    .foregroundColor(Color.black)
+            }.frame(width: 72, height: 72)
+                .primaryShadow()
+                .rotationEffect(.degrees(-16))
+                .padding(.bottom)
+            Text("shuffle")
+                .multilineTextAlignment(.center)
+                .sfPro(type: .bold, size: .h1)
+                .foregroundColor(.black)
+            Text("don't think any of the options fit? \nhit shuffle to get new ones. you can do this 2x for every question!")
+                .sfPro(type: .medium, size: .h3p1)
+                .foregroundColor(.black.opacity(0.5))
+                .multilineTextAlignment(.center)
+        }
+    }
+    
+    
+    var onboardingSlideFive: some View {
+        VStack(alignment: .center, spacing: 16) {
+            Spacer()
+            Text("❤️")
+                .multilineTextAlignment(.center)
+                .sfPro(type: .bold, size: .title)
+                .foregroundColor(.black)
+            Text("have fun!")
+                .multilineTextAlignment(.center)
+                .sfPro(type: .bold, size: .h1)
+                .foregroundColor(.black)
+            Text("polls reset every 6 hours.\nspread good vibes & give ur\nhomies some aura.")
+                .sfPro(type: .medium, size: .h3p1)
+                .foregroundColor(.black.opacity(0.5))
+                .multilineTextAlignment(.center)
+            Spacer()
+        }
+    }
+
+    private func bubbleView(for index: Int) -> some View {
+        ZStack {
+            Circle()
+                .fill(randomColor(for: index))
+                .overlay(
+                    Circle()
+                        .stroke(Color.black, lineWidth: 3)
+                )
+            Text(randomEmoji(for: index))
+                .font(.system(size: 32))
+        }
+        .frame(width: 64, height: 64)
+        .shadow(color: Color.black, radius: 0, x: 0, y: 2)
+    }
+
+    // Helper functions to generate random colors and emojis
+    private func randomColor(for index: Int) -> Color {
+        let colors: [Color] = [.red, .green, .blue, Color("lightPurple")]
+        return colors[index % colors.count]
+    }
+
+    private func randomEmoji(for index: Int) -> String {
+        let emojis = ["👦", "👧", "👨", "👩"]
+        return emojis[index % emojis.count]
+    }
+
     
     var firstSlideContent: some View {
         VStack(spacing: 12) {
@@ -103,7 +341,7 @@ struct TutorialModal: View {
                             .stroke(Color.black.opacity(0.1), lineWidth: 8)
                     )
                     .cornerRadius(8)
-                    .rotationEffect(.degrees(32))
+                    .rotationEffect(.degrees(24))
                 
                 Text("👦🏼")
                     .font(.system(size: 40))
@@ -115,7 +353,7 @@ struct TutorialModal: View {
                             .stroke(Color.black.opacity(0.1), lineWidth: 8)
                     )
                     .cornerRadius(8)
-                    .rotationEffect(.degrees(32))
+                    .rotationEffect(.degrees(24))
                 
                 Text("👧🏼")
                     .font(.system(size: 40))
@@ -127,7 +365,7 @@ struct TutorialModal: View {
                             .stroke(Color.black.opacity(0.1), lineWidth: 8)
                     )
                     .cornerRadius(8)
-                    .rotationEffect(.degrees(32))
+                    .rotationEffect(.degrees(24))
                 
                 Text("👦🏼")
                     .font(.system(size: 40))
@@ -139,31 +377,21 @@ struct TutorialModal: View {
                             .stroke(Color.black.opacity(0.1), lineWidth: 8)
                     )
                     .cornerRadius(8)
-                    .rotationEffect(.degrees(32))
+                    .rotationEffect(.degrees(24))
             }
             Text("you'll also see\nthese icons")
                 .sfPro(type: .bold, size: .h1)
                 .multilineTextAlignment(.center)
                 .foregroundColor(.black)
                 .padding(.top)
-            Text("maybe they mean something.\nmaybe they don’t...")
+            Text("maybe they mean something.\nmaybe they don't...")
                 .sfPro(type: .medium, size: .h3p1)
                 .foregroundColor(.black.opacity(0.5))
                 .multilineTextAlignment(.center)
         }
     }
     
-    var thirdSlideContent: some View {
-        VStack(spacing: 20) {
-            Text("connect with friends")
-                .sfPro(type: .bold, size: .h1)
-                .foregroundColor(.black)
-            Text("add friends, chat, and see what they're up to in real-time!")
-                .sfPro(type: .medium, size: .h3p1)
-                .foregroundColor(.black.opacity(0.5))
-                .multilineTextAlignment(.center)
-        }
-    }
+
 }
 
 #Preview {

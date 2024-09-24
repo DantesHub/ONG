@@ -4,7 +4,7 @@ struct FeedScreen: View {
     @EnvironmentObject var feedVM: FeedViewModel
     @EnvironmentObject var mainVM: MainViewModel
     @EnvironmentObject var profileVM: ProfileViewModel
-
+    @State private var displayTutorial = false
     @State private var scrollOffset: CGFloat = 0
     
     var body: some View {
@@ -56,6 +56,17 @@ struct FeedScreen: View {
                     }
                 }
             }
+        }.onAppear {
+            if !UserDefaults.standard.bool(forKey: Constants.finishedFeedTutorial) && mainVM.currentPage == .feed {
+                displayTutorial = true
+            }
+        }.onChange(of: mainVM.currentPage) {
+            if !UserDefaults.standard.bool(forKey: Constants.finishedFeedTutorial) && mainVM.currentPage == .feed {
+                displayTutorial = true
+            }
+        }
+        .sheet(isPresented: $displayTutorial) {
+            TutorialModal(isPresented: $displayTutorial, isFeed: true)
         }
     }
     

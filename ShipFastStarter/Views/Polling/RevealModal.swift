@@ -17,7 +17,7 @@ struct RevealModal: View {
     @State private var notEnoughBread = false
     @State private var revealLetter = false
     @State private var revealFullName = false
-    @State private var revealShield = true
+    @State private var revealShield = false
 
   var body: some View {
       ZStack {

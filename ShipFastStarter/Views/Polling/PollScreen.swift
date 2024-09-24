@@ -34,6 +34,7 @@ struct PollScreen: View {
     @State private var emojiShootingStage: EmojiShootingStage = .initial
     @State private var stagedEmojiIndex: Int = 0
     @State private var lastEmojiChangeCount: Int = 0
+    @State private var displayTutorial: Bool = false
 
     let emojiList = ["🔥", "❤️‍🔥", "🌈", "✨", "💖", "🚀", "⚡️", "🎉", "🥹", "💫", "🙀"]
 
@@ -170,19 +171,14 @@ struct PollScreen: View {
                                                 ZStack {
                                                     Circle()
                                                         .fill(Color(person.1 ))
-                                                        .stroke(Color(.black), lineWidth: 1)
-                                                        .overlay(
-                                                            Circle()
-                                                                .stroke(Color.black.opacity(1), lineWidth: 1)
-                                                                .padding(1)
-                                                                .mask(RoundedRectangle(cornerRadius: 20))
-                                                        )
-                                                        .frame(width: 36, height: 36)
-                                                        .drawingGroup()
-                                                        .shadow(color: Color.black, radius: 0, x: 0, y: 2)
+                                                        .stroke(Color(.black), lineWidth: 1.5)
+                                                        .padding(3)
                                                     Text("\(person.0 == "boy" ? "👦" : "👧")")
                                                         .font(.system(size: 16))
                                                 }
+                                                .frame(width: 40, height: 40)
+                                                .drawingGroup()
+                                                .shadow(color: Color.black, radius: 0, x: 0, y: 2)
                                             }
                                         }
                                         .padding(.horizontal, 4)
@@ -193,7 +189,9 @@ struct PollScreen: View {
                                             .sfPro(type: .medium, size: .p3)
                                             .font(.system(size: 14, weight: .medium))
                                             .foregroundColor(.black)
+                                        
                                     }
+                                    
 
                                 }.offset(y: 6)
 
@@ -235,6 +233,7 @@ struct PollScreen: View {
                     Text("No more polls available")
                         .font(.title)
                         .foregroundColor(.white)
+     
                 }
             }
             
@@ -243,7 +242,7 @@ struct PollScreen: View {
                 Text(particle.emoji)
                     .font(.system(size: 50))
                     .position(particle.position)
-            }
+                }
             // Counter display
             if isLongPressing {
                 Text("\(counter)")
@@ -254,6 +253,10 @@ struct PollScreen: View {
                     .padding(8)
                     .cornerRadius(8)
                     .position(x: activeButtonPosition.x, y: activeButtonPosition.y - 100)
+            }
+            if displayTutorial {
+                Color.black.edgesIgnoringSafeArea(.all)
+                    .opacity(0.7)
             }
           
         }
@@ -266,6 +269,12 @@ struct PollScreen: View {
         }
         .onAppear {          
             startEmojiAnimation()
+            if !UserDefaults.standard.bool(forKey: Constants.finishedPollTutorial) {
+                displayTutorial = true
+            }
+        }
+        .sheet(isPresented: $displayTutorial) {
+            TutorialModal(isPresented: $displayTutorial, isFeed: false)
         }
         .onDisappear {
             stopShootingEmojis()

@@ -400,6 +400,7 @@ struct ContentView: View {
     }
     
     private func navigateLeft() {
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
         withAnimation {
             switch mainVM.currentPage {
             case .inbox:
@@ -421,6 +422,7 @@ struct ContentView: View {
     }
     
     private func navigateRight() {
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
         withAnimation {
             switch mainVM.currentPage {
             case .profile:

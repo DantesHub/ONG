@@ -41,7 +41,6 @@ class FeedViewModel: ObservableObject {
     }
 
     func fetchNextPage() {
-        guard hasMoreData else { return }
         
         let startIndex = currentPage * pageSize
         let endIndex = min(startIndex + pageSize, allPolls.count)

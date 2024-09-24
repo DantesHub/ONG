@@ -267,6 +267,8 @@ struct NumberScreen: View {
                 }
             }
             await mainVM.fetchUser()
+            UserDefaults.standard.setValue(true, forKey: Constants.finishedFeedTutorial)
+            UserDefaults.standard.setValue(true, forKey: Constants.finishedPollTutorial)
             UserDefaults.standard.setValue(true, forKey: "finishedOnboarding")
             if let user = mainVM.currUser, user.username != "naveedjohnmo" {
                 async let notifications = inboxVM.fetchNotifications(for: user)
