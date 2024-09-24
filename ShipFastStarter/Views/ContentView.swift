@@ -305,6 +305,7 @@ struct ContentView: View {
             FeedScreen()
                 .environmentObject(feedVM)
                 .environmentObject(mainVM)
+                .environmentObject(profileVM)
         case .onboarding:
             OnboardingView()
                 .environmentObject(authVM)

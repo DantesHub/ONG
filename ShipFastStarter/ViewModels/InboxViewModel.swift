@@ -123,7 +123,8 @@ class InboxViewModel: ObservableObject {
                                             backgroundColor: Color(usr.color),
                                             accompanyingPoll: poll,
                                             pollOption: option,
-                                            isNew: notificationStatus
+                                            isNew: notificationStatus,
+                                            shields: usr.shields
                                         )
                                         if voteInfo["viewedNotification"] == "false" {
                                             newVotes.append(newInboxItem)

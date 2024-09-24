@@ -109,6 +109,7 @@ struct InboxItem: Identifiable {
     let accompanyingPoll: Poll
     let pollOption: PollOption
     let isNew: Bool
+    let shields: Int
 }
 
 struct InboxItemView: View {

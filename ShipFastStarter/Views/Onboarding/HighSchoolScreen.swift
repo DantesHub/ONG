@@ -65,9 +65,9 @@ struct HighSchoolScreen: View {
                                     } catch {
                                         print(error.localizedDescription, "high school screen crashed app")
                                         let bug = Bug(title: "Highschool Crash", description: error.localizedDescription, date: Date(), userId: currUser.id, highschoolId: "buildspace")
-                                        FirebaseService.shared.addDocument(bug, collection: "bugs") { str in
-                                            
-                                        }
+//                                        FirebaseService.shared.addDocument(bug, collection: "bugs") { str in
+//                                            
+//                                        }
                                     }
                                 }
                            

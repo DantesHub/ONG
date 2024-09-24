@@ -3,6 +3,7 @@ import SwiftUI
 struct FeedScreen: View {
     @EnvironmentObject var feedVM: FeedViewModel
     @EnvironmentObject var mainVM: MainViewModel
+    @EnvironmentObject var profileVM: ProfileViewModel
 
     @State private var scrollOffset: CGFloat = 0
     
@@ -30,7 +31,14 @@ struct FeedScreen: View {
                                         ZStack {
                                             FeedPostRow(post: post)
                                                 .padding(.horizontal)
-                                                
+                                                .onTapGesture {
+                                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                                    withAnimation {
+                                                        Analytics.shared.log(event: "FeedScreen: Tapped Row")
+                                                        profileVM.visitedUser = post.user
+                                                        profileVM.isVisitingUser = true
+                                                    }
+                                                }
                                             Text("\(post.aura)")
                                                 .foregroundColor(.white)
                                                 .sfPro(type: post.aura <= 50 ? .regular : post.aura <= 125  ? .medium : post.aura <= 200 ? .semibold : .bold, size: post.aura <= 50 ? .h1Small : post.aura <= 125  ? .h1 : post.aura <= 200 ? .h1Big : .title)

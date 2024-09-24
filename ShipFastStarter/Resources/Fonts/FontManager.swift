@@ -64,6 +64,7 @@ enum FontSize: CGFloat {
     case animation = 84
     case sticker = 104
     case logo = 128
+    case reveal = 172
 }
 
 extension View {

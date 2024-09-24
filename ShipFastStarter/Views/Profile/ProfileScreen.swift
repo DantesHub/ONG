@@ -346,7 +346,11 @@ struct ProfileScreen: View {
             isFriendRequest = false
             sentRequest = false
             isFriends = false
-            profileVM.visitedUser = nil            
+            profileVM.visitedUser = nil
+            if let currentUser = mainVM.currUser {
+                feedVM.visitingUser = currentUser
+                feedVM.processPollsForUserFeed()
+            }
         }
 //        .onChange(of: profileVM.profileImage) {
 //            if let user = mainVM.currUser {
@@ -400,7 +404,13 @@ struct ProfileScreen: View {
                         if currUser.friends.contains(where: { (k, v) -> Bool in
                                 return k == visitedUser.id
                         }) {
-                            isFriends = true
+                            if visitedUser.friends.contains(where: { k,v in
+                                k == currUser.id
+                            }) {
+                                isFriends = true
+                            } else {
+                                sentRequest = true
+                            }
                         }
                 }
             }

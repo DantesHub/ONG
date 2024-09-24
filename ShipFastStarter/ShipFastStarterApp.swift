@@ -84,7 +84,7 @@ struct ShipFastStarterApp: App {
             }
         }
         .modelContainer(sharedModelContainer)
-    }
+        }
     
     }
 

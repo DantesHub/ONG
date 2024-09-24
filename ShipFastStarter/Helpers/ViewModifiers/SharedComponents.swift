@@ -84,15 +84,17 @@ struct SharedComponents {
         var title: String
         var isDisabled: Bool
         var isOption: Bool
+        var isTutorial: Bool
         @State private var isPressed: Bool = false
         var action: () -> Void
         
-        init(img: Image? = nil, title: String = "Continue", isOption: Bool = false, action: @escaping () -> Void, isDisabled: Bool = false) {
+        init(img: Image? = nil, title: String = "Continue", isOption: Bool = false, isTutorial: Bool = false, action: @escaping () -> Void, isDisabled: Bool = false) {
              self.img = img
              self.title = title
              self.action = action
              self.isDisabled = isDisabled
              self.isOption = isOption
+            self.isTutorial = isTutorial
          }
         
         var body: some View {
@@ -134,7 +136,7 @@ struct SharedComponents {
                         }
                     }
                 }
-                .frame(height: isOption ? 104 : 72)
+                .frame(height: isOption ? 104 : isTutorial ? 60 : 72)
                 .opacity(1)
                 .disabled(isDisabled)
                 .opacity(isDisabled ? 0.5 : 1)

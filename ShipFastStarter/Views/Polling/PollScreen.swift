@@ -202,6 +202,7 @@ struct PollScreen: View {
                                     Analytics.shared.log(event: "PollScreen: tapped Skip")
                                     UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                     withAnimation {
+                                        shuffleCounter = 0
                                         skipPoll()
                                     }
                                 }) {
@@ -322,11 +323,11 @@ struct PollScreen: View {
         } else {
             // All polls completed
             mainVM.currUser?.lastPollFinished = Date()
+            mainVM.currUser?.aura += 300
+            mainVM.currUser?.bread += 300
             if let user = mainVM.currUser {
                 UserDefaults.standard.setValue(0, forKey: Constants.currentIndex)
                 mainVM.currUser?.lastPollFinished = Date()
-                mainVM.currUser?.aura += 300
-                mainVM.currUser?.bread += 300
                 pollVM.completedPoll = true
                 pollVM.finishPoll(user: user)
                 Task {
