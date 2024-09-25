@@ -274,7 +274,7 @@ struct PollScreen: View {
             }
         }
         .sheet(isPresented: $displayTutorial) {
-            TutorialModal(isPresented: $displayTutorial, isFeed: false)
+            TutorialModal(isPresented: $displayTutorial)
         }
         .onDisappear {
             stopShootingEmojis()
@@ -322,8 +322,14 @@ struct PollScreen: View {
             Task {
                 pollVM.selectedPoll = pollVM.pollSet[pollVM.currentPollIndex]
                 pollVM.allOptions = pollVM.selectedPoll.pollOptions
-                pollVM.getPollOptions(excludingUserId: user)
-                await pollVM.updatePollOptionsInFB()
+                print(pollVM.selectedPoll.pollOptions, "selectedPoll.pollOptions.count")
+                // this shouldnt create any new ones
+//                pollVM.getPollOptions(excludingUserId: user)
+                pollVM.currentTwelveOptions = Array(pollVM.allOptions.prefix(12)).shuffled()
+                // Take up to 4 options from the available options
+                pollVM.currentFourOptions = Array(pollVM.currentTwelveOptions.prefix(4))
+                pollVM.currentPollOptionIndex = min(4, pollVM.allOptions.count)
+//                await pollVM.updatePollOptionsInFB()
             }
 
             pollVM.showProgress = false

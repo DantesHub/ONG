@@ -96,7 +96,6 @@ class PollViewModel: ObservableObject {
                     allOptions = selectedPoll.pollOptions
                     self.getPollOptions(excludingUserId: user)
                     await updatePollOptionsInFB()
-                    
                     updateQuestionEmoji()
                 }
             }
@@ -107,8 +106,20 @@ class PollViewModel: ObservableObject {
     }
     
     func updatePollOptionsInFB() async {
-        if self.selectedPoll.pollOptions.count != allOptions.count { // update in firebase
-            self.selectedPoll.pollOptions = allOptions
+        var sortedArray1 = self.selectedPoll.pollOptions.sorted()
+        var sortedArray2 = allOptions.sorted()
+        print(sortedArray1, "*********", sortedArray2)
+        if sortedArray1 != sortedArray2 { // update in firebase
+            print("updated poll options in firebase")
+            self.selectedPoll.pollOptions = allOptions            // Update the poll in allPolls
+            if let index = self.allPolls.firstIndex(where: { $0.id == self.selectedPoll.id }) {
+                self.allPolls[index].pollOptions = self.allOptions
+            }            
+            // Update the poll in pollSet
+            if let index = self.pollSet.firstIndex(where: { $0.id == self.selectedPoll.id }) {
+                self.pollSet[index].pollOptions = self.allOptions
+            }
+            
             do {
                 try await FirebaseService.shared.updateDocument(collection: "polls", field: "id", isEqualTo: selectedPoll.id, object: self.selectedPoll)
             } catch {
@@ -131,7 +142,6 @@ class PollViewModel: ObservableObject {
 //            }
             
             self.allPolls = polls
-            print(allPolls.count, "we yamaza")
             self.pollSet = allPolls
             self.pollSet.sort { $0.createdAt < $1.createdAt }
             self.pollSet = polls.filter { !$0.usersWhoVoted.contains(user.id) }
@@ -157,6 +167,7 @@ class PollViewModel: ObservableObject {
             if let first = self.pollSet.first {
                 self.selectedPoll = first
                 allOptions = first.pollOptions
+                print(first.pollOptions.count, selectedPoll.title, "shibal gaeseki")
                 self.getPollOptions(excludingUserId: user)
             }
           
@@ -425,7 +436,6 @@ class PollViewModel: ObservableObject {
 
 
     func getPollOptions(excludingUserId user: User) {
-     
         // first get the top 10 most relavant options
         // priority #1
         
@@ -481,16 +491,17 @@ class PollViewModel: ObservableObject {
         
         seenUserIds = Set<String>()
         allOptions = allOptions.filter { option in
-        if seenUserIds.contains(option.userId) {
-            return false
+            if seenUserIds.contains(option.userId) {
+                return false
+            }
+            seenUserIds.insert(option.userId)
+            return true
         }
-        seenUserIds.insert(option.userId)
-        return true
-    }
         
         allOptions = allOptions.filter { option in
             option.userId != user.id
         }
+        
         currentTwelveOptions = Array(allOptions.prefix(12)).shuffled()
         // Take up to 4 options from the available options
         currentFourOptions = Array(currentTwelveOptions.prefix(4))
@@ -533,43 +544,7 @@ class PollViewModel: ObservableObject {
         print("shuffleOptions called")
         print("Current four options after shuffle: \(currentFourOptions.map { $0.option })")
     }
-    
-    func startCooldownTimer() {
-        guard timer == nil else { return }
-        updateTimeRemaining()
-        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
-            Task { @MainActor [weak self] in
-                self?.updateTimeRemaining()
-            }
-        }
-    }
-    
-    func stopCooldownTimer() {
-        timer?.invalidate()
-        timer = nil
-    }
-
-    private func updateTimeRemaining() {
-        guard let cooldownEndTime = cooldownEndTime else {
-            timeRemaining = 0
-            return
-        }
-        
-        timeRemaining = max(0, cooldownEndTime.timeIntervalSinceNow)
-        if timeRemaining == 0 {
-            stopCooldownTimer()
-            self.cooldownEndTime = nil
-        }
-    }
-
-    func timeRemainingString() -> String {
-        let hours = Int(timeRemaining) / 3600
-        let minutes = (Int(timeRemaining) % 3600) / 60
-        let seconds = Int(timeRemaining) % 60
-        
-        return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
-    }
-
+     
     func updateQuestionEmoji() {
         if let matchingQuestion = Question.bsQuestions.first(where: { $0.question == selectedPoll.title }) {
             self.questionEmoji = matchingQuestion.emoji
@@ -602,7 +577,7 @@ class PollViewModel: ObservableObject {
         let notificationDate = Date().addingTimeInterval(cooldownDuration)
         NotificationManager.scheduleNotification(
             title: "New polls are open!",
-            body: "Collect bread, and get ur aura up",
+            body: "stack ur bread, and get ur aura up",
             date: notificationDate
         )
         
@@ -615,6 +590,43 @@ class PollViewModel: ObservableObject {
             } catch {
                 print("Error updating user's last poll finished time: \(error.localizedDescription)")
             }
+        }
+    }
+    
+    //MARK: - COOL DOWN LOGIC
+    func timeRemainingString() -> String {
+        let hours = Int(timeRemaining) / 3600
+        let minutes = (Int(timeRemaining) % 3600) / 60
+        let seconds = Int(timeRemaining) % 60
+        
+        return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
+    }
+    
+    func startCooldownTimer() {
+        guard timer == nil else { return }
+        updateTimeRemaining()
+        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
+            Task { @MainActor [weak self] in
+                self?.updateTimeRemaining()
+            }
+        }
+    }
+    
+    func stopCooldownTimer() {
+        timer?.invalidate()
+        timer = nil
+    }
+
+    private func updateTimeRemaining() {
+        guard let cooldownEndTime = cooldownEndTime else {
+            timeRemaining = 0
+            return
+        }
+        
+        timeRemaining = max(0, cooldownEndTime.timeIntervalSinceNow)
+        if timeRemaining == 0 {
+            stopCooldownTimer()
+            self.cooldownEndTime = nil
         }
     }
 
@@ -660,7 +672,21 @@ class PollViewModel: ObservableObject {
             }
         }
     }
+    deinit {
+        // We can't call stopCooldownTimer() directly here, so we'll use a workaround
+        Task { @MainActor in
+            self.stopCooldownTimer()
+        }
+    }
 
+    func resetState() {
+        // Reset all relevant properties
+        self.completedPoll = false
+        self.cooldownEndTime = nil
+        // Reset any other properties as needed
+    }
+    
+    //MARK: - notification logic
     func hasNewNotifications(for user: User) -> Bool {
         return selectedPoll.pollOptions.contains { option in
             option.votes?[user.id]?["viewedNotification"] == "false"
@@ -687,17 +713,5 @@ class PollViewModel: ObservableObject {
         objectWillChange.send()
     }
 
-    deinit {
-        // We can't call stopCooldownTimer() directly here, so we'll use a workaround
-        Task { @MainActor in
-            self.stopCooldownTimer()
-        }
-    }
-
-    func resetState() {
-        // Reset all relevant properties
-        self.completedPoll = false
-        self.cooldownEndTime = nil
-        // Reset any other properties as needed
-    }
+   
 }

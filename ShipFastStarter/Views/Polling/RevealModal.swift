@@ -167,7 +167,7 @@ struct RevealModal: View {
                       .padding(.horizontal, 24)
                   }.foregroundColor(.white)
                   if notEnoughBread {
-                      Text("you don't have enough bread. you can more bread by doing more polls or")
+                      Text("you don't have enough bread. you can earn more bread by doing more polls or")
                           .sfPro(type: .semibold, size: .p2)
                           .foregroundColor(.red)
                           .multilineTextAlignment(.center)
@@ -406,7 +406,7 @@ struct RevealModal: View {
                   }.foregroundColor(.white)
                   Spacer()
                   if notEnoughBread {
-                      Text("you don't have enough bread. you can more bread by doing more polls or")
+                      Text("you don't have enough bread. you can earn more bread by doing more polls or")
                           .sfPro(type: .semibold, size: .p2)
                           .foregroundColor(.red)
                           .multilineTextAlignment(.center)

@@ -108,20 +108,20 @@ struct PollCooldownScreen: View {
                                 .sfPro(type: .semibold, size: .h2)
                                 .foregroundColor(.white)
                                 
-                            SharedComponents.PrimaryButton(
-                                title: "share on instagram",
-                                action: {
-                                     createDynamicLink(username: mainVM.currUser?.username ?? "") { url in
-                                        guard let url = url else { return }
-                                        
-                                         
-//                                         let image = TestView().snapshot()
-//                                         let image = UIImage(named: "temp")
-                                         shareToInstagramStories(TestView().snapshot())
-                                     }     
-                                }
-                            )
-                            .padding(.top, 32)
+//                            SharedComponents.PrimaryButton(
+//                                title: "share on instagram",
+//                                action: {
+//                                     createDynamicLink(username: mainVM.currUser?.username ?? "") { url in
+//                                        guard let url = url else { return }
+//                                        
+//                                         
+////                                         let image = TestView().snapshot()
+////                                         let image = UIImage(named: "temp")
+//                                         shareToInstagramStories(TestView().snapshot())
+//                                     }     
+//                                }
+//                            )
+//                            .padding(.top, 32)
 
                             LazyVGrid(columns: columns, spacing: 24) {
                                 ForEach(profileVM.topEight.prefix(8), id: \.id) { user in
@@ -204,60 +204,7 @@ struct PollCooldownScreen: View {
     }
     
     
-    func shareToInstagramStories(_ image: UIImage) {
-        guard let instagramStoriesUrl = URL(string: "instagram-stories://share?source_application=com.ong.app") else { return }
-        guard let imageData = image.pngData() else { return }
-//                jpegData(compressionQuality: 0.8) else { return } // Use JPEG compression
-//        guard let linkUrl = URL(string: link) else { return }  Validate the link URL
-        if UIApplication.shared.canOpenURL(instagramStoriesUrl) {
-            let pasteboardItems: [String: Any] = [
-                
-                     "com.instagram.sharedSticker.backgroundTopColor": "#636e72",
-                     "com.instagram.sharedSticker.backgroundBottomColor": "#b2bec3",
-                "com.instagram.sharedSticker.stickerImage": imageData,
-                
-                
-                
-            ]
-            UIPasteboard.general.setItems([pasteboardItems], options: [:])
-            //           UIApplication.shared.open(instagramStoriesUrl, options: [:], completionHandler: nil)
-            UIApplication.shared.open(instagramStoriesUrl, options: [:]) { success in
-                if !success {
-                    print("Failed to open Instagram Stories")
-                }
-            }
-        } else {
-            let alertController = UIAlertController(title: "Instagram Not Installed", message: "Please install Instagram to share content.", preferredStyle: .alert)
-            let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
-            alertController.addAction(okAction)
-            UIApplication.shared.windows.first?.rootViewController?.present(alertController, animated: true, completion: nil)
-        }
-    }
-    
-    func shareToFacebook(quote: String, url: URL) {
-           // Create the content to share
-           let content = ShareLinkContent()
-           content.contentURL = url // Replace with your content URL
-        
-           content.quote = quote // Optional: Add a quote
-        
-           // Configure the share dialog
-           let dialog = ShareDialog(
-            viewController: UIApplication.shared.windows.first?.rootViewController,
-               content: content,
-               delegate: nil
-           )
 
-           // Show the share dialog if possible
-           if dialog.canShow {
-               
-
-               dialog.show()
-           } else {
-               print("Unable to show the Facebook share dialog.")
-           }
-       }
-    
     
     func createDynamicLink(username: String, completion: @escaping (URL?) -> Void) {
          let link = "https://ongapp.page.link/share?user_name=\(username)"

@@ -8,7 +8,11 @@
 import SwiftData
 import Foundation
 
-struct PollOption: Codable, Equatable, FBObject {
+struct PollOption: Codable, Equatable, FBObject, Comparable {
+    static func < (lhs: PollOption, rhs: PollOption) -> Bool {
+        return lhs.userId > rhs.userId
+    }
+    
     var id: String
     let type: String?
     let option: String

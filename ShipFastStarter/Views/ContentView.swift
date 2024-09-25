@@ -257,6 +257,7 @@ struct ContentView: View {
         pollVM.checkCooldown(user: user)
         await profileVM.fetchPeopleList(user: user)
         pollVM.entireSchool = profileVM.peopleList
+        pollVM.friends = profileVM.friends
         feedVM.currUser = user
         feedVM.allUsers = profileVM.peopleList
         feedVM.allFriends = profileVM.friends

@@ -349,7 +349,7 @@ struct TutorialModal: View {
                     .background(Color("green"))
                     .overlay(
                         RoundedRectangle(cornerRadius: 8)
-                            .fill(.clear)
+                                .fill(.clear)
                             .stroke(Color.black.opacity(0.1), lineWidth: 8)
                     )
                     .cornerRadius(8)

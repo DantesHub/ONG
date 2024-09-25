@@ -2,16 +2,20 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>instagram-stories</string>
+	</array>
 	<key>FacebookClientToken</key>
 	<string>c0e4ccd875d0edec37027e6d222a05bb</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>fb491260527194135</string>
 				<string>app-1-403676286516-ios-2038c1f12688aeee588461</string>
-				
 			</array>
 		</dict>
 	</array>
@@ -19,14 +23,6 @@
 	<string>491260527194135</string>
 	<key>FacebookDisplayName</key>
 	<string>ONG</string>
-	<key>LSApplicationQueriesSchemes</key>
-	<array>
-		<string>fbapi</string>
-		<string>fb-messenger-api</string>
-		<string>fbauth2</string>
-		<string>fbshareextension</string>
-		<string>instagram-stories</string>
-	</array>
 	<key>FirebaseDynamicLinksCustomDomains</key>
 	<array>
 		<string>https://ongapp.com</string>
@@ -38,17 +34,6 @@
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
 		<string>io.background.task.1</string>
-	</array>
-	<key>CFBundleURLTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>app-1-403676286516-ios-2038c1f12688aeee588461</string>
-			</array>
-		</dict>
 	</array>
 	<key>FirebaseAppDelegateProxyEnabled</key>
 	<false/>

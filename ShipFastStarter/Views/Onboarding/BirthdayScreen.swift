@@ -30,12 +30,14 @@ struct BirthdayScreen: View {
                 DatePicker("", selection: $birthdate, displayedComponents: .date)
                     .datePickerStyle(WheelDatePickerStyle())
                     .labelsHidden()
-                    .foregroundColor(.black)
+//                    .foregroundColor(.black)
                     .background(Color.white)
                     .cornerRadius(16)
                     .stroke(color: .black, width: 3)
                     .padding(.horizontal)
                     .shadow(color: .black, radius: 0, y: 6)
+                    .foregroundColor(.black)
+                    .colorScheme(.light)
 //                    .primaryShadow()
                 Spacer()
 
@@ -55,11 +57,12 @@ struct BirthdayScreen: View {
                 SharedComponents.PrimaryButton(
                     title: "Continue",
                     action: {
+                        yearsOld = calculateAge()
                         if yearsOld >= 13 {
                             mainVM.currUser?.birthday = birthdate.toString()
                             print("Selected birthday: \(formattedDate)")
                             Analytics.shared.log(event: "BirthdayScreen: Tapped Continue")
-                            mainVM.onboardingScreen = .location
+                            mainVM.onboardingScreen = .gender
                         } else {
                             Analytics.shared.log(event: "BirthdayScreen: Tapped Continue")
                             errorString = "you must be 13+ to use ONG"
