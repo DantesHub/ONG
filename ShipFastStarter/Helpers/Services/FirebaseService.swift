@@ -466,7 +466,44 @@ class FirebaseService {
         }
     }
     
+    func removeUserFromPollOptions(userId: String) async throws {
+        let db = Firestore.firestore()
+        let pollsRef = db.collection("polls")
+        
+        // Get all polls
+        let querySnapshot = try await pollsRef.getDocuments()
+        
+        for document in querySnapshot.documents {
+            let pollRef = pollsRef.document(document.documentID)
+            
+            // Remove the user from usersWhoVoted array
+            try await pollRef.updateData([
+                "usersWhoVoted": FieldValue.arrayRemove([userId])
+            ])
+            
+            // Get the current poll options
+            let pollData = document.data()
+            guard var pollOptions = pollData["pollOptions"] as? [[String: Any]] else {
+                continue
+            }
+            
+            // Remove the user from each poll option's votes
+            for (index, var option) in pollOptions.enumerated() {
+                if var votes = option["votes"] as? [String: [String: String]] {
+                    votes.removeValue(forKey: userId)
+                    option["votes"] = votes
+                    pollOptions[index] = option
+                }
+            }
+            
+            // Update the poll with the modified poll options
+            try await pollRef.updateData([
+                "pollOptions": pollOptions
+            ])
+        }
+    }
 }
+
 class PhoneAuthUIDelegate: NSObject, AuthUIDelegate {
     func present(_ viewControllerToPresent: UIViewController, animated flag: Bool, completion: (() -> Void)? = nil) {
         if let topController = UIApplication.shared.windows.first?.rootViewController {

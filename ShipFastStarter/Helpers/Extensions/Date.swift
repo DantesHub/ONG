@@ -313,6 +313,10 @@ extension Date {
         
         return hour <= 4
     }
+    
+    static func yesterday() -> Date {
+        return Calendar.current.date(byAdding: .day, value: -1, to: Date()) ?? Date()
+    }
 }
 
 extension String {

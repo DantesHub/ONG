@@ -92,7 +92,7 @@ struct User: Codable, Equatable, FBObject {
         grade: "11",
         number: "+12013333333",
         votedPolls: [],
-        lastPollFinished: nil,
+        lastPollFinished: Date.yesterday(),
         friends: [:],
         invitedFriends: [],
         ogBadge: true,

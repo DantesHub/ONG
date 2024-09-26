@@ -353,11 +353,7 @@ class PollViewModel: ObservableObject {
                 gradeLevel: friend.grade
             )
             
-            newOption.priorityScore = 5
-            if newOption.gradeLevel == user.grade {
-                newOption.priorityScore += 2
-            }
-            
+            newOption.priorityScore = calculatePriorityScore(for: newOption, user: friend)
             allOptions.append(newOption)
         }
         
@@ -398,7 +394,9 @@ class PollViewModel: ObservableObject {
                     votes: [:],
                     gradeLevel: userInGrade.grade
                 )
-                
+
+                newOption.priorityScore = calculatePriorityScore(for: newOption, user: userInGrade)
+
                 newOption.priorityScore += 3
                 allOptions.append(newOption)
             }
@@ -426,6 +424,9 @@ class PollViewModel: ObservableObject {
                 votes: [:],
                 gradeLevel: remainUser.grade
             )
+
+            newOption.priorityScore = calculatePriorityScore(for: newOption, user: remainUser)
+
             
             allOptions.append(newOption)
         }
@@ -436,40 +437,29 @@ class PollViewModel: ObservableObject {
 
 
     func getPollOptions(excludingUserId user: User) {
-        // first get the top 10 most relavant options
-        // priority #1
-        
         var updatedOptions: [PollOption] = []
         var totalFriendOptions = 0
         var totalSameGradeOptions = 0
+
         for option in allOptions {
             var updatedOption = option
-            let hasVotes = (option.votes?.values.reduce(0) { $0 + (Int($1["numVotes"] ?? "0") ?? 0) } ?? 0) > 0
-            let isFriend = friends.contains { $0.id == option.userId }
-            let sameGrade = friends.contains { $0.grade == option.gradeLevel }
-            
-            if hasVotes && isFriend {
-                updatedOption.priorityScore += 7
+            updatedOption.priorityScore = calculatePriorityScore(for: option, user: user)
+
+            if friends.contains(where: { $0.id == option.userId }) {
                 totalFriendOptions += 1
-            } else if isFriend {
-                totalFriendOptions += 1
-                updatedOption.priorityScore += 5
-            } else if hasVotes {
-                updatedOption.priorityScore += 1
             }
-            
-            if sameGrade {
-                updatedOption.priorityScore += 2
+
+            if user.grade == option.gradeLevel {
                 totalSameGradeOptions += 1
-                
             }
-            
-            updatedOptions.append(option)
+
+            updatedOptions.append(updatedOption)
         }
-        
+
         // Sort priority options by score
         updatedOptions.sort { $0.priorityScore > $1.priorityScore }
         allOptions = updatedOptions
+
         // Remove duplicate options with the same userId
         var seenUserIds = Set<String>()
         allOptions = allOptions.filter { option in
@@ -486,9 +476,10 @@ class PollViewModel: ObservableObject {
         if (user.friends.count > 7 && totalFriendOptions <= 7) || totalSameGradeOptions < 8 || allOptions.count < 12  { // create new friend options
             createNewOptions(user: user, friends: friends)
             // Sort priority options by score
-            allOptions.sort { $0.priorityScore > $1.priorityScore }
         }
         
+        allOptions.sort { $0.priorityScore > $1.priorityScore }
+
         seenUserIds = Set<String>()
         allOptions = allOptions.filter { option in
             if seenUserIds.contains(option.userId) {
@@ -498,15 +489,20 @@ class PollViewModel: ObservableObject {
             return true
         }
         
+        
+        
         allOptions = allOptions.filter { option in
             option.userId != user.id
         }
         
+        selectedPoll.pollOptions = allOptions
         currentTwelveOptions = Array(allOptions.prefix(12)).shuffled()
         // Take up to 4 options from the available options
         currentFourOptions = Array(currentTwelveOptions.prefix(4))
         currentPollOptionIndex = min(4, allOptions.count)
-        
+        Task {
+            await updatePollOptionsInFB()
+        }
         
         updateQuestionEmoji()
         updateTotalVotes()
@@ -713,5 +709,41 @@ class PollViewModel: ObservableObject {
         objectWillChange.send()
     }
 
-   
+    func calculateDaysSinceLastPoll(for user: User) -> Int {
+        let calendar = Calendar.current
+        let now = Date()
+        if let lastPollFinished = user.lastPollFinished {
+            return calendar.dateComponents([.day], from: lastPollFinished, to: now).day ?? 0
+        } else {
+            return 7
+        }
+    }
+
+    func calculatePriorityScore(for option: PollOption, user: User) -> Int {
+        var score = 0
+        let daysSinceLastPoll = calculateDaysSinceLastPoll(for: user)
+        let hasVotes = (option.votes?.values.reduce(0) { $0 + (Int($1["numVotes"] ?? "0") ?? 0) } ?? 0) > 0
+        let isFriend = friends.contains { $0.id == option.userId }
+        let sameGrade = user.grade == option.gradeLevel
+
+        if hasVotes && isFriend {
+            score += 7
+        } else if isFriend {
+            score += 5
+        } else if hasVotes {
+            score += 1
+        }
+
+        if sameGrade {
+            score += 2
+        }
+
+        if daysSinceLastPoll > 5 {
+            score -= 5
+        } else if daysSinceLastPoll > 3 {
+            score -= 3
+        }
+
+        return score
+    }
 }

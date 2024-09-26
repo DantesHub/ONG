@@ -44,8 +44,8 @@ struct ColorScreen: View {
                                                 
                                                 if !pollVM.allPolls.isEmpty {
                                                     // Filter polls created in the last 2 days
-                                                    let twoDaysAgo = Calendar.current.date(byAdding: .day, value: -2, to: Date())!
-                                                    let recentPolls = pollVM.allPolls.filter { $0.createdAt >= twoDaysAgo }
+                                                    let sevenDaysAgo = Calendar.current.date(byAdding: .day, value: -7, to: Date())!
+                                                    let recentPolls = pollVM.allPolls.filter { $0.createdAt >= sevenDaysAgo }
                                                     
                                                     // Create a new poll option for the current user
                                                     let newOption = PollOption(
