@@ -537,14 +537,16 @@ struct PollOptionView: View {
                             y: value.location.y + geometry.frame(in: .global).minY
                         )
                         updateTouchLocation(touchPosition)
-                        if !isLongPressing {
-                            isLongPressing = true
-                            longPressStartTime = Date()
-                            hapticStartTime = Date()
-                            scheduleHapticFeedback()
-                            scheduleShaking()
-                            startCounter()
-                            scheduleLongPressActions(buttonPosition: buttonPosition, touchPosition: touchPosition)
+                        if !pollVM.showProgress {
+                            if !isLongPressing {
+                                isLongPressing = true
+                                longPressStartTime = Date()
+                                hapticStartTime = Date()
+                                scheduleHapticFeedback()
+                                scheduleShaking()
+                                startCounter()
+                                scheduleLongPressActions(buttonPosition: buttonPosition, touchPosition: touchPosition)
+                            }
                         }
                     }
                     .onEnded { _ in
@@ -703,7 +705,7 @@ struct PollOptionView: View {
                 if counter == 100 {
                     counter = 100
                 } else {
-                    let maxValue: Double = 9_000_000
+                    let maxValue: Double = 5000
                     let growth: Double
 
                     if counter < 500 {
@@ -714,11 +716,11 @@ struct PollOptionView: View {
                         growth = counter * 0.0008
                     } else if counter < 1_800 {
                         growth = counter * 0.00120
-                    } else if counter < 15_000 {
+                    } else if counter < 3000 {
                         growth = counter * 0.0004
-                    } else if counter < 120_000 {
+                    } else if counter < 4000 {
                         growth = counter * 0.00120
-                    } else if counter < 1_200_000 {
+                    } else if counter < 5000 {
                         growth = counter * 0.0002
                     } else {
                         growth = counter * 0.0001
