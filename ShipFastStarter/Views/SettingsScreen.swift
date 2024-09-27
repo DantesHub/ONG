@@ -85,6 +85,13 @@ struct SettingsScreen: View {
     }
     
     private func deleteAccount() async {
+//        if let currUser = mainVM.currUser {
+//            do {
+//            } catch {
+//                print(error.localizedDescription)
+//            }
+//        }
+
         if let user = Auth.auth().currentUser {
             if let currUser = mainVM.currUser {
                 do {
@@ -92,7 +99,7 @@ struct SettingsScreen: View {
                     try await FirebaseService.shared.deleteDocument(collection: "users", documentId: currUser.id)
                     
                     // Remove user from all poll options
-                    try await FirebaseService.shared.removeUserFromPollOptions(userId: currUser.id)
+                    try await FirebaseService.shared.removeUserFromPollOptions(user: currUser)
                     
                     // Delete the Firebase Auth user
                     try await user.delete()

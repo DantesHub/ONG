@@ -466,40 +466,54 @@ class FirebaseService {
         }
     }
     
-    func removeUserFromPollOptions(userId: String) async throws {
+    func removeUserFromPollOptions(user: User) async throws {
         let db = Firestore.firestore()
         let pollsRef = db.collection("polls")
-        
+        let userId = user.id
         // Get all polls
         let querySnapshot = try await pollsRef.getDocuments()
         
         for document in querySnapshot.documents {
             let pollRef = pollsRef.document(document.documentID)
             
-            // Remove the user from usersWhoVoted array
-            try await pollRef.updateData([
-                "usersWhoVoted": FieldValue.arrayRemove([userId])
-            ])
-            
-            // Get the current poll options
+            // Get the current poll data
             let pollData = document.data()
             guard var pollOptions = pollData["pollOptions"] as? [[String: Any]] else {
                 continue
             }
             
-            // Remove the user from each poll option's votes
-            for (index, var option) in pollOptions.enumerated() {
-                if var votes = option["votes"] as? [String: [String: String]] {
-                    votes.removeValue(forKey: userId)
-                    option["votes"] = votes
-                    pollOptions[index] = option
-                }
+            var userWasRemoved = false
+            
+            // Remove the user from usersWhoVoted array
+            if var usersWhoVoted = pollData["usersWhoVoted"] as? [String], usersWhoVoted.contains(userId) {
+                usersWhoVoted.removeAll { $0 == userId }
+                userWasRemoved = true
+                try await pollRef.updateData([
+                    "usersWhoVoted": usersWhoVoted
+                ])
             }
             
-            // Update the poll with the modified poll options
-            try await pollRef.updateData([
-                "pollOptions": pollOptions
-            ])
+            // Remove the user from poll options
+            pollOptions.removeAll { option in
+                guard let optionUserId = option["userId"] as? String else { return false }
+                return optionUserId == userId
+            }
+            
+            if pollOptions.count != (pollData["pollOptions"] as? [[String: Any]])?.count {
+                userWasRemoved = true
+            }
+            
+            // Update the poll with the modified poll options only if the user was removed
+            if userWasRemoved && pollData["schoolId"] as? String == user.schoolId {
+                do {
+                    try await pollRef.updateData([
+                        "pollOptions": pollOptions
+                    ])
+                    print("Updated poll: \(document.documentID)")
+                } catch {
+                    print("Unable to update poll option for poll: \(document.documentID)")
+                }
+            }
         }
     }
 }

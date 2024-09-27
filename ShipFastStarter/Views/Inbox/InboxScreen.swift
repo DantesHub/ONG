@@ -27,11 +27,7 @@ struct InboxScreen: View {
             }
         }
         .onAppear {
-            if let user = mainVM.currUser {
-                Task {
-                    await inboxVM.fetchNotifications(for: user)
-                }
-            }
+          
         }
         .fullScreenCover(isPresented: $inboxVM.tappedNotification) {
             PollAnswerDetailView()
@@ -108,8 +104,10 @@ struct InboxItem: Identifiable {
     let backgroundColor: Color
     let accompanyingPoll: Poll
     let pollOption: PollOption
-    let isNew: Bool
+    var isNew: Bool
     let shields: Int
+    
+    static var exInboxItem = InboxItem(id: UUID().uuidString, userId: "ongteam", firstName: "a friend", aura: 100, time: Date.longTimeAgo(), gender: "boy", grade: "ONG team", backgroundColor: Color.primaryBackground, accompanyingPoll: Poll.exPoll, pollOption: PollOption.exPollOption, isNew: true, shields: 0)
 }
 
 struct InboxItemView: View {
@@ -169,6 +167,9 @@ struct InboxItemView: View {
                 inboxVM.tappedNotificationRow()
                 if item.isNew {
                     Task {
+                        if item.firstName == "ONG" {
+                            UserDefaults.standard.setValue(true, forKey: Constants.sawThisInboxItem)
+                        }
                         await inboxVM.updateViewStatus()
                     }
                 }

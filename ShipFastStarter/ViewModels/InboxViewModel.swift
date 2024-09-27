@@ -23,83 +23,98 @@ class InboxViewModel: ObservableObject {
     @Published var selectedPoll: Poll?
     @Published var selectedPollOption: PollOption?
     @Published var selectedInbox: InboxItem?
-    @Published var pastNotifications: [PollOption] = []
-    @Published var newNotifications: [PollOption] = []
     @Published var oldUsersWhoVoted: [InboxItem] = []
     @Published var newUsersWhoVoted: [InboxItem] = []
     @Published var currentFourOptions: [PollOption] = []
     @Published var friendRequests: [FriendRequest] = []
+    @Published var allPolls: [Poll] = []
+    @Published var allUsers: [User] = []
+    @Published var currUser: User?
+
 
     func tappedNotificationRow() {
-        if let option = selectedPollOption, let poll = selectedPoll {
-            currentFourOptions = [option]
-            
-            // Get the other options that aren't the selected one
-            let otherOptions = poll.pollOptions.filter { $0.id != option.id }
-            
-            // Shuffle the other options and take the first three
-            let additionalOptions = Array(otherOptions.shuffled().prefix(3))
-            
-            // Add these options to currentFourOptions
-            currentFourOptions.append(contentsOf: additionalOptions)
-            
-            // If we don't have 4 options yet (in case there weren't 3 other options),
-            // pad with the selected option
-            while currentFourOptions.count < 4 {
-                currentFourOptions.append(option)
+        if selectedInbox?.userId == "ongteam" {
+            currentFourOptions = []
+            let userOption = PollOption(id: UUID().uuidString, type: "", option: "\(currUser?.firstName ?? "") \(currUser?.lastName ?? "")", userId: "ongteam1", votes: [:], gradeLevel: "12")
+            currentFourOptions.append(userOption)
+            currentFourOptions.append(PollOption.exPollOption)
+            currentFourOptions.append(PollOption.exPollOption)
+            currentFourOptions.append(PollOption.exPollOption)
+        } else {
+            if let option = selectedPollOption, let poll = selectedPoll {
+                currentFourOptions = [option]
+                
+                // Get the other options that aren't the selected one
+                let otherOptions = poll.pollOptions.filter { $0.id != option.id }
+                
+                // Shuffle the other options and take the first three
+                let additionalOptions = Array(otherOptions.shuffled().prefix(3))
+                
+                // Add these options to currentFourOptions
+                currentFourOptions.append(contentsOf: additionalOptions)
+                
+                // If we don't have 4 options yet (in case there weren't 3 other options),
+                // pad with the selected option
+                while currentFourOptions.count < 4 {
+                    currentFourOptions.append(option)
+                }
             }
         }
+     
 
     }
     
-    func fetchFriendRequests(for user: User) async {
+    func fetchFriendRequests(for user: User) {
         friendRequests = []
-        do {
-            for friendRequest in user.friendRequests {
-                // fetch friend
-                if friendRequests.contains(where: { $0.user.id == friendRequest.key }) {
-                    continue
-                }
-                let friendArray: [User] = try await FirebaseService.shared.fetchDocuments(collection: "users", whereField: "id", isEqualTo: friendRequest.key)
-                // why is that it only works the second time ?
-                if let friend = friendArray.first {
-                    print(friend.firstName, "ik")
-                    let timeStamp = Date.fromString((user.friendRequests[friend.id] ?? "")) ?? Date()
-                    let request = FriendRequest(id: UUID().uuidString, user: friend, time: timeStamp)
-                    if !friendRequests.contains(where: { req in
-                        req.user.id == request.user.id
-                    }) {
-                        friendRequests.append(request)
-                        print(friendRequests.count, user.friendRequests.count, "gyamazawa")
-                    }
-                }
-                // request
+        for friendRequest in user.friendRequests {
+            // fetch friend
+            if friendRequests.contains(where: { $0.user.id == friendRequest.key }) {
+                continue
             }
-        } catch {
-            print(error.localizedDescription)
+            
+            // why is that it only works the second time ?
+            if let friend = allUsers.first(where: { usr in
+                usr.id == friendRequest.key
+            }) {
+                print(friend.firstName, "ik")
+                let timeStamp = Date.fromString((user.friendRequests[friend.id] ?? "")) ?? Date()
+                let request = FriendRequest(id: UUID().uuidString, user: friend, time: timeStamp)
+                if !friendRequests.contains(where: { req in
+                    req.user.id == request.user.id
+                }) {
+                    friendRequests.append(request)
+                    print(friendRequests.count, user.friendRequests.count, "gyamazawa")
+                }
+            }
+            // request
         }
     }
     
     @MainActor
-    func fetchNotifications(for user: User) async {
+    func fetchNotifications(for user: User) {
         do {
-            let polls: [Poll] = try await FirebaseService.shared.fetchDocuments(
-                collection: "polls",
-                whereField: "schoolId",
-                isEqualTo: user.schoolId
-            )
-            
+//            let polls: [Poll] = try await FirebaseService.shared.fetchDocuments(
+//                collection: "polls",
+//                whereField: "schoolId",
+//                isEqualTo: user.schoolId
+//            )
+//            
             var newNotifs: [(PollOption, Date)] = []
             var pastNotifs: [(PollOption, Date)] = []
             var newVotes: [InboxItem] = []
             var oldVotes: [InboxItem] = []
+            allUsers.append(User.exUser)
             
-            for poll in polls {
+            
+            for poll in allPolls {
                 for option in poll.pollOptions {
                     if option.userId == user.id && !(option.votes?.isEmpty ?? true) {
                         if let votes = option.votes {
                             for (voterId, voteInfo) in votes {
-                                if let usr = await fetchUser(id: voterId) {
+                                
+                                if let usr = allUsers.first(where: { usrInSchool in
+                                    usrInSchool.id == voterId
+                                }) {
                                     if let dateStr = voteInfo["date"],
                                        let numVotes = voteInfo["numVotes"],
                                        let date = ISO8601DateFormatter().date(from: dateStr) {
@@ -128,14 +143,14 @@ class InboxViewModel: ObservableObject {
                                         )
                                         if voteInfo["viewedNotification"] == "false" {
                                             newVotes.append(newInboxItem)
-                                            if !newNotifs.contains(where: { $0.0.id == option.id }) {
-                                                newNotifs.append((option, date))
-                                            }
+//                                            if !newNotifs.contains(where: { $0.0.id == option.id }) {
+//                                                newNotifs.append((option, date))
+//                                            }
                                         } else {
                                             oldVotes.append(newInboxItem)
-                                            if !pastNotifs.contains(where: { $0.0.id == option.id }) {
-                                                pastNotifs.append((option, date))
-                                            }
+//                                            if !pastNotifs.contains(where: { $0.0.id == option.id }) {
+//                                                pastNotifs.append((option, date))
+//                                            }
                                         }
                                     }
                                 }
@@ -145,23 +160,27 @@ class InboxViewModel: ObservableObject {
                 }
             }
             
-            // Sort everything by date
-            newNotifs.sort { $0.1 > $1.1 }
-            pastNotifs.sort { $0.1 > $1.1 }
+            print(newVotes.count, oldVotes.count, "you can fly again", allPolls.count)
+
             newVotes.sort { $0.time > $1.time }
             oldVotes.sort { $0.time > $1.time }
             
-            // Update published properties
-            self.newNotifications = newNotifs.map { $0.0 }
-            self.pastNotifications = pastNotifs.map { $0.0 }
             self.newUsersWhoVoted = newVotes
             self.oldUsersWhoVoted = oldVotes
+
+            if !UserDefaults.standard.bool(forKey: Constants.sawThisInboxItem) {
+                newUsersWhoVoted.append(InboxItem.exInboxItem)
+            } else {
+                var newItem = InboxItem.exInboxItem
+                newItem.isNew = false
+                self.oldUsersWhoVoted.append(newItem)
+            }
             
         } catch {
             print("Error fetching notifications: \(error.localizedDescription)")
         }
         
-        await fetchFriendRequests(for: user)
+        fetchFriendRequests(for: user)
     }
     
     func updateViewStatus() async {
@@ -195,10 +214,10 @@ class InboxViewModel: ObservableObject {
                             oldUsersWhoVoted.sort { $0.time > $1.time }
                         }
 
-                        if let newNotificationIndex = newNotifications.firstIndex(where: { $0.id == selectedPollOption.id }) {
-                            let movedNotification = newNotifications.remove(at: newNotificationIndex)
-                            pastNotifications.append(movedNotification)
-                        }
+//                        if let newNotificationIndex = newNotifications.firstIndex(where: { $0.id == selectedPollOption.id }) {
+//                            let movedNotification = newNotifications.remove(at: newNotificationIndex)
+//                            pastNotifications.append(movedNotification)
+//                        }
 
                         // Update the published selectedPoll
                         self.selectedPoll = selectedPoll

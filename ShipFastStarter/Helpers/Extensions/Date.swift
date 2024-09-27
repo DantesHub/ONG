@@ -215,53 +215,34 @@ extension Date {
     }
     
     static func formatRelativeTime(from date: Date) -> String {
-         let now = Date()
-         let calendar = Calendar.current
-         let components = calendar.dateComponents([.year, .month, .day, .hour, .minute, .second], from: date, to: now)
-         
-         if let year = components.year, year > 0 {
-             return year == 1 ? "1 yr" : "\(year) yrs"
-         }
-         
-         if let month = components.month, month > 0 {
-             return month == 1 ? "1 mo" : "\(month) mo"
-         }
-         
-         if let day = components.day, day > 0 {
-             if day == 1 {
-                 return "yesterday"
-             } else if day < 7 {
-                 return "\(day)d ago"
-             } else {
-                 let weeks = day / 7
-                 return weeks == 1 ? "1 wk" : "\(weeks) wks"
-             }
-         }
-         
-         if let hour = components.hour, hour > 0 {
-             if hour == 1 {
-                 
-             }
-             if hour < 24 {
-                 return "\(hour)h"
-             }
+        let now = Date()
+        let calendar = Calendar.current
+        let dayDifference = calendar.dateComponents([.day], from: date, to: now).day ?? 0
 
-         }
-         
-         if let minute = components.minute, minute > 0 {
-             if minute < 60 {
-                 return "\(minute)m"
-             }
-         }
-         
-         if let second = components.second, second > 0 {
-             if second < 60 {
-                 return "now"
-             }
-         }
-         
-         return "just now"
-     }
+        if dayDifference > 0 {
+            if dayDifference == 1 {
+                return "Yesterday"
+            } else if dayDifference < 7 {
+                return "\(dayDifference)d ago"
+            } else {
+                let weeks = dayDifference / 7
+                return weeks == 1 ? "1 wk ago" : "\(weeks) wks ago"
+            }
+        } else {
+            let hourDifference = calendar.dateComponents([.hour], from: date, to: now).hour ?? 0
+            if hourDifference > 0 {
+                return hourDifference == 1 ? "1h ago" : "\(hourDifference)h ago"
+            } else {
+                let minuteDifference = calendar.dateComponents([.minute], from: date, to: now).minute ?? 0
+                if minuteDifference > 0 {
+                    return minuteDifference == 1 ? "1m ago" : "\(minuteDifference)m ago"
+                } else {
+                    return "Just now"
+                }
+            }
+        }
+    }
+
     
     func formatted() -> String {
         Date.dateFormatter.dateFormat = "MMM d"
@@ -317,6 +298,10 @@ extension Date {
     static func yesterday() -> Date {
         return Calendar.current.date(byAdding: .day, value: -1, to: Date()) ?? Date()
     }
+    static func longTimeAgo() -> Date {
+        return Calendar.current.date(byAdding: .day, value: -7, to: Date()) ?? Date()
+    }
+
 }
 
 extension String {

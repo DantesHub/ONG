@@ -41,22 +41,29 @@ class FeedViewModel: ObservableObject {
     }
 
     func fetchNextPage() {
-        
         let startIndex = currentPage * pageSize
         let endIndex = min(startIndex + pageSize, allPolls.count)
         
-        let newPosts = processPollsForFeed(polls: Array(allPolls))
+//        if startIndex >= endIndex {
+//            hasMoreData = false
+//            return
+//        }
+        
+        let pollsToProcess = Array(allPolls[startIndex..<endIndex])
+        let newPosts = processPollsForFeed(polls: allPolls)
         
         // Remove duplicates before appending
         let uniqueNewPosts = newPosts.filter { newPost in
             !feedPosts.contains { $0.id == newPost.id }
+            
         }
         
         feedPosts.append(contentsOf: uniqueNewPosts)
         
         currentPage += 1
-        hasMoreData = endIndex < allPolls.count
+//        hasMoreData = endIndex < allPolls.count
     }
+
     
     func processPollsForUserFeed() {
         var newPosts: [FeedPost] = []
@@ -92,7 +99,11 @@ class FeedViewModel: ObservableObject {
                             pollId: poll.id,
                             timestamp: date
                         )
-                        newPosts.append(feedPost)
+                        if !newPosts.contains(where: { post in
+                            post.id == feedPost.id
+                        }) {
+                            newPosts.append(feedPost)
+                        }
                     }
                 }
             }
@@ -104,6 +115,7 @@ class FeedViewModel: ObservableObject {
     private func processPollsForFeed(polls: [Poll]) -> [FeedPost] {
         var newPosts: [FeedPost] = []
         let dateFormatter = ISO8601DateFormatter()
+//        allUsers.append(currUser)
         
         for poll in polls {
             for option in poll.pollOptions {
@@ -125,16 +137,27 @@ class FeedViewModel: ObservableObject {
                         continue
                     }
                     
+                    var newAura = 0
+                    if Int(aura) ?? 0 < 103 {
+                        newAura = 100
+                    } else {
+                        newAura = Int(aura) ?? 0
+                    }
+                    
                     let feedPost = FeedPost(
                         id: "\(poll.id)_\(option.id)_\(voterId)", // Create a unique ID
                         user: votedUser,
                         votedByUser: votingUser,
-                        aura: Int(aura) ?? 0,
+                        aura: newAura,
                         question: poll.title,
                         pollId: poll.id,
                         timestamp: date
                     )
-                    newPosts.append(feedPost)
+                    if !newPosts.contains(where: { post in
+                        post.id == feedPost.id
+                    }) {
+                        newPosts.append(feedPost)
+                    }
                 }
             }
         }
@@ -142,5 +165,34 @@ class FeedViewModel: ObservableObject {
         return newPosts.sorted(by: { $0.timestamp > $1.timestamp })
     }
     
+    // Updated groupedFeedPosts
+        var groupedFeedPosts: [(key: String, posts: [FeedPost])] {
+            let calendar = Calendar.current
+            let now = Date()
 
+            let grouped = Dictionary(grouping: feedPosts) { post -> String in
+                let components = calendar.dateComponents([.day], from: post.timestamp, to: now)
+
+                if let day = components.day, day > 0 {
+                    if day == 1 {
+                        return "Yesterday"
+                    } else if day < 7 {
+                        return "This Week"
+                    } else {
+                        return "Past"
+                    }
+                } else {
+                    return "Today"
+                }
+            }
+
+            let order = ["Today", "Yesterday", "This Week", "Past"]
+            return order.compactMap { key in
+                if let posts = grouped[key] {
+                    return (key: key, posts: posts)
+                } else {
+                    return nil
+                }
+            }
+        }
 }

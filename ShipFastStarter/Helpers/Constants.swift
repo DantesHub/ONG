@@ -22,6 +22,7 @@ struct Constants {
            "teal",
            "yellow"
        ]
+    static var sawThisInboxItem = "sawThisInboxItem"
     static var finishedPollTutorial = "finishedPollTutorial"
     static var finishedFeedTutorial = "finishedFeedTutorial"
     static var viewedNotificationIds = "viewedNotificationIds"

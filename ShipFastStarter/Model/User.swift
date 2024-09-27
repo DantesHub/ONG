@@ -80,10 +80,10 @@ struct User: Codable, Equatable, FBObject {
     }
 
     static var exUser = User(
-        id: UUID().uuidString,
-        firstName: "Naveed",
-        lastName: "Johnmo",
-        username: "naveedjohnmo",
+        id: "ongteam",
+        firstName: "ONG",
+        lastName: "Team",
+        username: "ongteam",
         schoolId: "123e4567-e89b-12d3-a456-426614174000",
         color: "",
         aura: 100,

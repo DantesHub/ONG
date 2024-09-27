@@ -135,11 +135,12 @@ struct PollAnswerDetailView: View {
                     }
                 }
                 .frame(height: 72)
+                .disabled(inboxVM.selectedInbox?.userId == "ongteam")
+                .opacity(inboxVM.selectedInbox?.userId == "ongteam" ? 0.3 : 1)
             }
         }
         .sheet(isPresented: $tappedReveal) {
             RevealModal()
-                .presentationDetents([.medium])  // This line changes the sheet to a half sheet
         }
         .alert(isPresented: $showPhotoPermissionAlert) {
             Alert(
@@ -332,9 +333,15 @@ struct PollAnswerContentView: View {
             // Poll options in vertical layout
             VStack(spacing: 16) {
                 ForEach(Array(inboxVM.currentFourOptions.enumerated()), id: \.element.id) { index, option in
-                    OriginalPollOptionView(option: option, isCompleted: true, isSelected: index == 0)
-                        .environmentObject(pollVM)
-                        .environmentObject(mainVM)
+                    if index == 0 && option.option == "a classmate" {
+                        OriginalPollOptionView(option: option, isCompleted: true, isSelected: index == 0)
+                            .environmentObject(pollVM)
+                            .environmentObject(mainVM)
+                    } else {
+                        OriginalPollOptionView(option: option, isCompleted: true, isSelected: index == 0)
+                            .environmentObject(pollVM)
+                            .environmentObject(mainVM)
+                    }
                 }
             }
             .padding(.horizontal, 16)

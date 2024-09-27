@@ -1,33 +1,34 @@
 import SwiftUI
 
+import SwiftUI
+
 struct FeedScreen: View {
     @EnvironmentObject var feedVM: FeedViewModel
     @EnvironmentObject var mainVM: MainViewModel
     @EnvironmentObject var profileVM: ProfileViewModel
     @State private var displayTutorial = false
-    @State private var scrollOffset: CGFloat = 0
-    
+
     var body: some View {
         ZStack {
             Color.white.edgesIgnoringSafeArea(.all)
             VStack {
                 InboxScreen().customToolbar
-             
+
                 if feedVM.feedPosts.isEmpty {
                     Text("gotta get some friends!")
                         .foregroundColor(Color.black.opacity(0.7))
                         .font(.system(size: 22, weight: .bold))
                         .multilineTextAlignment(.center)
-                        .frame(maxWidth: UIScreen.size.width)
+                        .frame(maxWidth: UIScreen.main.bounds.width)
                         .padding(.horizontal, 32)
                         .opacity(0.3)
                         .padding(.top, 32)
                 } else {
                     ScrollView(showsIndicators: false) {
                         LazyVStack(spacing: 32) {
-                            ForEach(sortedGroupKeys, id: \.self) { key in
-                                Section(header: sectionHeader(for: key)) {
-                                    ForEach(groupedFeedPosts[key] ?? []) { post in
+                            ForEach(groupedFeedPosts, id: \.key) { group in
+                                Section(header: sectionHeader(for: group.key)) {
+                                    ForEach(group.posts) { post in
                                         ZStack {
                                             FeedPostRow(post: post)
                                                 .padding(.horizontal)
@@ -39,15 +40,30 @@ struct FeedScreen: View {
                                                         profileVM.isVisitingUser = true
                                                     }
                                                 }
+                                            // Your existing overlay code
                                             Text("\(post.aura)")
                                                 .foregroundColor(.white)
-                                                .sfPro(type: post.aura <= 50 ? .regular : post.aura <= 125  ? .medium : post.aura <= 200 ? .semibold : .bold, size: post.aura <= 50 ? .h1Small : post.aura <= 125  ? .h1 : post.aura <= 200 ? .h1Big : .title)
-                                                .stroke(color: post.aura <= 50 ? .black : post.aura <= 125  ? .red : post.aura <= 200 ? Color("pink") : Color("primaryBackground"), width: 3)
+                                                .sfPro(
+                                                    type: post.aura <= 50 ? .regular : post.aura <= 125 ? .medium : post.aura <= 200 ? .semibold : .bold,
+                                                    size: post.aura <= 50 ? .h1Small : post.aura <= 125 ? .h1 : post.aura <= 200 ? .h1Big : .title
+                                                )
+                                                .stroke(
+                                                    color: post.aura <= 50 ? .black : post.aura <= 125 ? .red : post.aura <= 200 ? Color("pink") : Color("primaryBackground"),
+                                                    width: 3
+                                                )
                                                 .shadow(color: .black.opacity(0.5), radius: 4)
                                                 .rotationEffect(.degrees(16))
                                                 .padding(8)
                                                 .cornerRadius(8)
-                                                .position(x: UIScreen.main.bounds.width / (post.aura > 200 ? 1.2 :  1.14), y: 12)
+                                                .position(x: UIScreen.main.bounds.width / (post.aura > 200 ? 1.2 : 1.14), y: 12)
+                                        }
+                                        .onAppear {
+                                            if post == feedVM.feedPosts.last {
+                                                // Trigger the next page
+                                                if feedVM.hasMoreData {
+                                                    feedVM.fetchNextPage()
+                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -56,11 +72,13 @@ struct FeedScreen: View {
                     }
                 }
             }
-        }.onAppear {
+        }
+        .onAppear {
             if !UserDefaults.standard.bool(forKey: Constants.finishedFeedTutorial) && mainVM.currentPage == .feed {
                 displayTutorial = true
             }
-        }.onChange(of: mainVM.currentPage) {
+        }
+        .onChange(of: mainVM.currentPage) { newValue in
             if !UserDefaults.standard.bool(forKey: Constants.finishedFeedTutorial) && mainVM.currentPage == .feed {
                 displayTutorial = true
             }
@@ -69,23 +87,20 @@ struct FeedScreen: View {
             TutorialModal(isPresented: $displayTutorial, isFeed: true)
         }
     }
-    
-    var groupedFeedPosts: [String: [FeedPost]] {
+
+    // Grouped Feed Posts
+    var groupedFeedPosts: [(key: String, posts: [FeedPost])] {
         let calendar = Calendar.current
         let now = Date()
-        
-        return Dictionary(grouping: feedVM.feedPosts) { post in
-            let components = calendar.dateComponents([.year, .month, .day, .hour, .minute, .second], from: post.timestamp, to: now)
-            
+
+        let grouped = Dictionary(grouping: feedVM.feedPosts) { post -> String in
+            let components = calendar.dateComponents([.year, .month, .day], from: post.timestamp, to: now)
+
             if let year = components.year, year > 0 {
                 return "Past"
-            }
-            
-            if let month = components.month, month > 0 {
+            } else if let month = components.month, month > 0 {
                 return "Past"
-            }
-            
-            if let day = components.day, day > 0 {
+            } else if let day = components.day, day > 0 {
                 if day == 1 {
                     return "Yesterday"
                 } else if day < 7 {
@@ -93,18 +108,21 @@ struct FeedScreen: View {
                 } else {
                     return "Past"
                 }
+            } else {
+                return "Today"
             }
-            
-            // Everything within the last 24 hours is considered "Today"
-            return "Today"
+        }
+
+        let order = ["Today", "Yesterday", "This Week", "Past"]
+        return order.compactMap { key in
+            if let posts = grouped[key] {
+                return (key: key, posts: posts)
+            } else {
+                return nil
+            }
         }
     }
-    
-    var sortedGroupKeys: [String] {
-        let order = ["Today", "Yesterday", "This Week", "Past"]
-        return order.filter { groupedFeedPosts.keys.contains($0) }
-    }
-    
+
     func sectionHeader(for key: String) -> some View {
         Text(key)
             .foregroundColor(.black)
@@ -114,6 +132,7 @@ struct FeedScreen: View {
             .padding(.top, 12)
     }
 }
+
 
 struct ScrollOffsetPreferenceKey: PreferenceKey {
     static var defaultValue: CGFloat = 0

@@ -142,50 +142,16 @@ struct ContentView: View {
                 self.dragGesture = gesture
                 handleDragGesture(gesture)
             }
-        }.onChange(of: pollVM.allPolls) {
-            feedVM.allPolls = pollVM.allPolls
-            if let user = mainVM.currUser {
-                feedVM.currUser = user
-                feedVM.visitingUser = user
-            }
-            feedVM.allUsers = profileVM.peopleList
-            feedVM.allFriends = profileVM.friends
-            feedVM.hasMoreData = true
-            feedVM.processPollsForUserFeed()
-            feedVM.fetchNextPage()
         }
-//        .onChange(of: deepLink) { _ in
-//            // Handle deep link here
-//            if let deepLink = deepLink {
-//                switch deepLink {
-//                case "pollScreen":
-//                    mainVM.currentPage = .poll
-//                case "feedScreen":
-//                    mainVM.currentPage = .feed
-//                // Add more cases as needed
-//                default:
-//                    print("Unknown deep link")
-//                }
-//            }
-//            // Reset deep link after handling
-//            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-//                self.deepLink = nil
-//            }
-//        }
+
     }
     
     
     //MARK: - data logic
     private func setupInitialState() {
-        UserDefaults.standard.setValue(0, forKey: Constants.currentIndex)
+//        UserDefaults.standard.setValue(0, forKey: Constants.currentIndex)
         authVM.isUserSignedIn()
-//        Task {
-//            do {
-//                try await FirebaseService.shared.updateAllObjects(collection: "users")
-//            } catch {
-//                print(error.localizedDescription)
-//            }
-//        }
+        
       
         if UserDefaults.standard.bool(forKey: "finishedOnboarding") {
             Task {
@@ -193,7 +159,7 @@ struct ContentView: View {
 //
                 if let user = mainVM.currUser {
                     await fetchPeopleAndNotifications(user)
-                    await fetchPollData(user: user)
+                    await fetchPolls()
                     showSplash = false
                     mainVM.currentPage = .cooldown
                 }
@@ -216,7 +182,7 @@ struct ContentView: View {
             fetchUserAndData()
             if let user = mainVM.currUser {
                 Task {
-                    await fetchPollData(user: user)
+                    await fetchPolls()
                 }
                 if pollVM.cooldownEndTime == nil {
                     pollVM.isNewPollReady = true
@@ -238,7 +204,7 @@ struct ContentView: View {
                 showSplash = false
                 if !highschoolVM.isHighSchoolLocked {
                     mainVM.onboardingScreen = .addFriends
-                    await fetchPollData(user: currUser)
+                    await fetchPolls()
                 }
             }
         }
@@ -253,47 +219,51 @@ struct ContentView: View {
         }
     }
     
-    func fetchPollData(user: User) async {
-        pollVM.checkCooldown(user: user)
-        await profileVM.fetchPeopleList(user: user)
-        pollVM.entireSchool = profileVM.peopleList
-        pollVM.friends = profileVM.friends
-        feedVM.currUser = user
-        feedVM.allUsers = profileVM.peopleList
-        feedVM.allFriends = profileVM.friends
-        await fetchPolls(user: user)
-        feedVM.fetchNextPage()
-    }
-    
+
     
     private func fetchPeopleAndNotifications(_ user: User) async {
-        print(user.schoolId, "bro what is going on")
-        async let notifications = inboxVM.fetchNotifications(for: user)
         async let profilePic = profileVM.fetchUserProfilePicture(user: user)
-        
-        _ = await (notifications, profilePic)
+        _ = await (profilePic)
     }
     
     
         
-    private func fetchPolls(user: User) async {
-        Task {
-            print("fetching polls")
-            await pollVM.fetchPolls(for: user)
-            feedVM.allPolls = pollVM.allPolls
-            feedVM.currUser = user
-            feedVM.allUsers = profileVM.peopleList
-            feedVM.allFriends = profileVM.friends
-            feedVM.fetchNextPage()
-            withAnimation {
-                if pollVM.cooldownEndTime == nil {
-                    pollVM.completedPoll = false
-                    pollVM.isNewPollReady = true
+    private func fetchPolls() async {
+        if let user = mainVM.currUser {
+            Task {
+                await profileVM.fetchPeopleList(user: user)
+                
+                // pollVM data fetch
+                pollVM.entireSchool = profileVM.peopleList
+                pollVM.friends = profileVM.friends
+                print(pollVM.allPolls.count, "kurapika")
+                await pollVM.fetchPolls(for: user)
+                print(pollVM.allPolls.count, "kurapik2")
+                pollVM.checkCooldown(user: user)
+                
+                withAnimation {
+                    if pollVM.cooldownEndTime == nil {
+                        pollVM.completedPoll = false
+                        pollVM.isNewPollReady = true
+                    }
+               
                 }
-           
+                
+                // feedVM data fetch
+                feedVM.currUser = user
+                feedVM.allUsers = profileVM.peopleList
+                feedVM.allFriends = profileVM.friends
+                feedVM.allPolls = pollVM.allPolls
+                feedVM.fetchNextPage()
+                
+                // inboxVM data fetch
+                inboxVM.currUser = user
+                inboxVM.allUsers = profileVM.peopleList
+                inboxVM.allPolls = pollVM.allPolls
+                inboxVM.fetchNotifications(for: user)
             }
-            
         }
+       
     }
     
     //MARK: - Navigation
@@ -331,7 +301,6 @@ struct ContentView: View {
                      .environmentObject(mainVM)
                      .environmentObject(pollVM)
              }
-          
         case .inbox:
             InboxScreen()
                 .environmentObject(mainVM)
@@ -350,6 +319,7 @@ struct ContentView: View {
                 .environmentObject(inboxVM)
         }
     }
+    
     private func toolbarButton(for page: Page, title: String) -> some View {
         Button(action: {
             withAnimation {

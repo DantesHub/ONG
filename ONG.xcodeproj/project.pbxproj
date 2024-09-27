@@ -11,6 +11,8 @@
 		880A21BD2CA22737004F5E1C /* ShareHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 880A21BC2CA22737004F5E1C /* ShareHelper.swift */; };
 		880A21BF2CA23208004F5E1C /* RevealModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 880A21BE2CA23208004F5E1C /* RevealModal.swift */; };
 		880A21C12CA2884B004F5E1C /* TutorialModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 880A21C02CA2884B004F5E1C /* TutorialModal.swift */; };
+		880A21C32CA60D0E004F5E1C /* PollOptionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 880A21C22CA60D0E004F5E1C /* PollOptionView.swift */; };
+		880A21C52CA60DBE004F5E1C /* PollHelperFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 880A21C42CA60DBE004F5E1C /* PollHelperFunctions.swift */; };
 		881A09F62C963B5800D8A858 /* AboutScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 881A09F52C963B5800D8A858 /* AboutScreen.swift */; };
 		881A09F82C9641F000D8A858 /* FriendsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 881A09F72C9641F000D8A858 /* FriendsScreen.swift */; };
 		881A09FA2C96721600D8A858 /* AgeScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 881A09F92C96721600D8A858 /* AgeScreen.swift */; };
@@ -111,6 +113,8 @@
 		880A21BC2CA22737004F5E1C /* ShareHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareHelper.swift; sourceTree = "<group>"; };
 		880A21BE2CA23208004F5E1C /* RevealModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RevealModal.swift; sourceTree = "<group>"; };
 		880A21C02CA2884B004F5E1C /* TutorialModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialModal.swift; sourceTree = "<group>"; };
+		880A21C22CA60D0E004F5E1C /* PollOptionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PollOptionView.swift; sourceTree = "<group>"; };
+		880A21C42CA60DBE004F5E1C /* PollHelperFunctions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PollHelperFunctions.swift; sourceTree = "<group>"; };
 		881A09F52C963B5800D8A858 /* AboutScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutScreen.swift; sourceTree = "<group>"; };
 		881A09F72C9641F000D8A858 /* FriendsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendsScreen.swift; sourceTree = "<group>"; };
 		881A09F92C96721600D8A858 /* AgeScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgeScreen.swift; sourceTree = "<group>"; };
@@ -275,6 +279,8 @@
 				887C78372C9CD1E400CEDC72 /* StartPollScreen.swift */,
 				887C784A2CA0CA6400CEDC72 /* PollAnswerDetailView.swift */,
 				880A21BE2CA23208004F5E1C /* RevealModal.swift */,
+				880A21C22CA60D0E004F5E1C /* PollOptionView.swift */,
+				880A21C42CA60DBE004F5E1C /* PollHelperFunctions.swift */,
 			);
 			path = Polling;
 			sourceTree = "<group>";
@@ -658,7 +664,9 @@
 				8838DC7E2C93ED7F00500C6E /* FriendRequests.swift in Sources */,
 				887C78502CA12B9400CEDC72 /* Bug.swift in Sources */,
 				884B24772C87B97500229F1E /* Poll.swift in Sources */,
+				880A21C32CA60D0E004F5E1C /* PollOptionView.swift in Sources */,
 				88B37D4A2C2410EB000A7D91 /* Numbers.swift in Sources */,
+				880A21C52CA60DBE004F5E1C /* PollHelperFunctions.swift in Sources */,
 				888FF3BC2C867CD80025EC1B /* LocationScreen.swift in Sources */,
 				88C1E5642C86A6B300C9317E /* FirebaseService.swift in Sources */,
 				884B24792C87B97D00229F1E /* PollOption.swift in Sources */,
@@ -827,7 +835,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = ONG.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 35;
+				CURRENT_PROJECT_VERSION = 36;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "\"ShipFastStarter/Preview Content\"";
 				DEVELOPMENT_TEAM = VY92D2R4AT;
@@ -849,7 +857,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.3.4;
+				MARKETING_VERSION = 1.3.5;
 				"OTHER_LDFLAGS[arch=*]" = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.ong.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -870,7 +878,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = ONG.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 35;
+				CURRENT_PROJECT_VERSION = 36;
 				DEVELOPMENT_ASSET_PATHS = "\"ShipFastStarter/Preview Content\"";
 				DEVELOPMENT_TEAM = VY92D2R4AT;
 				ENABLE_PREVIEWS = YES;
@@ -891,7 +899,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.3.4;
+				MARKETING_VERSION = 1.3.5;
 				"OTHER_LDFLAGS[arch=*]" = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.ong.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";

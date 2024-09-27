@@ -58,7 +58,7 @@ struct PollOption: Codable, Equatable, FBObject, Comparable {
     static var exPollOption = PollOption(
         id: "example_option_id",
         type: "Interest Based Question",
-        option: "Example Option",
+        option: "a classmate",
         userId: "user_id",
         votes: [:],
         gradeLevel: "9" // Example grade level

@@ -29,7 +29,7 @@ struct Poll: Codable, Equatable, FBObject {
 
     static var exPoll = Poll(
         id: "example_poll_id",
-        title: "Example Poll",
+        title: "you'll see this when someone chooses you in a poll!",
         createdAt: Date(),
         pollOptions: [],
         isActive: true,

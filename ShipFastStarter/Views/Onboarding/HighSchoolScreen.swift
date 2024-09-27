@@ -49,6 +49,7 @@ struct HighSchoolScreen: View {
                                         try await FirebaseService.shared.updateField(collection: "users", documentId: currUser.id, field: "schoolId", value: "buildspace")
                                         await viewModel.checkHighSchoolLock(for: currUser, id: "buildspace")
                                         viewModel.updateNumStudents(user: currUser, for: "buildspace")
+                                        
                                         if !viewModel.selectedHighschool.students.contains(currUser.id) {
                                             await profileVM.fetchPeopleList(user: currUser)
                                         }
@@ -65,9 +66,7 @@ struct HighSchoolScreen: View {
                                     } catch {
                                         print(error.localizedDescription, "high school screen crashed app")
                                         let bug = Bug(title: "Highschool Crash", description: error.localizedDescription, date: Date(), userId: currUser.id, highschoolId: "buildspace")
-//                                        FirebaseService.shared.addDocument(bug, collection: "bugs") { str in
-//                                            
-//                                        }
+                                        Analytics.shared.logCrash(error: error)
                                     }
                                 }
                            
