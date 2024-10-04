@@ -11,8 +11,8 @@ import SwiftUI
 
 @MainActor
 class PollViewModel: ObservableObject {
-    @Published var pollSet: [Poll] = []
     @Published var allPolls: [Poll] = []
+    @Published var pollSet: [Poll] = []
     @Published var selectedPoll: Poll = Poll.exPoll
     @Published var currentFourOptions: [PollOption] = []
     @Published var allOptions: [PollOption] = []
@@ -23,7 +23,6 @@ class PollViewModel: ObservableObject {
     @Published var isNewPollReady: Bool = true
     @Published var questionEmoji: String = ""
     @Published var completedPoll: Bool = false
-    @Published var totalVotes: Int = 0
     @Published var cooldownEndTime: Date?
     @Published var timeRemaining: TimeInterval = 0
     @Published var randomizedPeople: [(String, String)] = []
@@ -33,140 +32,117 @@ class PollViewModel: ObservableObject {
     @Published var entireSchool: [User] = []
     
     private var timer: Timer?
-
+    
     init() {
         updateQuestionEmoji()
         randomizePeople()
     }
     
     func randomizePeople() {
-       let randomNumber = Int.random(in: 2...4)
- 
-       
-       let randomPerson = 0
+        let randomNumber = Int.random(in: 2...4)
+        
+        
+        let randomPerson = 0
         
         for _ in 0..<randomNumber {
             var randGender = Int.random(in: 0...1)
             var color = Int.random(in: 0...7)
             randomizedPeople.append((randGender == 0 ? "boy" : "girl", Constants.colors[color]))
-         }
-    }
-
-    func fetchPolls(for user: User) async {
-        await initPolls(for: user)
-    }
-    
-    func updatePollOptionsInFB() async {
-        let sortedArray1 = self.selectedPoll.pollOptions.sorted()
-        let sortedArray2 = allOptions.sorted()
-        
-        if sortedArray1 != sortedArray2 { // update in firebase
-            self.selectedPoll.pollOptions = allOptions            // Update the poll in allPolls
-            if let index = self.allPolls.firstIndex(where: { $0.id == self.selectedPoll.id }) {
-                self.allPolls[index].pollOptions = self.allOptions
-            }            
-            // Update the poll in pollSet
-            if let index = self.pollSet.firstIndex(where: { $0.id == self.selectedPoll.id }) {
-                self.pollSet[index].pollOptions = self.allOptions
-            }
-            
-            
-            do {
-                try await FirebaseService.shared.updateDocument(collection: "polls", field: "id", isEqualTo: selectedPoll.id, object: self.selectedPoll)
-            } catch {
-                print(error.localizedDescription)
-            }
         }
     }
     
-    func initPolls(for user: User) async {
+    func fetchPolls(for user: User) async {
         do {
-            let polls: [Poll] = try await FirebaseService.shared.fetchDocuments(
-                collection: "polls",
+            print("Fetching polls for user \(user.id)")
+            let votes: [Vote] = try await FirebaseService.shared.fetchDocuments(
+                collection: FirestoreCollections.votes,
+                whereField: "voterId",
+                isEqualTo: user.id
+            )
+            let votedPollIds = votes.map { $0.pollId }
+            
+            let allActivePolls: [Poll] = try await FirebaseService.shared.fetchDocumentsWithFilters(
+                collection: FirestoreCollections.polls,
+                whereField: "schoolId",
+                isEqualTo: user.schoolId,
+                additionalFilters: [
+                    ("status", "isEqualTo", "active")
+                ],
+                orderBy: ("createdAt", true)
+            )
+            
+            // Then, filter out the polls the user has already voted on
+            let filteredPolls = allActivePolls.filter { poll in
+                !votedPollIds.contains(poll.id)
+            }
+            
+            // Finally, take the first 8 polls
+            self.allPolls = allActivePolls
+            self.pollSet = Array(filteredPolls.prefix(8))
+            
+            // setup allOptions here, which is all the users in the school
+            let allUsers: [User] = try await FirebaseService.shared.fetchDocuments(
+                collection: FirestoreCollections.users,
                 whereField: "schoolId",
                 isEqualTo: user.schoolId
             )
-            
-//            self.allPolls = polls.filter { question in
-//                !Question.bsQuestions.contains { $0.question == question.title }
-//            }
-            
-            self.allPolls = polls
-            self.pollSet = allPolls
-            self.pollSet.sort { $0.createdAt < $1.createdAt }
-            self.pollSet = polls.filter { !$0.usersWhoVoted.contains(user.id) }
-         
-            if pollSet.count < 8 {
-                await createPoll(user: user)
-            } else {
-                for poll in pollSet {
-                    self.selectedPoll = poll
-                    allOptions = poll.pollOptions
-                    getPollOptions(excludingUserId: user)
-                    await updatePollOptionsInFB()
+            self.allOptions = allUsers
+                .filter { $0.id != user.id }
+                .map {
+                    PollOption(
+                        id: $0.id,
+                        type: "Poll",
+                        option: "\($0.firstName) \($0.lastName)",
+                        userId: $0.id,
+                        gradeLevel: $0.grade
+                    )
                 }
-            }
             
-            // Limit pollSet to the first 8 polls
-            self.pollSet = Array(self.pollSet.prefix(8))
-            // create array of poll ids
             let pollIds = pollSet.map { $0.id }
-            
             UserDefaults.standard.setValue(pollIds, forKey: Constants.pollIds)
-
+            
             if let first = self.pollSet.first {
                 self.selectedPoll = first
-                allOptions = first.pollOptions
-                print(first.pollOptions.count, selectedPoll.title, "shibal gaeseki")
-                self.getPollOptions(excludingUserId: user)
             }
             
             if UserDefaults.standard.integer(forKey: Constants.currentIndex) != 0  {
                 currentPollIndex = UserDefaults.standard.integer(forKey: Constants.currentIndex)
                 self.selectedPoll = pollSet[currentPollIndex]
             }
-          
+            
         } catch {
             print("Error fetching polls: \(error.localizedDescription)")
         }
     }
-
+    
     func answerPoll(user: User, option: PollOption, optionUser: User, totalVotes: Int) async {
-        print("Answering poll for option: \(option.option)")
-        if let optionIndex = selectedPoll.pollOptions.firstIndex(where: { $0.id == option.id }) {
+        if let optionIndex = currentFourOptions.firstIndex(where: { $0.id == option.id }) {
             
             let currentDate = Date()
             let dateString = ISO8601DateFormatter().string(from: currentDate)
-            
-            // Update votes with the new structure
-            if selectedPoll.pollOptions[optionIndex].votes == nil {
-                selectedPoll.pollOptions[optionIndex].votes = [:]
-            }
-            
-            
-            if var voteObj = selectedPoll.pollOptions[optionIndex].votes?[user.id] {
-                var currentVotes = Int(voteObj["numVotes"] ?? "100") ?? 100
-                currentVotes += totalVotes
-                selectedPoll.pollOptions[optionIndex].votes?[user.id] = [
-                    "date": dateString,
-                    "numVotes": String(currentVotes),
-                    "viewedNotification": "false"
-                ]
+
+            let vote = Vote(
+                id: UUID().uuidString,
+                voterId: user.id,
+                votedForId: optionUser.id,
+                schoolId: user.schoolId,
+                votedForOptionIndex: optionIndex,
+                amount: totalVotes,
+                pollId: selectedPoll.id,
+                createdAt: currentDate,
+                viewedNotification: false,
+                pollOptions: currentFourOptions.map { $0.option },
+                question: selectedPoll.title
+            )
+
+            if let index = self.pollSet.firstIndex(where: { $0.id == self.selectedPoll.id }) {
+                self.pollSet[index].voteSummary[optionUser.id, default: 0] += totalVotes
+                self.selectedPoll = self.pollSet[index]
             } else {
-                selectedPoll.pollOptions[optionIndex].votes?[user.id] = [
-                    "date": dateString,
-                    "numVotes": String(Int(totalVotes)),
-                    "viewedNotification": "false"
-                ]
+                print("Error: Selected poll not found in pollSet")
             }
+
             
-            selectedPoll.usersWhoVoted.append(user.id)
-            
-            if let index = pollSet.firstIndex(where: { $0.id == selectedPoll.id }) {
-                pollSet[index] = selectedPoll
-            }
-            
-            updateTotalVotes()
             showProgress = true
             animateProgress = true
             animateAllOptions = true
@@ -176,26 +152,25 @@ class PollViewModel: ObservableObject {
             
             // Perform Firebase updates
             do {
-                try await FirebaseService.shared.updateDocument(
-                    collection: "polls",
-                    object: selectedPoll
+                FirebaseService.shared.addDocument(
+                    vote,
+                    collection: FirestoreCollections.votes,
+                    completion: {_ in }
                 )
-                                     
+
+                try await FirebaseService.shared.updateFields(
+                    collection: FirestoreCollections.polls,
+                    documentId: self.selectedPoll.id,
+                    fields: ["voteSummary": self.selectedPoll.voteSummary]
+                )
+
                 var updatedOptionUser = optionUser
                 updatedOptionUser.aura += totalVotes
-                                
+
                 try await FirebaseService.shared.updateDocument(
-                    collection: "users",
-                    object: user
-                )
-                
-                try await FirebaseService.shared.updateDocument(
-                    collection: "users",
+                    collection: FirestoreCollections.users,
                     object: updatedOptionUser
                 )
-                
-                
-                print("Firebase update completed")
             } catch {
                 print("Error answering poll: \(error.localizedDescription)")
             }
@@ -203,69 +178,51 @@ class PollViewModel: ObservableObject {
             print("Failed to find matching poll or option")
         }
     }
-
-    func createPoll(user: User) async {
-        print(" *******  *******  ******* creating polls  ******* ******* *******")
-
-        var potentialQuestions = Question.bsQuestions.filter { question in
-            !allPolls.contains { $0.title == question.question }
-        }
-
-        var newPolls: [Poll] = []
-        while pollSet.count < 8 && !potentialQuestions.isEmpty {
-            if let question = potentialQuestions.first {
-                potentialQuestions.removeFirst()
-           
-                let id = UUID().uuidString
-                selectedPoll.id = id
-                
-                allOptions = []
-                getPollOptions(excludingUserId: user)
-
-                let poll = Poll(
-                    id: id,
-                    title: question.question,
-                    createdAt: Date(),
-                    pollOptions: allOptions,
-                    isActive: true,
-                    schoolId: user.schoolId,
-                    grade: user.grade,
-                    type: "Poll",
-                    category: question.category,
-                    usersWhoVoted: [] // Initialize with empty array
-                )
-                
-                selectedPoll = poll
-                pollSet.append(poll)
-                newPolls.append(poll)
-            }
-        }
-
-        // Prepare data for batch save
-        var batchDocuments: [(collection: String, data: [String: Any])] = []
-
-        for poll in newPolls {
-            if let pollData = poll.encodeToDictionary() {
-                batchDocuments.append((collection: "polls", data: pollData))
-            }
-        }
-  
+    
+    func initPolls(for user: User) async {
+        // if there are no polls in the db, create them
         do {
-            // Perform batch save
-            try await FirebaseService.shared.batchSave(documents: batchDocuments)
+            let polls: [Poll] = try await FirebaseService.shared.fetchDocuments(collection: FirestoreCollections.polls, whereField: "schoolId", isEqualTo: user.schoolId)
+            
+            if polls.isEmpty {
+                print("No polls yet for school: \(user.schoolId), initializing.")
+                
+                var pollQuestions = Question.bsQuestions
+                
+                var newPolls: [Poll] = []
+                for question in pollQuestions {
+                    let poll = Poll(
+                        id: UUID().uuidString,
+                        title: question.question,
+                        createdAt: Date(),
+                        status: "active",
+                        schoolId: user.schoolId,
+                        grade: user.grade,
+                        type: "Poll",
+                        category: question.category,
+                        voteSummary: [:]
+                    )
+                    newPolls.append(poll)
+                }
+                
+                var batchDocuments: [(collection: String, data: [String: Any])] = []
+                
+                for poll in newPolls {
+                    if let pollData = poll.encodeToDictionary() {
+                        batchDocuments.append((collection: FirestoreCollections.polls, data: pollData))
+                    }
+                }
 
-            // Update local state
-            self.allPolls.append(contentsOf: newPolls)
-            self.pollSet = self.allPolls.filter { !$0.usersWhoVoted.contains(user.id) }
-            self.pollSet.sort { $0.createdAt > $1.createdAt }
-            if let first = self.pollSet.first {
-                self.selectedPoll = first
-                allOptions = first.pollOptions
-                self.getPollOptions(excludingUserId: user)
+                do {
+                    try await FirebaseService.shared.batchSave(documents: batchDocuments)
+                } catch {
+                    print("Error creating polls: \(error.localizedDescription)")
+                }
             }
         } catch {
-            print("Error creating polls: \(error.localizedDescription)")
+            print("Error fetching polls: \(error.localizedDescription)")
         }
+        
     }
     
     func createNewOptions(user: User, friends: [User]) {
@@ -273,8 +230,8 @@ class PollViewModel: ObservableObject {
             let friendNotAnOption = allOptions.contains { $0.userId != friend.id }
             return friendNotAnOption
         }
-      
-    
+        
+        
         if allOptions.contains(where: { option in
             option.userId != user.id
         }) {
@@ -284,20 +241,18 @@ class PollViewModel: ObservableObject {
                 type: "Poll",
                 option: "\(user.firstName) \(user.lastName)",
                 userId: user.id,
-                votes: [:],
                 gradeLevel: user.grade
             )
             userOption.priorityScore = -3
             allOptions.append(userOption)
         }
-                
+        
         for friend in friendOptions {
             var newOption = PollOption(
                 id: UUID().uuidString,
                 type: "Poll",
                 option: "\(friend.firstName) \(friend.lastName)",
                 userId: friend.id,
-                votes: [:],
                 gradeLevel: friend.grade
             )
             
@@ -339,17 +294,16 @@ class PollViewModel: ObservableObject {
                     type: "Poll",
                     option: "\(userInGrade.firstName) \(userInGrade.lastName)",
                     userId: userInGrade.id,
-                    votes: [:],
                     gradeLevel: userInGrade.grade
                 )
-
+                
                 newOption.priorityScore = calculatePriorityScore(for: newOption, user: userInGrade)
-
+                
                 newOption.priorityScore += 3
                 allOptions.append(newOption)
             }
         }
-          
+        
         // finally if allOptions is still not > 12 we will add in rest of school here
         // Filter entireSchool to exclude users already in allOptions
         var remainingUsers = entireSchool.filter { schoolUser in
@@ -369,45 +323,41 @@ class PollViewModel: ObservableObject {
                 type: "Poll",
                 option: "\(remainUser.firstName) \(remainUser.lastName)",
                 userId: remainUser.id,
-                votes: [:],
                 gradeLevel: remainUser.grade
             )
-
+            
             newOption.priorityScore = calculatePriorityScore(for: newOption, user: remainUser)
-
+            
             
             allOptions.append(newOption)
         }
         
     }
-
     
-
-
     func getPollOptions(excludingUserId user: User) {
         var updatedOptions: [PollOption] = []
         var totalFriendOptions = 0
         var totalSameGradeOptions = 0
-
+        
         for option in allOptions {
             var updatedOption = option
             updatedOption.priorityScore = calculatePriorityScore(for: option, user: user)
-
+            
             if friends.contains(where: { $0.id == option.userId }) {
                 totalFriendOptions += 1
             }
-
+            
             if user.grade == option.gradeLevel {
                 totalSameGradeOptions += 1
             }
-
+            
             updatedOptions.append(updatedOption)
         }
-
+        
         // Sort priority options by score
         updatedOptions.sort { $0.priorityScore > $1.priorityScore }
         allOptions = updatedOptions
-
+        
         // Remove duplicate options with the same userId
         var seenUserIds = Set<String>()
         allOptions = allOptions.filter { option in
@@ -427,7 +377,7 @@ class PollViewModel: ObservableObject {
         }
         
         allOptions.sort { $0.priorityScore > $1.priorityScore }
-
+        
         seenUserIds = Set<String>()
         allOptions = allOptions.filter { option in
             if seenUserIds.contains(option.userId) {
@@ -443,31 +393,25 @@ class PollViewModel: ObservableObject {
             option.userId != user.id
         }
         
-        selectedPoll.pollOptions = allOptions
         currentTwelveOptions = Array(allOptions.prefix(12)).shuffled()
         // Take up to 4 options from the available options
         currentFourOptions = Array(currentTwelveOptions.prefix(4))
         currentPollOptionIndex = min(4, allOptions.count)
-        Task {
-            await updatePollOptionsInFB()
-        }
         
         updateQuestionEmoji()
-        updateTotalVotes()
         resetPollState()
         
         // Print debug information
         print("getPollOptions called")
-        print("Selected poll has \(selectedPoll.pollOptions.count) total options")
         print("Available options after filtering: \(updatedOptions.count)")
         print("Current four options: \(currentFourOptions.map { $0.option })")
-                 
+        
     }
-
+    
     func shuffleOptions(excludingUserId: String) {
         let totalOptions = allOptions.count
         var availableOptions = currentTwelveOptions.filter { $0.userId != excludingUserId }
-
+        
         if currentPollOptionIndex >= totalOptions {
             currentPollOptionIndex = 0
         }
@@ -488,7 +432,7 @@ class PollViewModel: ObservableObject {
         print("shuffleOptions called")
         print("Current four options after shuffle: \(currentFourOptions.map { $0.option })")
     }
-     
+    
     func updateQuestionEmoji() {
         if let matchingQuestion = Question.bsQuestions.first(where: { $0.question == selectedPoll.title }) {
             self.questionEmoji = matchingQuestion.emoji
@@ -496,21 +440,14 @@ class PollViewModel: ObservableObject {
             self.questionEmoji = "❓"
         }
     }
-
+    
     func resetPollState() {
         showProgress = false
         animateProgress = false
         animateAllOptions = false
     }
-
-    func updateTotalVotes() {
-        totalVotes = selectedPoll.pollOptions.reduce(0) { total, option in
-            total + (option.votes?.values.reduce(0) { $0 + (Int($1["numVotes"] ?? "0") ?? 0) } ?? 0)
-        }
-        print("Updated total votes: \(totalVotes)")
-        objectWillChange.send()
-    }
-
+    
+    
     func finishPoll(user: User) {
         self.isNewPollReady = false
         let cooldownDuration: TimeInterval = 6 * 60 * 60
@@ -528,7 +465,7 @@ class PollViewModel: ObservableObject {
         Task {
             do {
                 try await FirebaseService.shared.updateDocument(
-                    collection: "users",
+                    collection: FirestoreCollections.users,
                     object: user
                 )
             } catch {
@@ -560,7 +497,7 @@ class PollViewModel: ObservableObject {
         timer?.invalidate()
         timer = nil
     }
-
+    
     private func updateTimeRemaining() {
         guard let cooldownEndTime = cooldownEndTime else {
             timeRemaining = 0
@@ -573,7 +510,7 @@ class PollViewModel: ObservableObject {
             self.cooldownEndTime = nil
         }
     }
-
+    
     func checkCooldown(user: User) {
         if let lastPollFinished = user.lastPollFinished {
             let cooldownDuration: TimeInterval = 6 * 60 * 60
@@ -593,7 +530,7 @@ class PollViewModel: ObservableObject {
             stopCooldownTimer()
         }
     }
-
+    
     func resetCooldown(user: User) {
         let twelveHoursAgo = Date().addingTimeInterval(-6 * 60 * 60)
         cooldownEndTime = nil
@@ -601,13 +538,13 @@ class PollViewModel: ObservableObject {
         stopCooldownTimer()
         completedPoll = false
         objectWillChange.send()
-
+        
         Task {
             do {
                 var updatedUser = user
                 updatedUser.lastPollFinished = twelveHoursAgo
                 try await FirebaseService.shared.updateDocument(
-                    collection: "users",
+                    collection: FirestoreCollections.users,
                     object: updatedUser
                 )
                 print("User updated in Firebase after cooldown reset")
@@ -622,7 +559,7 @@ class PollViewModel: ObservableObject {
             self.stopCooldownTimer()
         }
     }
-
+    
     func resetState() {
         // Reset all relevant properties
         self.completedPoll = false
@@ -630,33 +567,7 @@ class PollViewModel: ObservableObject {
         // Reset any other properties as needed
     }
     
-    //MARK: - notification logic
-    func hasNewNotifications(for user: User) -> Bool {
-        return selectedPoll.pollOptions.contains { option in
-            option.votes?[user.id]?["viewedNotification"] == "false"
-        }
-    }
-
-    func markNotificationsAsViewed(for user: User) async {
-        for i in 0..<selectedPoll.pollOptions.count {
-            if var votes = selectedPoll.pollOptions[i].votes?[user.id],
-               votes["viewedNotification"] == "false" {
-                votes["viewedNotification"] = "true"
-                selectedPoll.pollOptions[i].votes?[user.id] = votes
-                
-                do {
-                    try await FirebaseService.shared.updateDocument(
-                        collection: "pollOptions",
-                        object: selectedPoll.pollOptions[i]
-                    )
-                } catch {
-                    print("Error updating poll option: \(error.localizedDescription)")
-                }
-            }
-        }
-        objectWillChange.send()
-    }
-
+    
     func calculateDaysSinceLastPoll(for user: User) -> Int {
         let calendar = Calendar.current
         let now = Date()
@@ -666,14 +577,15 @@ class PollViewModel: ObservableObject {
             return 7
         }
     }
-
+    
     func calculatePriorityScore(for option: PollOption, user: User) -> Int {
         var score = 0
         let daysSinceLastPoll = calculateDaysSinceLastPoll(for: user)
-        let hasVotes = (option.votes?.values.reduce(0) { $0 + (Int($1["numVotes"] ?? "0") ?? 0) } ?? 0) > 0
+        let voteCount = selectedPoll.voteSummary[option.userId] ?? 0
+        let hasVotes = voteCount > 0
         let isFriend = friends.contains { $0.id == option.userId }
         let sameGrade = user.grade == option.gradeLevel
-
+        
         if hasVotes && isFriend {
             score += 7
         } else if isFriend {
@@ -681,17 +593,17 @@ class PollViewModel: ObservableObject {
         } else if hasVotes {
             score += 1
         }
-
+        
         if sameGrade {
             score += 2
         }
-
+        
         if daysSinceLastPoll > 5 {
             score -= 5
         } else if daysSinceLastPoll > 3 {
             score -= 3
         }
-
+        
         return score
     }
 }

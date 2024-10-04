@@ -27,3 +27,11 @@ struct Constants {
     static var finishedFeedTutorial = "finishedFeedTutorial"
     static var viewedNotificationIds = "viewedNotificationIds"
 }
+
+struct FirestoreCollections {
+    static var users = "users"
+    static var polls = "_polls"
+    static var votes = "_votes"
+    static var schools = "highschools"
+    static var bugs = "bugs"
+}

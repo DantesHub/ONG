@@ -276,7 +276,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
             //                  user.number = "2234567890"
             //                  user.firstName = "Epik"
             //                  user.fcmToken = token
-            //                  try await FirebaseService.shared.updateDocument(collection: "users", field: "number", isEqualTo: "2234567890", object: user)
+            //                  try await FirebaseService.shared.updateDocument(collection: FirestoreCollections.users, field: "number", isEqualTo: "2234567890", object: user)
             //              }
         }
     }

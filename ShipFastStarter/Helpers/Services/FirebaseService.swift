@@ -69,8 +69,13 @@ class FirebaseService {
         let batch = Firestore.firestore().batch()
         
         for doc in documents {
-            let ref = Firestore.firestore().collection(doc.collection).document()
-            batch.setData(doc.data, forDocument: ref)
+            if let id = doc.data["id"] as? String {
+                let docRef = Firestore.firestore().collection(doc.collection).document(id)
+                batch.setData(doc.data, forDocument: docRef)
+            } else {
+                print("Error: 'id' not found or not a string in document data")
+                throw NSError(domain: "FirebaseService", code: 1, userInfo: [NSLocalizedDescriptionKey: "Missing or invalid 'id' in document data"])
+            }
         }
         
         try await batch.commit()
@@ -178,7 +183,7 @@ class FirebaseService {
     static func getUser(completion: @escaping (Result<User, Error>) -> Void) {
         if let number = UserDefaults.standard.string(forKey: "userNumber") {
             print(number, "shibal")
-            let userCollection = FirebaseService.db.collection("users")
+            let userCollection = FirebaseService.db.collection(FirestoreCollections.users)
             userCollection.whereField("number", isEqualTo: number).getDocuments { (querySnapshot, error) in
                 if let error = error {
                     completion(.failure(error))
@@ -298,6 +303,49 @@ class FirebaseService {
             }
         }
     }
+
+    func fetchDocumentsWithFilters<T: Codable>(
+        collection: String,
+        whereField: String,
+        isEqualTo: Any,
+        additionalFilters: [(String, String, Any)] = [],
+        orderBy: (String, Bool)? = nil,
+        limit: Int? = nil
+    ) async throws -> [T] {
+        let db = Firestore.firestore()
+        var query: Query = db.collection(collection).whereField(whereField, isEqualTo: isEqualTo)
+        
+        for filter in additionalFilters {
+            switch filter.1 {
+            case "isEqualTo":
+                query = query.whereField(filter.0, isEqualTo: filter.2)
+            case "notIn":
+                if let array = filter.2 as? [Any], !array.isEmpty {
+                    query = query.whereField(filter.0, notIn: array)
+                }
+            case "in":
+                if let array = filter.2 as? [Any], !array.isEmpty {
+                    query = query.whereField(filter.0, in: array)
+                }
+            default:
+                break
+            }
+        }
+        
+        if let (field, descending) = orderBy {
+            query = query.order(by: field, descending: descending)
+        }
+        
+        if let limit = limit {
+            query = query.limit(to: limit)
+        }
+        
+        let snapshot = try await query.getDocuments()
+        return try snapshot.documents.compactMap { document in
+            let jsonData = try JSONSerialization.data(withJSONObject: document.data())
+            return try JSONDecoder().decode(T.self, from: jsonData)
+        }
+    }
     
     //MARK: - revert
      func updateAllObjects(collection: String) async throws {
@@ -331,7 +379,7 @@ class FirebaseService {
     }
 
     func isUsernameTaken(_ username: String) async throws -> Bool {
-        let usersRef = FirebaseService.db.collection("users")
+        let usersRef = FirebaseService.db.collection(FirestoreCollections.users)
         let query = usersRef.whereField("username", isEqualTo: username)
         
         do {
@@ -441,7 +489,7 @@ class FirebaseService {
         let db = Firestore.firestore()
         
         // Query to find the user document based on the username
-        let userDoc = db.collection("users").whereField("username", isEqualTo: username)
+        let userDoc = db.collection(FirestoreCollections.users).whereField("username", isEqualTo: username)
         
         userDoc.getDocuments { (querySnapshot, error) in
             if let error = error {
@@ -468,7 +516,7 @@ class FirebaseService {
     
     func removeUserFromPollOptions(user: User) async throws {
         let db = Firestore.firestore()
-        let pollsRef = db.collection("polls")
+        let pollsRef = db.collection(FirestoreCollections.polls)
         let userId = user.id
         // Get all polls
         let querySnapshot = try await pollsRef.getDocuments()

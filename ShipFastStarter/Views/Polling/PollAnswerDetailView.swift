@@ -338,7 +338,7 @@ struct PollAnswerContentView: View {
                             .environmentObject(pollVM)
                             .environmentObject(mainVM)
                     } else {
-                        OriginalPollOptionView(option: option, isCompleted: true, isSelected: index == 0)
+                        OriginalPollOptionView(option: option, isCompleted: true, isSelected: index == inboxVM.selectedVote!.votedForOptionIndex)
                             .environmentObject(pollVM)
                             .environmentObject(mainVM)
                     }
@@ -395,10 +395,7 @@ struct OriginalPollOptionView: View {
             .onChange(of: pollVM.animateProgress) { _ in
                 updateProgressWidth(geometry: geometry)
             }
-            .onChange(of: pollVM.totalVotes) { _ in
-                updateProgressWidth(geometry: geometry)
-            }
-            .onChange(of: pollVM.selectedPoll) { _ in
+            .onChange(of: pollVM.selectedPoll.voteSummary) { _ in
                 updateProgressWidth(geometry: geometry)
             }
         }
@@ -421,18 +418,10 @@ struct OriginalPollOptionView: View {
     }
 
     private var progress: Double {
-        guard pollVM.totalVotes > 0 else { return 0 }
-        let optionVotes = calculateOptionVotes()
-        let progress = Double(optionVotes) / Double(pollVM.totalVotes)
-        return progress
-    }
-
-    private func calculateOptionVotes() -> Int {
-        return pollVM.selectedPoll.pollOptions
-            .first(where: { $0.id == option.id })?
-            .votes?
-            .values
-            .reduce(0) { $0 + (Int($1["numVotes"] ?? "0") ?? 0) } ?? 0
+        let totalVotes = pollVM.selectedPoll.voteSummary.values.reduce(0, +)
+        guard totalVotes > 0 else { return 0 }
+        let optionVotes = pollVM.selectedPoll.voteSummary[option.userId] ?? 0
+        return Double(optionVotes) / Double(totalVotes)
     }
 }
 
@@ -474,4 +463,3 @@ struct ActivityView: UIViewControllerRepresentable {
         .environmentObject(MainViewModel())
         .environmentObject(PollViewModel())
 }
-

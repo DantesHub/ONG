@@ -236,9 +236,10 @@ struct ContentView: View {
                 // pollVM data fetch
                 pollVM.entireSchool = profileVM.peopleList
                 pollVM.friends = profileVM.friends
-                print(pollVM.allPolls.count, "kurapika")
+                print(pollVM.pollSet.count, "kurapika")
+                await pollVM.initPolls(for: user)
                 await pollVM.fetchPolls(for: user)
-                print(pollVM.allPolls.count, "kurapik2")
+                await pollVM.getPollOptions(excludingUserId: user)
                 pollVM.checkCooldown(user: user)
                 
                 withAnimation {
@@ -253,14 +254,14 @@ struct ContentView: View {
                 feedVM.currUser = user
                 feedVM.allUsers = profileVM.peopleList
                 feedVM.allFriends = profileVM.friends
-                feedVM.allPolls = pollVM.allPolls
+                await feedVM.fetchVotes()
                 feedVM.fetchNextPage()
                 
                 // inboxVM data fetch
                 inboxVM.currUser = user
                 inboxVM.allUsers = profileVM.peopleList
                 inboxVM.allPolls = pollVM.allPolls
-                inboxVM.fetchNotifications(for: user)
+                await inboxVM.fetchNotifications(for: user)
             }
         }
        

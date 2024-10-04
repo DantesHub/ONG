@@ -107,6 +107,7 @@
 		C45CF5572C9166E900D58633 /* FirebaseDynamicLinks in Frameworks */ = {isa = PBXBuildFile; productRef = C45CF5562C9166E900D58633 /* FirebaseDynamicLinks */; };
 		C45CF55A2C91C24700D58633 /* FacebookShare in Frameworks */ = {isa = PBXBuildFile; productRef = C45CF5592C91C24700D58633 /* FacebookShare */; };
 		C4C38B712C984BEB003FDE11 /* SwiftUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4C38B702C984BEB003FDE11 /* SwiftUIView.swift */; };
+		F4B404632CAE8B410044B399 /* Vote.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4B404622CAE8B3F0044B399 /* Vote.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -200,6 +201,7 @@
 		88C1E5712C876CF100C9317E /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "ShipFastStarter/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		88C1E5772C876E7500C9317E /* ONG-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "ONG-Info.plist"; sourceTree = "<group>"; };
 		C4C38B702C984BEB003FDE11 /* SwiftUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIView.swift; sourceTree = "<group>"; };
+		F4B404622CAE8B3F0044B399 /* Vote.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Vote.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -410,6 +412,7 @@
 		88B37D222C23FDEE000A7D91 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				F4B404622CAE8B3F0044B399 /* Vote.swift */,
 				884B24742C87B96E00229F1E /* User.swift */,
 				884B24762C87B97500229F1E /* Poll.swift */,
 				884B24782C87B97D00229F1E /* PollOption.swift */,
@@ -681,6 +684,7 @@
 				8838DC3E2C8A5B7B00500C6E /* PollCooldownScreen.swift in Sources */,
 				8838DC742C911A9600500C6E /* String.swift in Sources */,
 				88B37D0D2C23FD60000A7D91 /* ShipFastStarterApp.swift in Sources */,
+				F4B404632CAE8B410044B399 /* Vote.swift in Sources */,
 				884B247D2C87B99D00229F1E /* VibeCheck.swift in Sources */,
 				881A09FA2C96721600D8A858 /* AgeScreen.swift in Sources */,
 				88B37D372C2407DF000A7D91 /* AnalyticsService.swift in Sources */,

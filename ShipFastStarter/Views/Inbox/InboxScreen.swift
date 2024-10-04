@@ -103,11 +103,11 @@ struct InboxItem: Identifiable {
     let grade: String
     let backgroundColor: Color
     let accompanyingPoll: Poll
-    let pollOption: PollOption
+    let accompanyingVote: Vote
     var isNew: Bool
     let shields: Int
     
-    static var exInboxItem = InboxItem(id: UUID().uuidString, userId: "ongteam", firstName: "a friend", aura: 100, time: Date.longTimeAgo(), gender: "boy", grade: "ONG team", backgroundColor: Color.primaryBackground, accompanyingPoll: Poll.exPoll, pollOption: PollOption.exPollOption, isNew: true, shields: 0)
+    static var exInboxItem = InboxItem(id: UUID().uuidString, userId: "ongteam", firstName: "a friend", aura: 100, time: Date.longTimeAgo(), gender: "boy", grade: "ONG team", backgroundColor: Color.primaryBackground, accompanyingPoll: Poll.exPoll, accompanyingVote: Vote.exVote, isNew: true, shields: 0)
 }
 
 struct InboxItemView: View {
@@ -162,7 +162,7 @@ struct InboxItemView: View {
                 UIImpactFeedbackGenerator(style: .light).impactOccurred()
                 Analytics.shared.log(event: "InboxScreen: Tapped Row")
                 inboxVM.selectedPoll = item.accompanyingPoll
-                inboxVM.selectedPollOption = item.pollOption
+                inboxVM.selectedVote = item.accompanyingVote
                 inboxVM.selectedInbox = item
                 inboxVM.tappedNotificationRow()
                 if item.isNew {

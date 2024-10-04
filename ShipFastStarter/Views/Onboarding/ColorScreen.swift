@@ -39,44 +39,8 @@ struct ColorScreen: View {
                                         
                                         if let currUser = mainVM.currUser {
                                             Task {
-                                                try await FirebaseService.shared.updateDocument(collection: "users", object: currUser)
-                                                await pollVM.fetchPolls(for: currUser)
-                                                
-                                                if !pollVM.allPolls.isEmpty {
-                                                    // Filter polls created in the last 2 days
-                                                    let sevenDaysAgo = Calendar.current.date(byAdding: .day, value: -7, to: Date())!
-                                                    let recentPolls = pollVM.allPolls.filter { $0.createdAt >= sevenDaysAgo }
-                                                    
-                                                    // Create a new poll option for the current user
-                                                    let newOption = PollOption(
-                                                        id: UUID().uuidString,
-                                                        type: "Poll",
-                                                        option: "\(currUser.firstName) \(currUser.lastName)",
-                                                        userId: currUser.id,
-                                                        votes: [:],
-                                                        gradeLevel: currUser.grade
-                                                    )
-                                                    
-                                                    // Add the new option to all recent polls and prepare for batch update
-                                                    var updatedPolls: [Poll] = []
-                                                    for var poll in recentPolls {
-                                                        if !poll.pollOptions.contains(where: { $0.userId == currUser.id }) {
-                                                            poll.pollOptions.append(newOption)
-                                                            updatedPolls.append(poll)
-                                                        }
-                                                    }
-                                                    
-                                                    // Batch update the polls in Firebase
-                                                    if !updatedPolls.isEmpty {
-                                                        do {
-                                                            try await FirebaseService.shared.batchUpdate(collection: "polls", objects: updatedPolls)
-                                                            print("Successfully updated \(updatedPolls.count) polls with the new user")
-                                                        } catch {
-                                                            print("Error updating polls with new user: \(error.localizedDescription)")
-                                                        }
-                                                    }
-                                                }
-                                                
+                                                try await FirebaseService.shared.updateDocument(collection: FirestoreCollections.users, object: currUser)
+                                                await pollVM.fetchPolls(for: currUser) 
                                                 Analytics.shared.identifyUser(user: currUser)
                                             }
                                         }

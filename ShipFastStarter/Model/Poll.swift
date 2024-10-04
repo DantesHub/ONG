@@ -12,67 +12,55 @@ struct Poll: Codable, Equatable, FBObject {
     var id: String
     let title: String
     let createdAt: Date
-    var pollOptions: [PollOption]
-    var isActive: Bool
+    var status: String
     var schoolId: String
     var grade: String
     var type: String
     let category: String
-    var usersWhoVoted: [String]
-
-//    struct PollOption: Codable, Equatable, Identifiable {
-//        let id: String
-//        let option: String
-//        var votes: [String: String]
-//        let gradeLevel: String
-//    }
+    var voteSummary: [String: Int] = [:]
 
     static var exPoll = Poll(
         id: "example_poll_id",
         title: "you'll see this when someone chooses you in a poll!",
         createdAt: Date(),
-        pollOptions: [],
-        isActive: true,
+        status: "active",
         schoolId: "example_school_id",
         grade: "All",
         type: "Interest Based Question",
         category: "General",
-        usersWhoVoted: []
+        voteSummary: [:]
     )
 
     static func == (lhs: Poll, rhs: Poll) -> Bool {
         return lhs.id == rhs.id
     }
 
-    enum CodingKeys: String, CodingKey {
-        case id, title, createdAt, pollOptions, isActive, schoolId, grade, type, category, usersWhoVoted
+    enum CodingKeys: String, CodingKey { 
+        case id, title, createdAt, status, schoolId, grade, type, category, voteSummary 
     }
 
-    init(id: String, title: String, createdAt: Date, pollOptions: [PollOption], isActive: Bool, schoolId: String, grade: String, type: String, category: String, usersWhoVoted: [String] = []) {
+    init(id: String, title: String, createdAt: Date, status: String, schoolId: String, grade: String, type: String, category: String, voteSummary: [String: Int]) {
         self.id = id
         self.title = title
         self.createdAt = createdAt
-        self.pollOptions = pollOptions
-        self.isActive = isActive
+        self.status = status
         self.schoolId = schoolId
         self.grade = grade
         self.type = type
         self.category = category
-        self.usersWhoVoted = usersWhoVoted
+        self.voteSummary = voteSummary
     }
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(String.self, forKey: .id)
         title = try container.decode(String.self, forKey: .title)
-        pollOptions = try container.decode([PollOption].self, forKey: .pollOptions)
-        isActive = try container.decode(Bool.self, forKey: .isActive)
         schoolId = try container.decode(String.self, forKey: .schoolId)
         grade = try container.decode(String.self, forKey: .grade)
         type = try container.decode(String.self, forKey: .type)
         category = try container.decode(String.self, forKey: .category)
-        usersWhoVoted = try container.decode([String].self, forKey: .usersWhoVoted)
-
+        status = try container.decode(String.self, forKey: .status)
+        voteSummary = try container.decode([String: Int].self, forKey: .voteSummary)
         // Custom decoding for createdAt
         if let createdAtTimestamp = try? container.decode(Double.self, forKey: .createdAt) {
             createdAt = Date(timeIntervalSince1970: createdAtTimestamp)

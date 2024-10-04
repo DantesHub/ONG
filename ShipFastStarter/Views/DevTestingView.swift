@@ -39,7 +39,7 @@ struct DevTestingView: View {
                     if let user = mainVM.currUser {
                         Task {
                             do {
-                                try await FirebaseService.shared.deleteDocument(collection: "users", documentId: user.id)
+                                try await FirebaseService.shared.deleteDocument(collection: FirestoreCollections.users, documentId: user.id)
 
                             } catch {
                                 print(error.localizedDescription)
@@ -101,7 +101,7 @@ struct DevTestingView: View {
     private func deleteObject(withId id: String) {
         Task {
             do {
-                try await FirebaseService.shared.deleteDocument(collection: "users", documentId: id)
+                try await FirebaseService.shared.deleteDocument(collection: FirestoreCollections.users, documentId: id)
                 print("Successfully deleted object with ID: \(id)")
                 objectIdToDelete = "" // Clear the text field
             } catch {

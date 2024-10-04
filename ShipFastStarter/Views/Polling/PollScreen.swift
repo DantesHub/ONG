@@ -315,7 +315,7 @@ struct PollScreen: View {
 
             Task {
                 pollVM.selectedPoll = pollVM.pollSet[pollVM.currentPollIndex]
-                pollVM.allOptions = pollVM.selectedPoll.pollOptions
+                await pollVM.getPollOptions(excludingUserId: user) // this will recalculate priority scores for the new selected pll
                 pollVM.updateQuestionEmoji()
                 pollVM.currentTwelveOptions = Array(pollVM.allOptions.prefix(12)).shuffled()
                 // Take up to 4 options from the available options

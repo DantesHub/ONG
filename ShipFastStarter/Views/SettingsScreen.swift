@@ -96,7 +96,7 @@ struct SettingsScreen: View {
             if let currUser = mainVM.currUser {
                 do {
                     // Delete user from users collection
-                    try await FirebaseService.shared.deleteDocument(collection: "users", documentId: currUser.id)
+                    try await FirebaseService.shared.deleteDocument(collection: FirestoreCollections.users, documentId: currUser.id)
                     
                     // Remove user from all poll options
                     try await FirebaseService.shared.removeUserFromPollOptions(user: currUser)

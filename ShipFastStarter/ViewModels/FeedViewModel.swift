@@ -21,6 +21,7 @@ class FeedViewModel: ObservableObject {
     @Published var currUser: User = User.exUser
     @Published var feedPosts: [FeedPost] = []
     @Published var allPolls: [Poll] = []
+    @Published var allVotes: [Vote] = []
     @Published var allFriends: [User] = []
     @Published var allUsers: [User] = []
     @Published var userPosts: [FeedPost] = []
@@ -30,8 +31,9 @@ class FeedViewModel: ObservableObject {
     private let pageSize = 20
     var hasMoreData = true
 
-    func setInitialData(polls: [Poll], friends: [User], users: [User]) {
+    func setInitialData(polls: [Poll], votes: [Vote], friends: [User], users: [User]) {
         self.allPolls = polls
+        self.allVotes = votes
         self.allFriends = friends
         self.allUsers = users
         self.feedPosts = [] // Clear existing posts
@@ -40,16 +42,24 @@ class FeedViewModel: ObservableObject {
         fetchNextPage() // Fetch the first page
     }
 
+
+    func fetchVotes() async {
+        do {
+            let votes: [Vote] = try await FirebaseService.shared.fetchDocuments(
+                collection: FirestoreCollections.votes,
+                whereField: "schoolId",
+                isEqualTo: currUser.schoolId
+            )
+            self.allVotes = votes
+        } catch {
+            print("Error fetching votes for user: \(error.localizedDescription)")
+        }
+    }
+
+
     func fetchNextPage() {
         let startIndex = currentPage * pageSize
         let endIndex = min(startIndex + pageSize, allPolls.count)
-        
-//        if startIndex >= endIndex {
-//            hasMoreData = false
-//            return
-//        }
-        
-        let pollsToProcess = Array(allPolls[startIndex..<endIndex])
         let newPosts = processPollsForFeed(polls: allPolls)
         
         // Remove duplicates before appending
@@ -61,51 +71,30 @@ class FeedViewModel: ObservableObject {
         feedPosts.append(contentsOf: uniqueNewPosts)
         
         currentPage += 1
-//        hasMoreData = endIndex < allPolls.count
     }
 
     
     func processPollsForUserFeed() {
         var newPosts: [FeedPost] = []
         let dateFormatter = ISO8601DateFormatter()
-        
-        for poll in allPolls {
-            for option in poll.pollOptions {
-                // Check if the option corresponds to the visiting user and has votes
-                if option.userId == visitingUser.id, let votes = option.votes, !votes.isEmpty {
-                    // Sort votes by date (most recent first)
-                    let sortedVotes = votes.sorted {
-                        guard let date1 = dateFormatter.date(from: $0.value["date"] ?? ""),
-                              let date2 = dateFormatter.date(from: $1.value["date"] ?? "") else {
-                            return false
-                        }
-                        return date1 > date2
-                    }
-                    
-                    for (voterId, voteInfo) in sortedVotes {
-                        guard let votingUser = allUsers.first(where: { $0.id == voterId }),
-                              let dateString = voteInfo["date"],
-                              let aura = voteInfo["numVotes"],
-                              let date = dateFormatter.date(from: dateString) else {
-                            continue
-                        }
-                        
-                        let feedPost = FeedPost(
-                            id: "\(poll.id)_\(option.id)_\(voterId)",
-                            user: visitingUser,
-                            votedByUser: votingUser,
-                            aura: Int(aura) ?? 0,
-                            question: poll.title,
-                            pollId: poll.id,
-                            timestamp: date
-                        )
-                        if !newPosts.contains(where: { post in
-                            post.id == feedPost.id
-                        }) {
-                            newPosts.append(feedPost)
-                        }
-                    }
-                }
+        let sortedVotes = self.allVotes.sorted {
+            return $0.createdAt > $1.createdAt
+        }
+        for vote in sortedVotes {
+            let votedByUser = (allUsers + [self.currUser]).first(where: { $0.id == vote.voterId })
+            let feedPost = FeedPost(
+                id: vote.id,
+                user: visitingUser,
+                votedByUser: (votedByUser)!,
+                aura: vote.amount,
+                question: vote.question,
+                pollId: vote.pollId,
+                timestamp: vote.createdAt
+            )
+            if !newPosts.contains(where: { post in
+                post.id == feedPost.id
+            }) {
+                newPosts.append(feedPost)
             }
         }
         
@@ -114,51 +103,26 @@ class FeedViewModel: ObservableObject {
     
     private func processPollsForFeed(polls: [Poll]) -> [FeedPost] {
         var newPosts: [FeedPost] = []
-        let dateFormatter = ISO8601DateFormatter()
-//        allUsers.append(currUser)
-        
-        for poll in polls {
-            for option in poll.pollOptions {
-                guard let votes = option.votes, !votes.isEmpty else { continue }
-                let sortedVotes = votes.sorted {
-                    guard let date1 = dateFormatter.date(from: $0.value["date"] ?? ""),
-                          let date2 = dateFormatter.date(from: $1.value["date"] ?? "") else {
-                        return false
-                    }
-                    return date1 > date2
-                }
-                
-                for (voterId, voteInfo) in sortedVotes {
-                    guard let votedUser = allUsers.first(where: { $0.id == option.userId }),
-                          let votingUser = allUsers.first(where: { $0.id == voterId }),
-                          let dateString = voteInfo["date"],
-                          let aura = voteInfo["numVotes"],
-                          let date = dateFormatter.date(from: dateString) else {
-                        continue
-                    }
-                    
-                    var newAura = 0
-                    if Int(aura) ?? 0 < 103 {
-                        newAura = 100
-                    } else {
-                        newAura = Int(aura) ?? 0
-                    }
-                    
-                    let feedPost = FeedPost(
-                        id: "\(poll.id)_\(option.id)_\(voterId)", // Create a unique ID
-                        user: votedUser,
-                        votedByUser: votingUser,
-                        aura: newAura,
-                        question: poll.title,
-                        pollId: poll.id,
-                        timestamp: date
-                    )
-                    if !newPosts.contains(where: { post in
-                        post.id == feedPost.id
-                    }) {
-                        newPosts.append(feedPost)
-                    }
-                }
+        let sortedVotes = self.allVotes.sorted {
+            return $0.createdAt > $1.createdAt
+        }
+
+        for vote in sortedVotes {
+            let votedByUser = (allUsers + [self.currUser]).first(where: { $0.id == vote.voterId })
+            let votedForUser = (allUsers + [self.currUser]).first(where: { $0.id == vote.votedForId })
+            let feedPost = FeedPost(
+                id: vote.id,
+                user: votedForUser!,
+                votedByUser: (votedByUser)!,
+                aura: vote.amount,
+                question: vote.question,
+                pollId: vote.pollId,
+                timestamp: vote.createdAt
+            )
+            if !newPosts.contains(where: { post in
+                post.id == feedPost.id
+            }) {
+                newPosts.append(feedPost)
             }
         }
         

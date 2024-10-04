@@ -65,6 +65,7 @@ struct OnboardingScreen: View {
 
                 SharedComponents.PrimaryButton(title: "continue") {
                     mainVM.currUser = User.exUser
+                    mainVM.currUser?.id = UUID().uuidString
                     mainVM.onboardingScreen = .birthday                                    
                 }
                 .padding(.vertical, 48)

@@ -21,6 +21,7 @@ struct FriendRequest: Identifiable {
 class InboxViewModel: ObservableObject {
     @Published var tappedNotification: Bool = false
     @Published var selectedPoll: Poll?
+    @Published var selectedVote: Vote?
     @Published var selectedPollOption: PollOption?
     @Published var selectedInbox: InboxItem?
     @Published var oldUsersWhoVoted: [InboxItem] = []
@@ -35,33 +36,26 @@ class InboxViewModel: ObservableObject {
     func tappedNotificationRow() {
         if selectedInbox?.userId == "ongteam" {
             currentFourOptions = []
-            let userOption = PollOption(id: UUID().uuidString, type: "", option: "\(currUser?.firstName ?? "") \(currUser?.lastName ?? "")", userId: "ongteam1", votes: [:], gradeLevel: "12")
+            let userOption = PollOption(id: UUID().uuidString, type: "", option: "\(currUser?.firstName ?? "") \(currUser?.lastName ?? "")", userId: "ongteam1", gradeLevel: "12")
             currentFourOptions.append(userOption)
             currentFourOptions.append(PollOption.exPollOption)
             currentFourOptions.append(PollOption.exPollOption)
             currentFourOptions.append(PollOption.exPollOption)
         } else {
-            if let option = selectedPollOption, let poll = selectedPoll {
-                currentFourOptions = [option]
-                
-                // Get the other options that aren't the selected one
-                let otherOptions = poll.pollOptions.filter { $0.id != option.id }
-                
-                // Shuffle the other options and take the first three
-                let additionalOptions = Array(otherOptions.shuffled().prefix(3))
-                
-                // Add these options to currentFourOptions
-                currentFourOptions.append(contentsOf: additionalOptions)
-                
-                // If we don't have 4 options yet (in case there weren't 3 other options),
-                // pad with the selected option
-                while currentFourOptions.count < 4 {
-                    currentFourOptions.append(option)
-                }
+            currentFourOptions = []
+            for option in selectedVote!.pollOptions {
+                currentFourOptions.append(
+                    PollOption(
+                        id: UUID().uuidString,
+                        type: "",
+                        option: option,
+                        userId: "ongteam1",
+                        gradeLevel: "12"
+                    )
+                )
             }
+            // currentFourOptions = selectedVote.pollOptions
         }
-     
-
     }
     
     func fetchFriendRequests(for user: User) {
@@ -91,75 +85,52 @@ class InboxViewModel: ObservableObject {
     }
     
     @MainActor
-    func fetchNotifications(for user: User) {
+    func fetchNotifications(for user: User) async {
         do {
-//            let polls: [Poll] = try await FirebaseService.shared.fetchDocuments(
-//                collection: "polls",
-//                whereField: "schoolId",
-//                isEqualTo: user.schoolId
-//            )
-//            
-            var newNotifs: [(PollOption, Date)] = []
-            var pastNotifs: [(PollOption, Date)] = []
+//          
             var newVotes: [InboxItem] = []
             var oldVotes: [InboxItem] = []
             allUsers.append(User.exUser)
-            
-            
-            for poll in allPolls {
-                for option in poll.pollOptions {
-                    if option.userId == user.id && !(option.votes?.isEmpty ?? true) {
-                        if let votes = option.votes {
-                            for (voterId, voteInfo) in votes {
-                                
-                                if let usr = allUsers.first(where: { usrInSchool in
-                                    usrInSchool.id == voterId
-                                }) {
-                                    if let dateStr = voteInfo["date"],
-                                       let numVotes = voteInfo["numVotes"],
-                                       let date = ISO8601DateFormatter().date(from: dateStr) {
-                                        var notificationStatus = false
-                                        let viewdIds = UserDefaults.standard.array(forKey: Constants.viewedNotificationIds) as? [String] ?? []
-                                        if viewdIds.contains(where: { id in
-                                            id == poll.id
-                                        }) {
-                                            notificationStatus = true
-                                        } else {
-                                            notificationStatus = voteInfo["viewedNotification"] == "false"
-                                        }
-                                        let newInboxItem = InboxItem(
-                                            id: UUID().uuidString,
-                                            userId: voterId,
-                                            firstName: usr.firstName,
-                                            aura: Int(numVotes) ?? 1,
-                                            time: date,
-                                            gender: usr.gender,
-                                            grade: usr.grade,
-                                            backgroundColor: Color(usr.color),
-                                            accompanyingPoll: poll,
-                                            pollOption: option,
-                                            isNew: notificationStatus,
-                                            shields: usr.shields
-                                        )
-                                        if voteInfo["viewedNotification"] == "false" {
-                                            newVotes.append(newInboxItem)
-//                                            if !newNotifs.contains(where: { $0.0.id == option.id }) {
-//                                                newNotifs.append((option, date))
-//                                            }
-                                        } else {
-                                            oldVotes.append(newInboxItem)
-//                                            if !pastNotifs.contains(where: { $0.0.id == option.id }) {
-//                                                pastNotifs.append((option, date))
-//                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
+
+            // get new votes where notificationViewed is false, sorted by date
+            let votes: [Vote] = try await FirebaseService.shared.fetchDocuments(
+                collection: FirestoreCollections.votes,
+                whereField: "votedForId",
+                isEqualTo: user.id
+            )
+
+            let newNotifs = votes.filter { $0.viewedNotification == false }
+            let pastNotifs = votes.filter { $0.viewedNotification == true }
+            for vote in votes {
+                guard let user = allUsers.first(where: { $0.id == vote.voterId }),
+                      let poll = allPolls.first(where: { $0.id == vote.pollId }) else {
+                    print("Warning: Couldn't find user or poll for vote \(vote.id)")
+                    continue
                 }
+
+                let inboxItem = InboxItem(
+                    id: vote.id,
+                    userId: user.id,
+                    firstName: user.firstName,
+                    aura: vote.amount,
+                    time: vote.createdAt,
+                    gender: user.gender,
+                    grade: user.grade,
+                    backgroundColor: Color(user.color),
+                    accompanyingPoll: poll,
+                    accompanyingVote: vote,
+                    isNew: !vote.viewedNotification,
+                    shields: user.shields
+                )
+
+                if vote.viewedNotification {
+                    oldVotes.append(inboxItem)
+                } else {
+                    newVotes.append(inboxItem)
+                }
+                
             }
-            
+
             print(newVotes.count, oldVotes.count, "you can fly again", allPolls.count)
 
             newVotes.sort { $0.time > $1.time }
@@ -184,64 +155,72 @@ class InboxViewModel: ObservableObject {
     }
     
     func updateViewStatus() async {
-        guard var selectedPoll = selectedPoll,
-              let selectedPollOption = selectedPollOption,
+        guard var selectedVote = selectedVote,
               let selectedInbox = selectedInbox else {
             print("Error: Selected poll, option, or inbox item is nil")
             return
         }
 
-        // Update local data
-        if let index = selectedPoll.pollOptions.firstIndex(where: { $0.id == selectedPollOption.id }) {
-            if var votes = selectedPoll.pollOptions[index].votes {
-                if var userVote = votes[selectedInbox.userId] {
-                    userVote["viewedNotification"] = "true"
-                    // Do not modify the date at all
-                    votes[selectedInbox.userId] = userVote
-                    selectedPoll.pollOptions[index].votes = votes
-
-                    // Update Firebase
-                    do {
-                        try await FirebaseService.shared.updateDocument(
-                            collection: "polls",
-                            object: selectedPoll
-                        )
-
-                        // Update local lists
-                        if let newIndex = newUsersWhoVoted.firstIndex(where: { $0.id == selectedInbox.id }) {
-                            let movedItem = newUsersWhoVoted.remove(at: newIndex)
-                            oldUsersWhoVoted.append(movedItem)
-                            oldUsersWhoVoted.sort { $0.time > $1.time }
-                        }
-
-//                        if let newNotificationIndex = newNotifications.firstIndex(where: { $0.id == selectedPollOption.id }) {
-//                            let movedNotification = newNotifications.remove(at: newNotificationIndex)
-//                            pastNotifications.append(movedNotification)
-//                        }
-
-                        // Update the published selectedPoll
-                        self.selectedPoll = selectedPoll
-
-                        print("View status updated successfully")
-                    } catch {
-                        print("Error updating view status in Firebase: \(error.localizedDescription)")
-                    }
-                } else {
-                    print("Error: User vote not found")
-                }
-            } else {
-                print("Error: Votes dictionary is nil")
-            }
-        } else {
-            print("Error: Selected poll option not found in poll")
+        
+        let voteRef = Firestore.firestore().collection(FirestoreCollections.votes).document(selectedInbox.accompanyingVote.id)
+        do {
+            try await voteRef.updateData(["viewedNotification": true])
+        } catch {
+            print("Error updating vote: \(error.localizedDescription)")
+            // Handle the error appropriately
         }
+
+        // Update local data
+//         if let index = selectedPoll.pollOptions.firstIndex(where: { $0.id == selectedPollOption.id }) {
+//             if var votes = selectedPoll.pollOptions[index].votes {
+//                 if var userVote = votes[selectedInbox.userId] {
+//                     userVote["viewedNotification"] = "true"
+//                     // Do not modify the date at all
+//                     votes[selectedInbox.userId] = userVote
+//                     selectedPoll.pollOptions[index].votes = votes
+
+//                     // Update Firebase
+//                     do {
+//                         try await FirebaseService.shared.updateDocument(
+//                             collection: FirestoreCollections.polls,
+//                             object: selectedPoll
+//                         )
+
+//                         // Update local lists
+//                         if let newIndex = newUsersWhoVoted.firstIndex(where: { $0.id == selectedInbox.id }) {
+//                             let movedItem = newUsersWhoVoted.remove(at: newIndex)
+//                             oldUsersWhoVoted.append(movedItem)
+//                             oldUsersWhoVoted.sort { $0.time > $1.time }
+//                         }
+
+// //                        if let newNotificationIndex = newNotifications.firstIndex(where: { $0.id == selectedPollOption.id }) {
+// //                            let movedNotification = newNotifications.remove(at: newNotificationIndex)
+// //                            pastNotifications.append(movedNotification)
+// //                        }
+
+//                         // Update the published selectedPoll
+//                         self.selectedPoll = selectedPoll
+
+//                         print("View status updated successfully")
+//                     } catch {
+//                         print("Error updating view status in Firebase: \(error.localizedDescription)")
+//                     }
+//                 } else {
+//                     print("Error: User vote not found")
+//                 }
+//             } else {
+//                 print("Error: Votes dictionary is nil")
+//             }
+//         } else {
+//             print("Error: Selected poll option not found in poll")
+//         }
     }
     
     @MainActor
     func fetchUser(id: String) async -> User? {
         do {
-//            let users: [User] = try await FirebaseService.getFilteredDocuments(collection: "users", filterField: "id", filterValue: id)
-            let user: User = try await FirebaseService.shared.getDocument(collection: "users", documentId: id)
+//            let users: [User] = try await FirebaseService.getFilteredDocuments(collection: FirestoreCollections.users, filterField: "id", filterValue: id)
+            let user: User = try await FirebaseService.shared.getDocument(collection: FirestoreCollections.users, documentId: id)
             return user
         } catch {
             print("Error fetching user \(id): \(error.localizedDescription)")
@@ -262,9 +241,9 @@ class InboxViewModel: ObservableObject {
         }
         var fieldsToUpdate = ["friendRequests": currUser.friendRequests, "friends": currUser.friends]
         do {
-//            try await FirebaseService.shared.updateDocument(collection: "users", object: currUser)
-            try await FirebaseService.shared.updateFields(collection: "users", documentId: currUser.id, fields: fieldsToUpdate)
-            try await FirebaseService.shared.updateField(collection: "users", documentId: updatedRequestedUser.id, field: "friends", value: updatedRequestedUser.friends)
+//            try await FirebaseService.shared.updateDocument(collection: FirestoreCollections.users, object: currUser)
+            try await FirebaseService.shared.updateFields(collection: FirestoreCollections.users, documentId: currUser.id, fields: fieldsToUpdate)
+            try await FirebaseService.shared.updateField(collection: FirestoreCollections.users, documentId: updatedRequestedUser.id, field: "friends", value: updatedRequestedUser.friends)
         } catch {
             print(error.localizedDescription)
         }
@@ -279,10 +258,13 @@ class InboxViewModel: ObservableObject {
         }
         // update in firebase
         do {
-            try await FirebaseService.shared.updateField(collection: "users", documentId: currUser.id, field: "friendRequests", value: currUser.friendRequests)
-            try await FirebaseService.shared.updateField(collection: "users", documentId: updatedRequestedUser.id, field: "friends", value: updatedRequestedUser.friends)
+            try await FirebaseService.shared.updateField(collection: FirestoreCollections.users, documentId: currUser.id, field: "friendRequests", value: currUser.friendRequests)
+            try await FirebaseService.shared.updateField(collection: FirestoreCollections.users, documentId: updatedRequestedUser.id, field: "friends", value: updatedRequestedUser.friends)
         } catch {
             print(error.localizedDescription)
         }
     }
 }
+
+
+
