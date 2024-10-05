@@ -17,22 +17,14 @@ struct PollOption: Codable, Equatable, FBObject, Comparable {
     let type: String?
     let option: String
     let userId: String
-    var votes: [String: [String: String]]?
-    // 3BAD5166-DFAF-4582-B691-BD4D398287E9 {
-    // date:  "2024-09-21T04:58:55Z"
-    // numVotes: "100"
-    // viewedNotification:  "false"  
-    // } structure of votes dictionary
     let gradeLevel: String
-    var computedProgress: Double = 0 // Make this mutable
     var priorityScore = 0
 
-    init(id: String, type: String, option: String, userId: String, votes: [String: [String: String]], gradeLevel: String) {
+    init(id: String, type: String, option: String, userId: String, gradeLevel: String) {
         self.id = id
         self.type = type
         self.option = option
         self.userId = userId
-        self.votes = votes
         self.gradeLevel = gradeLevel
     }
 
@@ -41,7 +33,7 @@ struct PollOption: Codable, Equatable, FBObject, Comparable {
     }
 
     enum CodingKeys: String, CodingKey {
-        case id, type, option, votes, gradeLevel, userId
+        case id, type, option, gradeLevel, userId
     }
 
     func encodeToDictionary() -> [String: Any]? {
@@ -60,7 +52,6 @@ struct PollOption: Codable, Equatable, FBObject, Comparable {
         type: "Interest Based Question",
         option: "a classmate",
         userId: "user_id",
-        votes: [:],
         gradeLevel: "9" // Example grade level
     )
 }

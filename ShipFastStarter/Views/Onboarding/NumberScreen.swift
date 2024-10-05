@@ -107,6 +107,8 @@ struct NumberScreen: View {
                 }
                 
                 Spacer()
+
+                // TODO (kat) : dont actually merge this, keep for testing.
                  
                 SharedComponents.PrimaryButton(
                     title: authVM.isVerificationCodeSent ? "Verify" : "Next",
@@ -115,14 +117,24 @@ struct NumberScreen: View {
 //                            verificationCode = "333333"
 //                            verifyCode()
 //                            mainVM.currUser?.fcmToken = UserDefaults.standard.string(forKey: "fcmToken") ?? ""
-//                            let formattedNumber = "+1\(phoneNumber)"
-//                            if var user = mainVM.currUser {
-//                                mainVM.currUser?.number = formattedNumber
-//                                user.number = formattedNumber
-//                            }
-                            //                            UserDefaults.standard.setValue(formattedNumber, forKey: "userNumber")
-
-//                            UserDefaults.standard.setValue(true, forKey: "finishedOnboarding")
+                            let formattedNumber = "+1\(phoneNumber)"
+                            if var user = mainVM.currUser {
+                                mainVM.currUser?.number = formattedNumber
+                                user.number = formattedNumber
+                                FirebaseService.shared.addDocument(user, collection: FirestoreCollections.users) { str in
+                                    UserDefaults.standard.setValue(user.id, forKey: Constants.userId)
+                                    authVM.signInSuccessful = true
+                                    authVM.isVerified = true
+                                    withAnimation {
+                                        mainVM.onboardingScreen = .highschool
+                                    }
+                                    
+//                                    print("Successfully verified and signed in: \(authResult.user.uid)")
+                                }
+                            }
+                                                        UserDefaults.standard.setValue(formattedNumber, forKey: "userNumber")
+                            
+                            UserDefaults.standard.setValue(true, forKey: "finishedOnboarding")
 //                            if authVM.tappedLogin {
 //                                Task {
 //                                    isLoading = true
@@ -138,7 +150,7 @@ struct NumberScreen: View {
 //                                        authVM.tappedLogin = false
 //                                        let fcmToken = UserDefaults.standard.string(forKey: "fcmToken") ?? ""
 //                                        do {
-//                                            try await FirebaseService.shared.updateField(collection: "users", documentId: user.id, field: "fcmToken", value: fcmToken)
+//                                            try await FirebaseService.shared.updateField(collection: FirestoreCollections.users, documentId: user.id, field: "fcmToken", value: fcmToken)
 //                                        } catch {
 //                                            print(error.localizedDescription)
 //                                        }
@@ -146,7 +158,7 @@ struct NumberScreen: View {
 //                                    }
 //                                }
 //                            }
-                            sendVerificationCode()
+//                            sendVerificationCode()
                         } else {
                             verifyCode()
                         
@@ -235,7 +247,7 @@ struct NumberScreen: View {
                             loginUser()
                         } else {
                             authVM.updateReferralCount()
-                            FirebaseService.shared.addDocument(user, collection: "users") { str in
+                            FirebaseService.shared.addDocument(user, collection: FirestoreCollections.users) { str in
                                 UserDefaults.standard.setValue(user.id, forKey: Constants.userId)
                                 authVM.signInSuccessful = true
                                 authVM.isVerified = true
@@ -277,7 +289,7 @@ struct NumberScreen: View {
                 _ = await (notifications, peopleList, profilePic)
                 let fcmToken = UserDefaults.standard.string(forKey: "fcmToken") ?? ""
                 do {
-                    try await FirebaseService.shared.updateField(collection: "users", documentId: user.id, field: "fcmToken", value: fcmToken)
+                    try await FirebaseService.shared.updateField(collection: FirestoreCollections.users, documentId: user.id, field: "fcmToken", value: fcmToken)
                 } catch {
                     print(error.localizedDescription)
                 }

@@ -22,7 +22,7 @@ class MainViewModel: ObservableObject {
     func fetchUser() async {
         if let number = UserDefaults.standard.string(forKey: "userNumber") {
             do {
-                let users: [User] = try await FirebaseService.getFilteredDocuments(collection: "users", filterField: "number", filterValue: number)
+                let users: [User] = try await FirebaseService.getFilteredDocuments(collection: FirestoreCollections.users, filterField: "number", filterValue: number)
                 if let user = users.first {
                     await MainActor.run {
                         self.currUser = user
@@ -43,7 +43,7 @@ class MainViewModel: ObservableObject {
     
     func fetchUserById(_ userId: String) async {
         do {
-            let user: User = try await FirebaseService.shared.getDocument(collection: "users", documentId: userId)
+            let user: User = try await FirebaseService.shared.getDocument(collection: FirestoreCollections.users, documentId: userId)
             DispatchQueue.main.async {
                 self.currUser = user
             }
@@ -58,9 +58,6 @@ class MainViewModel: ObservableObject {
         }
     }
     
-    func addVotedPoll(_ pollId: String) {
-        self.currUser?.votedPolls.append(pollId)
-    }
     
     func updateCurrentUser(_ updatedUser: User) {
         DispatchQueue.main.async {

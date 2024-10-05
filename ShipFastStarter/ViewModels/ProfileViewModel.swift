@@ -39,7 +39,7 @@ class ProfileViewModel: ObservableObject, ImageUploadable {
             newFriend.friendRequests[newUser.id] = Date().toString(format: "yyyy-MM-dd HH:mm:ss")
             
             do {
-                try await FirebaseService.shared.updateField(collection: "users", documentId: newFriend.id, field: "friendRequests", value: newFriend.friendRequests)
+                try await FirebaseService.shared.updateField(collection: FirestoreCollections.users, documentId: newFriend.id, field: "friendRequests", value: newFriend.friendRequests)
             } catch {
                 print(error.localizedDescription)
             }
@@ -49,7 +49,7 @@ class ProfileViewModel: ObservableObject, ImageUploadable {
         newFriends.append(newUser)
         
         do {
-            try await FirebaseService.shared.updateField(collection: "users", documentId: currUser.id, field: "friends", value: newUser.friends)
+            try await FirebaseService.shared.updateField(collection: FirestoreCollections.users, documentId: currUser.id, field: "friends", value: newUser.friends)
         } catch {
             print(error.localizedDescription)
         }
@@ -101,8 +101,8 @@ class ProfileViewModel: ObservableObject, ImageUploadable {
         }
         
         do {
-            try await FirebaseService.shared.updateDocument(collection: "users", object: newUser)
-            try await FirebaseService.shared.updateDocument(collection: "users", object: selectedFriend)
+            try await FirebaseService.shared.updateDocument(collection: FirestoreCollections.users, object: newUser)
+            try await FirebaseService.shared.updateDocument(collection: FirestoreCollections.users, object: selectedFriend)
         } catch {
             print(error.localizedDescription)
         }
@@ -125,9 +125,11 @@ class ProfileViewModel: ObservableObject, ImageUploadable {
     }
 
     func fetchPeopleList(user: User) async {
-        self.peopleList = []
+        DispatchQueue.main.async {
+            self.peopleList = []
+        }
         do {
-            let fetchedPeopleList: [User] = try await FirebaseService.shared.fetchDocuments(collection: "users", whereField: "schoolId", isEqualTo: user.schoolId)
+            let fetchedPeopleList: [User] = try await FirebaseService.shared.fetchDocuments(collection: FirestoreCollections.users, whereField: "schoolId", isEqualTo: user.schoolId)
             var updatedPeopleList = fetchedPeopleList
             var updatedFriends = self.friends
             
@@ -162,8 +164,10 @@ class ProfileViewModel: ObservableObject, ImageUploadable {
             }
             
             // Update @Published properties on the main thread
-            self.peopleList = updatedPeopleList
-            self.friends = updatedFriends
+            DispatchQueue.main.async {
+                self.peopleList = updatedPeopleList
+                self.friends = updatedFriends
+            }
             self.fetchTop8()
             
             
@@ -208,7 +212,7 @@ class ProfileViewModel: ObservableObject, ImageUploadable {
                         do {
                             var newUser = user
                             newUser.proPic = url
-                            try await FirebaseService.shared.updateField(collection: "users", documentId: newUser.id, field: "proPic", value: url)
+                            try await FirebaseService.shared.updateField(collection: FirestoreCollections.users, documentId: newUser.id, field: "proPic", value: url)
                             DispatchQueue.main.async {
                                 self.currentUser = newUser
                             }
@@ -226,7 +230,7 @@ class ProfileViewModel: ObservableObject, ImageUploadable {
 
     func updateUserProfile(_ user: User) async throws {
         do {
-            try await FirebaseService.shared.updateDocument(collection: "users", object: user)
+            try await FirebaseService.shared.updateDocument(collection: FirestoreCollections.users, object: user)
             DispatchQueue.main.async {
                 self.currentUser = user
             }

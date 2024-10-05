@@ -82,7 +82,6 @@ final class Analytics: ObservableObject {
             "birthday": dateFormatter.date(from: user.birthday) ?? Date(),
             "grade": user.grade,
             "number": user.number,
-            "votedPolls": user.votedPolls,
             "lastPollFinished": user.lastPollFinished ?? Date(),
             "friends": user.friends,
             "invitedFriends": user.invitedFriends,

@@ -38,7 +38,7 @@ class HighSchoolViewModel: ObservableObject {
     func checkHighSchoolLock(for user: User, id: String) async {
         do {
             totalKids = 0
-            selectedHighschool = try await FirebaseService.shared.getDocument(collection: "highschools", documentId: id)
+            selectedHighschool = try await FirebaseService.shared.getDocument(collection: FirestoreCollections.schools, documentId: id)
             totalKids = selectedHighschool.students.count
             // Adjust this threshold as needed
             self.isHighSchoolLocked = totalKids <= 11
@@ -48,7 +48,7 @@ class HighSchoolViewModel: ObservableObject {
             }
         } catch {
             let bug = Bug(title: "Highschool Crash Locked", description: error.localizedDescription, date: Date(), userId: user.id, highschoolId: "buildspace")
-            FirebaseService.shared.addDocument(bug, collection: "bugs") { str in
+            FirebaseService.shared.addDocument(bug, collection: FirestoreCollections.bugs) { str in
                 
             }
             
@@ -62,7 +62,7 @@ class HighSchoolViewModel: ObservableObject {
             var students = selectedHighschool.students
             students.append(user.id)
             selectedHighschool.students = students
-            try await FirebaseService.shared.updateField(collection: "highschools", documentId: highschoolId, field: "students", value: students)
+            try await FirebaseService.shared.updateField(collection: FirestoreCollections.schools, documentId: highschoolId, field: "students", value: students)
             totalKids = students.count
         }
     }

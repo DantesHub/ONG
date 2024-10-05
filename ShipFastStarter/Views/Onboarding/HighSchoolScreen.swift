@@ -46,7 +46,7 @@ struct HighSchoolScreen: View {
                         if let currUser = mainVM.currUser {
                                 Task {
                                     do {
-                                        try await FirebaseService.shared.updateField(collection: "users", documentId: currUser.id, field: "schoolId", value: "buildspace")
+                                        try await FirebaseService.shared.updateField(collection: FirestoreCollections.users, documentId: currUser.id, field: "schoolId", value: "buildspace")
                                         await viewModel.checkHighSchoolLock(for: currUser, id: "buildspace")
                                         viewModel.updateNumStudents(user: currUser, for: "buildspace")
                                         

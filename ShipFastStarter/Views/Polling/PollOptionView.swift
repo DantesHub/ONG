@@ -50,7 +50,6 @@ struct PollOptionView: View {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             withAnimation(.spring()) {
                 self.opacity = 1
-                mainVM.currUser?.votedPolls.append(pollVM.selectedPoll.id)
                 if let user = mainVM.currUser {
                     Task {
                         if let optionUser = profileVM.peopleList.first(where: { usr in
@@ -146,10 +145,7 @@ struct PollOptionView: View {
             .onChange(of: pollVM.animateProgress) {
                 updateProgressWidth(geometry: geometry)
             }
-            .onChange(of: pollVM.totalVotes) {
-                updateProgressWidth(geometry: geometry)
-            }
-            .onChange(of: pollVM.selectedPoll) {
+            .onChange(of: pollVM.selectedPoll.voteSummary) { _ in
                 updateProgressWidth(geometry: geometry)
             }
         }
@@ -335,18 +331,10 @@ struct PollOptionView: View {
     }
 
     private var progress: Double {
-        guard pollVM.totalVotes > 0 else { return 0 }
-        let optionVotes = calculateOptionVotes()
-        let progress = Double(optionVotes) / Double(pollVM.totalVotes)
-        return progress
-    }
-
-    private func calculateOptionVotes() -> Int {
-        return pollVM.selectedPoll.pollOptions
-            .first(where: { $0.id == option.id })?
-            .votes?
-            .values
-            .reduce(0) { $0 + (Int($1["numVotes"] ?? "0") ?? 0) } ?? 0
+        let totalVotes = pollVM.selectedPoll.voteSummary.values.reduce(0, +)
+        guard totalVotes > 0 else { return 0 }
+        let optionVotes = pollVM.selectedPoll.voteSummary[option.userId] ?? 0
+        return Double(optionVotes) / Double(totalVotes)
     }
 }
 
